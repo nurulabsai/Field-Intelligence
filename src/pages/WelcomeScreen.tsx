@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import NeonButton from '../components/ui/NeonButton';
+import NuruOSLogo from '../components/ui/NuruOSLogo';
 
 export default function WelcomeScreen() {
   const navigate = useNavigate();
@@ -19,19 +20,9 @@ export default function WelcomeScreen() {
           <div className="absolute -z-10 inset-0 translate-y-2 rounded-[32px] bg-neon-lime/5 blur-2xl" />
 
           <div className="flex h-28 w-28 items-center justify-center rounded-[32px] border border-white/5 bg-bg-card">
-            <svg
-              width="56"
-              height="56"
-              viewBox="0 0 100 100"
-              fill="none"
-              style={{ filter: 'drop-shadow(0 0 8px rgba(190,242,100,0.3))' }}
-              aria-label="NuruOS logo"
-            >
-              <rect x="22" y="22" width="18" height="56" rx="9" fill="white" />
-              <rect x="60" y="22" width="18" height="56" rx="9" fill="white" />
-              <path d="M38 32L62 68" stroke="white" strokeWidth="16" strokeLinecap="round" />
-              <path d="M42 45L58 55" stroke="#111622" strokeWidth="6" strokeLinecap="round" />
-            </svg>
+            <div style={{ filter: 'drop-shadow(0 0 8px rgba(190,242,100,0.3))' }}>
+              <NuruOSLogo size={56} color="white" bgColor="#111622" showRing={false} />
+            </div>
           </div>
         </div>
 

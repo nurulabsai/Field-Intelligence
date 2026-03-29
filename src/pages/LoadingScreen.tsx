@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import NuruOSLogo from '../components/ui/NuruOSLogo';
 
 interface LoadingScreenProps {
   onComplete?: () => void;
@@ -54,12 +55,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
           className="relative flex h-[124px] w-[124px] items-center justify-center rounded-full border border-neon-lime/30"
           style={{ boxShadow: '0 8px 24px -4px rgba(190,242,100,0.35)' }}
         >
-          <svg width="68" height="68" viewBox="0 0 100 100" fill="none" aria-label="NuruOS logo">
-            <rect x="22" y="22" width="18" height="56" rx="9" fill="white" />
-            <rect x="60" y="22" width="18" height="56" rx="9" fill="white" />
-            <path d="M38 32L62 68" stroke="white" strokeWidth="16" strokeLinecap="round" />
-            <path d="M42 45L58 55" stroke="#0B0F19" strokeWidth="6" strokeLinecap="round" />
-          </svg>
+          <NuruOSLogo size={68} color="white" ringColor="rgba(190,242,100,0.4)" bgColor="#0B0F19" />
         </div>
       </div>
 

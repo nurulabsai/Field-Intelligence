@@ -7,6 +7,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import NuruAvatar from './NuruAvatar';
+import NuruOSLogo from './ui/NuruOSLogo';
 
 interface NavItem {
   label: string;
@@ -41,8 +42,8 @@ const NuruSideNav: React.FC<NuruSideNavProps> = ({
       {/* Logo */}
       <div className="py-6 px-5 border-b border-[rgba(255,255,255,0.06)]">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-white font-extrabold text-sm">
-            N
+          <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+            <NuruOSLogo size={22} color="#BEF264" bgColor="#111622" showRing={false} />
           </div>
           <span className="text-white font-bold text-lg tracking-tight">
             NuruOS

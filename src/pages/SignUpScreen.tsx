@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/index';
 import FormInput from '../components/ui/FormInput';
 import NeonButton from '../components/ui/NeonButton';
+import NuruOSLogo from '../components/ui/NuruOSLogo';
 
 export default function SignUpScreen() {
   const navigate = useNavigate();
@@ -46,15 +47,20 @@ export default function SignUpScreen() {
     <div className="flex min-h-dvh flex-col bg-bg-deep">
       {/* Header section */}
       <div className="px-8 pt-14 pb-10">
-        <button
-          onClick={() => navigate(-1)}
-          className="mb-6 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/5 transition-all active:scale-95"
-          aria-label="Go back"
-        >
-          <span className="material-symbols-outlined text-white text-[20px]">
-            arrow_back
-          </span>
-        </button>
+        <div className="mb-6 flex items-center gap-3">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/5 transition-all active:scale-95"
+            aria-label="Go back"
+          >
+            <span className="material-symbols-outlined text-white text-[20px]">
+              arrow_back
+            </span>
+          </button>
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/5 bg-white/5">
+            <NuruOSLogo size={28} color="#BEF264" bgColor="#0B0F19" showRing={false} />
+          </div>
+        </div>
 
         <h1 className="font-sora text-4xl font-light text-white">
           Create an Account

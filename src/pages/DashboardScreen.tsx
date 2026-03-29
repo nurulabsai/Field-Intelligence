@@ -3,6 +3,7 @@ import { useAuthStore, useAuditStore, useUIStore } from '../store/index';
 import BottomNav from '../components/ui/BottomNav';
 import GlassCard from '../components/ui/GlassCard';
 import SyncStatusBar from '../components/ui/SyncStatusBar';
+import NuruOSLogo from '../components/ui/NuruOSLogo';
 
 export default function DashboardScreen() {
   const navigate = useNavigate();
@@ -21,12 +22,9 @@ export default function DashboardScreen() {
       {/* Header */}
       <div className="flex items-center justify-between px-6 pt-12 pb-6">
         <div className="flex items-center gap-3">
-          <button
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5"
-            aria-label="Sort"
-          >
-            <span className="material-symbols-outlined text-white text-[20px]">sort</span>
-          </button>
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5">
+            <NuruOSLogo size={24} color="#BEF264" bgColor="#0B0F19" showRing={false} />
+          </div>
           <span className="font-sora text-xl font-light text-white">NuruOS</span>
         </div>
         <button

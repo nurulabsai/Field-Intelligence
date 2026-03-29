@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/index';
 import FormInput from '../components/ui/FormInput';
 import NeonButton from '../components/ui/NeonButton';
 import GlassCard from '../components/ui/GlassCard';
+import NuruOSLogo from '../components/ui/NuruOSLogo';
 
 export default function SignInScreen() {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ export default function SignInScreen() {
       <div className="relative z-10 flex flex-1 flex-col overflow-y-auto px-6 pt-16 scrollbar-hide">
         {/* Icon + heading */}
         <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/5 bg-white/5">
-          <span className="material-symbols-outlined text-white text-[24px]">analytics</span>
+          <NuruOSLogo size={28} color="#BEF264" bgColor="#0B0F19" showRing={false} />
         </div>
         <h1 className="mt-4 font-sora text-[40px] font-light leading-tight text-white">
           Welcome Back
