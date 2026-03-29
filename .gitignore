@@ -31,5 +31,8 @@ dist-ssr
 # Backup files
 *.backup
 
+# Test credentials — never commit
+.test-credentials.txt
+
 # Claude Code
 .claude/
