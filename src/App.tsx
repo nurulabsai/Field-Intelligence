@@ -1,115 +1,121 @@
-import React, { useEffect, useState, lazy, Suspense } from 'react';
-import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState, lazy, Suspense } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/index';
-import { useUIStore } from './store/index';
-import LoadingScreen from './screens/LoadingScreen';
-import OfflineBanner from './components/OfflineBanner';
-import NuruSideNav from './components/NuruSideNav';
-import NuruBottomNav from './components/NuruBottomNav';
 import ToastProvider from './components/ToastProvider';
-import LoadingSkeleton from './components/LoadingSkeleton';
+
+// Eager-loaded (first paint)
+import StitchLoadingScreen from './pages/LoadingScreen';
 
 // Lazy-loaded screens
-const SignUpScreen = lazy(() => import('./screens/auth/SignUpScreen'));
-const LoginScreen = lazy(() => import('./screens/auth/LoginScreen'));
-const DashboardHome = lazy(() => import('./screens/dashboard/DashboardHome'));
-const AuditList = lazy(() => import('./screens/audit/AuditList'));
-const AuditWizard = lazy(() => import('./screens/audit/AuditWizard'));
-const CalendarScreen = lazy(() => import('./screens/schedule/CalendarScreen'));
+const WelcomeScreen = lazy(() => import('./pages/WelcomeScreen'));
+const SignInScreen = lazy(() => import('./pages/SignInScreen'));
+const SignUpScreen = lazy(() => import('./pages/SignUpScreen'));
+const DashboardScreen = lazy(() => import('./pages/DashboardScreen'));
+const ScheduleScreen = lazy(() => import('./pages/ScheduleScreen'));
+const AuditTypeSelectorScreen = lazy(() => import('./pages/AuditTypeSelectorScreen'));
+const AuditFormScreen = lazy(() => import('./pages/AuditFormScreen'));
+const SyncDashboardScreen = lazy(() => import('./pages/SyncDashboardScreen'));
+const CameraScreen = lazy(() => import('./pages/CameraScreen'));
 
-// ─── Auth Guard ──────────────────────────────────────────────────────────────
-const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const user = useAuthStore((s) => s.user);
-  const isLoading = useAuthStore((s) => s.isLoading);
+// Keep old screens accessible for backward compatibility
+const LegacyAuditWizard = lazy(() => import('./screens/audit/AuditWizard'));
+const LegacyAuditList = lazy(() => import('./screens/audit/AuditList'));
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
-        <LoadingSkeleton variant="card" count={1} />
-      </div>
-    );
-  }
+// ---------------------------------------------------------------------------
+// Auth Guards
+// ---------------------------------------------------------------------------
 
-  if (!user) {
-    return <Navigate to="/auth/login" replace />;
-  }
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const user = useAuthStore(s => s.user);
+  const isLoading = useAuthStore(s => s.isLoading);
+
+  if (isLoading) return <PageLoader />;
+  if (!user) return <Navigate to="/signin" replace />;
 
   return <>{children}</>;
-};
+}
 
-// ─── Public Guard (redirect to dashboard if logged in) ──────────────────────
-const PublicOnly: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const user = useAuthStore((s) => s.user);
-  const isLoading = useAuthStore((s) => s.isLoading);
+function PublicOnly({ children }: { children: React.ReactNode }) {
+  const user = useAuthStore(s => s.user);
+  const isLoading = useAuthStore(s => s.isLoading);
 
   if (isLoading) return null;
   if (user) return <Navigate to="/dashboard" replace />;
 
   return <>{children}</>;
-};
+}
 
-// ─── App Shell (sidebar + bottom nav + content) ────────────────────────────
-const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const user = useAuthStore((s) => s.user);
-  const signOut = useAuthStore((s) => s.signOut);
-  const isOnline = useUIStore((s) => s.isOnline);
-  const pendingSyncCount = useUIStore((s) => s.pendingSyncCount);
-  const navigate = useNavigate();
-  const location = useLocation();
+// ---------------------------------------------------------------------------
+// Page Loader (suspense fallback)
+// ---------------------------------------------------------------------------
 
-  const handleNavigate = (path: string) => {
-    navigate(path);
-  };
-
+function PageLoader() {
   return (
-    <div className="flex min-h-screen bg-bg-primary">
-      {/* Desktop Sidebar */}
-      <NuruSideNav
-        currentPath={location.pathname}
-        onNavigate={handleNavigate}
-        user={{ name: user?.fullName ?? 'User', role: user?.role ?? 'Agent' }}
-        onLogout={async () => {
-          await signOut();
-          navigate('/auth/login');
-        }}
-      />
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen pb-[72px]">
-        {!isOnline && <OfflineBanner pendingCount={pendingSyncCount} />}
-        <main className="flex-1 overflow-auto">
-          {children}
-        </main>
+    <div className="flex min-h-dvh items-center justify-center bg-bg-deep">
+      <div className="flex flex-col items-center gap-4">
+        <span className="material-symbols-outlined animate-spin text-neon-lime text-[32px]">
+          progress_activity
+        </span>
+        <p className="font-manrope text-xs text-white/40">Loading...</p>
       </div>
-
-      {/* Mobile Bottom Nav */}
-      <NuruBottomNav
-        currentPath={location.pathname}
-        onNavigate={handleNavigate}
-      />
     </div>
   );
-};
+}
 
-// ─── Suspense Wrapper ───────────────────────────────────────────────────────
-const PageLoader: React.FC = () => (
-  <div className="min-h-screen bg-bg-primary p-6 flex flex-col gap-4">
-    <LoadingSkeleton variant="text" count={2} />
-    <LoadingSkeleton variant="card" count={3} />
-  </div>
-);
+// ---------------------------------------------------------------------------
+// Settings (minimal)
+// ---------------------------------------------------------------------------
 
-// ─── Main App ───────────────────────────────────────────────────────────────
-const App: React.FC = () => {
+function SettingsScreen() {
+  const user = useAuthStore(s => s.user);
+  const signOut = useAuthStore(s => s.signOut);
+
+  return (
+    <div className="min-h-dvh bg-bg-deep p-6 max-w-[600px] mx-auto">
+      <h1 className="font-sora text-2xl font-light text-white mb-6">Settings</h1>
+
+      <div className="glass-card rounded-[24px] p-6 mb-4">
+        <div className="mb-4">
+          <p className="font-manrope text-[10px] font-bold uppercase tracking-[0.15em] text-white/40 mb-1">Name</p>
+          <p className="font-manrope text-base text-white">{user?.fullName ?? 'N/A'}</p>
+        </div>
+        <div className="mb-4">
+          <p className="font-manrope text-[10px] font-bold uppercase tracking-[0.15em] text-white/40 mb-1">Email</p>
+          <p className="font-manrope text-base text-white">{user?.email ?? 'N/A'}</p>
+        </div>
+        <div>
+          <p className="font-manrope text-[10px] font-bold uppercase tracking-[0.15em] text-white/40 mb-1">Role</p>
+          <p className="font-manrope text-base text-white capitalize">{user?.role ?? 'N/A'}</p>
+        </div>
+      </div>
+
+      <button
+        onClick={async () => {
+          await signOut();
+          window.location.href = '/signin';
+        }}
+        className="w-full rounded-full border border-neon-red/20 bg-neon-red/10 py-4 font-manrope text-sm font-bold uppercase tracking-[0.15em] text-neon-red transition-all active:scale-95"
+      >
+        Sign Out
+      </button>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// App
+// ---------------------------------------------------------------------------
+
+export default function App() {
   const [showSplash, setShowSplash] = useState(true);
-  const restoreSession = useAuthStore((s) => s.restoreSession);
+  const restoreSession = useAuthStore(s => s.restoreSession);
 
   useEffect(() => {
     restoreSession();
   }, [restoreSession]);
 
   if (showSplash) {
-    return <LoadingScreen onComplete={() => setShowSplash(false)} />;
+    return <StitchLoadingScreen onComplete={() => setShowSplash(false)} />;
   }
 
   return (
@@ -117,88 +123,29 @@ const App: React.FC = () => {
       <ToastProvider />
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          {/* Splash redirect */}
+          {/* Public routes */}
           <Route path="/" element={<SplashRedirect />} />
+          <Route path="/welcome" element={<PublicOnly><WelcomeScreen /></PublicOnly>} />
+          <Route path="/signin" element={<PublicOnly><SignInScreen /></PublicOnly>} />
+          <Route path="/signup" element={<PublicOnly><SignUpScreen /></PublicOnly>} />
 
-          {/* Public auth routes */}
-          <Route
-            path="/auth/signup"
-            element={
-              <PublicOnly>
-                <SignUpWrapper />
-              </PublicOnly>
-            }
-          />
-          <Route
-            path="/auth/login"
-            element={
-              <PublicOnly>
-                <LoginWrapper />
-              </PublicOnly>
-            }
-          />
+          {/* Legacy auth routes (redirect) */}
+          <Route path="/auth/login" element={<Navigate to="/signin" replace />} />
+          <Route path="/auth/signup" element={<Navigate to="/signup" replace />} />
 
           {/* Protected routes */}
-          <Route
-            path="/dashboard"
-            element={
-              <RequireAuth>
-                <AppShell>
-                  <DashboardWrapper />
-                </AppShell>
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/audits"
-            element={
-              <RequireAuth>
-                <AppShell>
-                  <AuditListWrapper />
-                </AppShell>
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/audit/new"
-            element={
-              <RequireAuth>
-                <AppShell>
-                  <AuditWizard />
-                </AppShell>
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/audit/:id"
-            element={
-              <RequireAuth>
-                <AppShell>
-                  <AuditWizard />
-                </AppShell>
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/schedule"
-            element={
-              <RequireAuth>
-                <AppShell>
-                  <CalendarScreen />
-                </AppShell>
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <RequireAuth>
-                <AppShell>
-                  <SettingsPlaceholder />
-                </AppShell>
-              </RequireAuth>
-            }
-          />
+          <Route path="/dashboard" element={<ProtectedRoute><DashboardScreen /></ProtectedRoute>} />
+          <Route path="/schedule" element={<ProtectedRoute><ScheduleScreen /></ProtectedRoute>} />
+          <Route path="/audit/select" element={<ProtectedRoute><AuditTypeSelectorScreen /></ProtectedRoute>} />
+          <Route path="/audit/new/:type" element={<ProtectedRoute><AuditFormScreen /></ProtectedRoute>} />
+          <Route path="/sync" element={<ProtectedRoute><SyncDashboardScreen /></ProtectedRoute>} />
+          <Route path="/camera" element={<ProtectedRoute><CameraScreen /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><SettingsScreen /></ProtectedRoute>} />
+
+          {/* Legacy routes */}
+          <Route path="/audits" element={<ProtectedRoute><LegacyAuditList audits={[]} /></ProtectedRoute>} />
+          <Route path="/audit/new" element={<ProtectedRoute><LegacyAuditWizard /></ProtectedRoute>} />
+          <Route path="/audit/:id" element={<ProtectedRoute><LegacyAuditWizard /></ProtectedRoute>} />
 
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/" replace />} />
@@ -206,120 +153,17 @@ const App: React.FC = () => {
       </Suspense>
     </>
   );
-};
+}
 
-// ─── Auth Screen Wrappers ───────────────────────────────────────────────────
-const LoginWrapper: React.FC = () => {
-  const navigate = useNavigate();
-  const signIn = useAuthStore((s) => s.signIn);
+// ---------------------------------------------------------------------------
+// Splash redirect
+// ---------------------------------------------------------------------------
 
-  return (
-    <LoginScreen
-      onLogin={async (data) => {
-        await signIn(data.email, data.password);
-        navigate('/dashboard');
-      }}
-      onNavigateToSignUp={() => navigate('/auth/signup')}
-      onForgotPassword={() => alert('Contact admin to reset password')}
-    />
-  );
-};
+function SplashRedirect() {
+  const user = useAuthStore(s => s.user);
+  const isLoading = useAuthStore(s => s.isLoading);
 
-const SignUpWrapper: React.FC = () => {
-  const navigate = useNavigate();
-  const signUp = useAuthStore((s) => s.signUp);
+  if (isLoading) return <PageLoader />;
 
-  return (
-    <SignUpScreen
-      onSignUp={async (data) => {
-        await signUp(data.email, data.password, data.full_name);
-        navigate('/dashboard');
-      }}
-      onNavigateToLogin={() => navigate('/auth/login')}
-    />
-  );
-};
-
-// ─── Dashboard Wrapper ──────────────────────────────────────────────────────
-const DashboardWrapper: React.FC = () => {
-  const user = useAuthStore((s) => s.user);
-  const navigate = useNavigate();
-
-  return (
-    <DashboardHome
-      userName={user?.fullName}
-      onAuditClick={(id) => navigate(`/audit/${id}`)}
-      onViewAllAudits={() => navigate('/audits')}
-    />
-  );
-};
-
-// ─── Audit Wrappers ─────────────────────────────────────────────────────────
-const AuditListWrapper: React.FC = () => {
-  const navigate = useNavigate();
-  return (
-    <AuditList
-      audits={[]}
-      onAuditClick={(id) => navigate(`/audit/${id}`)}
-      onNewAudit={() => navigate('/audit/new')}
-    />
-  );
-};
-
-// ─── Splash Redirect ────────────────────────────────────────────────────────
-const SplashRedirect: React.FC = () => {
-  const user = useAuthStore((s) => s.user);
-  const isLoading = useAuthStore((s) => s.isLoading);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
-        <LoadingSkeleton variant="card" count={1} />
-      </div>
-    );
-  }
-
-  return user ? <Navigate to="/dashboard" replace /> : <Navigate to="/auth/login" replace />;
-};
-
-// ─── Settings Screen (basic) ────────────────────────────────────────────────
-const SettingsPlaceholder: React.FC = () => {
-  const user = useAuthStore((s) => s.user);
-  const signOut = useAuthStore((s) => s.signOut);
-  const navigate = useNavigate();
-
-  return (
-    <div className="p-6 max-w-[600px] mx-auto">
-      <h1 className="text-2xl font-bold text-text-primary font-heading mb-6">
-        Settings
-      </h1>
-
-      <div className="bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)] p-6 mb-4">
-        <div className="mb-4">
-          <div className="text-xs text-text-tertiary mb-1">Name</div>
-          <div className="text-base text-text-primary">{user?.fullName || 'N/A'}</div>
-        </div>
-        <div className="mb-4">
-          <div className="text-xs text-text-tertiary mb-1">Email</div>
-          <div className="text-base text-text-primary">{user?.email || 'N/A'}</div>
-        </div>
-        <div>
-          <div className="text-xs text-text-tertiary mb-1">Role</div>
-          <div className="text-base text-text-primary capitalize">{user?.role || 'N/A'}</div>
-        </div>
-      </div>
-
-      <button
-        onClick={async () => {
-          await signOut();
-          navigate('/auth/login');
-        }}
-        className="w-full py-3.5 px-6 bg-[rgba(239,68,68,0.1)] text-[#EF4444] border border-[rgba(239,68,68,0.2)] rounded-xl text-base font-semibold cursor-pointer font-base"
-      >
-        Sign Out
-      </button>
-    </div>
-  );
-};
-
-export default App;
+  return user ? <Navigate to="/dashboard" replace /> : <Navigate to="/welcome" replace />;
+}

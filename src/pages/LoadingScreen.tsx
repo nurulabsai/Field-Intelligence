@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-export default function LoadingScreen() {
-  const navigate = useNavigate();
+interface LoadingScreenProps {
+  onComplete?: () => void;
+}
+
+export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const [progress, setProgress] = useState(0);
-  const frameRef = useRef<number>(0);
+  const callbackRef = useRef(onComplete);
+  callbackRef.current = onComplete;
 
   useEffect(() => {
     const duration = 2500;
@@ -21,15 +24,15 @@ export default function LoadingScreen() {
       setProgress(current);
     }, interval);
 
-    frameRef.current = window.setTimeout(() => {
-      navigate('/welcome');
+    const redirect = setTimeout(() => {
+      callbackRef.current?.();
     }, 2800);
 
     return () => {
       clearInterval(timer);
-      clearTimeout(frameRef.current);
+      clearTimeout(redirect);
     };
-  }, [navigate]);
+  }, []);
 
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-bg-deep">
