@@ -270,6 +270,12 @@ h6 {
   font-family: var(--font-family-heading);
 }
 
+/* Focus-visible — keyboard users see a ring, mouse users don't */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
