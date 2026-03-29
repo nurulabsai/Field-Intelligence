@@ -23,7 +23,9 @@ const PRECACHE_URLS = [
 // API origin(s) to treat with Network-First strategy
 const API_ORIGINS = [
   'localhost:3001',
-  'api.nuruos.com',         // replace with your prod API domain
+  'api.nuruos.com',
+  'supabase.co',            // Supabase REST/Auth API
+  'supabase.com',           // Supabase alternate domain
 ];
 
 // ── Install: pre-cache app shell ──────────────────────────────────────────

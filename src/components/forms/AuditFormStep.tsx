@@ -110,7 +110,11 @@ export default function AuditFormStep({
       </div>
 
       {/* Navigation footer */}
-      <div className="fixed bottom-28 left-0 right-0 z-50 flex justify-between px-4 pb-6">
+      <div className="fixed bottom-28 left-0 right-0 z-50 flex justify-between px-4 pb-6 pt-4"
+        style={{
+          background: 'linear-gradient(to top, #0B0F19 60%, transparent)',
+        }}
+      >
         <button
           onClick={onBack}
           className="flex items-center gap-2 rounded-full border border-white/5 bg-white/5 px-6 py-3 font-manrope text-xs font-bold uppercase tracking-[0.15em] text-white transition-all active:scale-95"

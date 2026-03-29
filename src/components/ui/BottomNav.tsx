@@ -27,7 +27,7 @@ export default function BottomNav({ active }: BottomNavProps) {
       aria-label="Main navigation"
     >
       <div
-        className="flex items-center justify-around rounded-full bg-black p-2"
+        className="glass-pill flex items-center justify-around rounded-full p-2"
         style={{ boxShadow: '0 20px 60px -12px rgba(0,0,0,0.60)' }}
       >
         {NAV_ITEMS.map(item => {
