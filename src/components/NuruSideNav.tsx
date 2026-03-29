@@ -58,7 +58,7 @@ const NuruSideNav: React.FC<NuruSideNavProps> = ({
             <button
               key={item.path}
               onClick={() => onNavigate(item.path)}
-              className="flex items-center gap-3 w-full py-2.5 px-3.5 rounded-[10px] border-none cursor-pointer font-[Inter,sans-serif] text-sm transition-all duration-150 mb-1 text-left"
+              className="flex items-center gap-3 w-full min-h-[44px] py-2.5 px-3.5 rounded-[10px] border-none cursor-pointer font-[Inter,sans-serif] text-sm transition-all duration-150 mb-1 text-left"
               style={{
                 fontWeight: isActive ? 600 : 400,
                 color: isActive ? '#F0513E' : '#9CA3AF',
