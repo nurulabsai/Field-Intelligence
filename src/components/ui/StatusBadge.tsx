@@ -1,6 +1,6 @@
 import { cn } from '../../design-system';
 
-type BadgeStatus =
+export type BadgeStatus =
   | 'completed'
   | 'syncing'
   | 'failed'
