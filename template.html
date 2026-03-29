@@ -1,0 +1,64 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>Vital Harmonized Loading Screen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&amp;family=Sora:wght@300&amp;display=swap" rel="stylesheet">
+<style type="text/tailwindcss">
+        :root {
+            --bg-deep: #0B0F19;
+            --brand-primary-lime: #BEF264;
+            --neon-glow: rgba(190, 242, 100, 0.35);
+            --track-slate: #1E293B;
+            --slate-400: #94A3B8;
+        }
+        body {
+            background-color: var(--bg-deep);
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .neon-glow-diffused {
+            box-shadow: 0 0 40px 4px var(--neon-glow);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased text-white selection:bg-[#BEF264]/30">
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(190,242,100,0.06),transparent_65%)] pointer-events-none"></div>
+<div class="relative z-10 flex flex-col items-center justify-center w-full max-w-[320px] px-8">
+<div class="relative mb-24"> 
+<div class="absolute inset-0 bg-[var(--brand-primary-lime)] opacity-5 blur-3xl rounded-full scale-[2.5]"></div>
+<div class="w-[124px] h-[124px] rounded-full border border-[var(--brand-primary-lime)]/30 neon-glow-diffused flex items-center justify-center relative bg-[var(--bg-deep)]">
+<svg class="object-contain" fill="none" height="68" viewBox="0 0 100 100" width="68" xmlns="http://www.w3.org/2000/svg">
+<rect fill="white" height="56" rx="9" width="18" x="22" y="22"></rect>
+<rect fill="white" height="56" rx="9" width="18" x="60" y="22"></rect>
+<path d="M38 32 L62 68" stroke="white" stroke-linecap="round" stroke-width="16"></path>
+<path d="M42 45 L58 55" stroke="var(--bg-deep)" stroke-linecap="round" stroke-width="6"></path>
+</svg>
+</div>
+</div>
+<div class="w-full flex flex-col items-center space-y-6">
+<div class="font-['Sora'] font-light text-[18px] text-white tracking-tight leading-none" style="">
+                Initializing Intelligence...
+            </div>
+<div class="w-full h-[6px] bg-[var(--track-slate)] rounded-full overflow-hidden relative">
+<div class="h-full bg-[var(--brand-primary-lime)] rounded-full w-[62%] absolute top-0 left-0"></div>
+</div>
+</div>
+</div>
+<div class="absolute bottom-12 flex flex-col items-center w-full px-6">
+<p class="font-['Manrope'] text-[12px] font-medium tracking-[0.2em] text-[var(--slate-400)] uppercase text-center opacity-80" style="">
+            NuruOS Field Intelligence</p>
+</div>
+
+</body></html>

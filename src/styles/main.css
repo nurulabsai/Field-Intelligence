@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* =========================================================================
+   Design System Tokens
+   ========================================================================= */
+
+:root {
+  /* === COLORS === */
+
+  /* Primary - Dark Charcoal */
+  --color-primary: #171717;
+  --color-primary-dark: #0D0D0D;
+  --color-primary-darker: #000000;
+  --color-primary-light: #1E1E1E;
+  --color-primary-lighter: #252525;
+
+  /* Secondary - Coral Red */
+  --color-secondary: #F0513E;
+  --color-secondary-dark: #D4402E;
+  --color-secondary-light: #F4705F;
+  --color-secondary-lighter: #2A1A17;
+
+  /* Accent */
+  --color-accent: #F0513E;
+  --color-accent-dark: #D4402E;
+  --color-accent-light: #F4705F;
+
+  /* Semantic */
+  --color-success: #22C55E;
+  --color-success-light: #86EFAC;
+  --color-success-lighter: #0D2818;
+
+  --color-warning: #F59E0B;
+  --color-warning-light: #FCD34D;
+  --color-warning-lighter: #2A2008;
+
+  --color-error: #EF4444;
+  --color-error-light: #FCA5A5;
+  --color-error-lighter: #2A1010;
+
+  --color-info: #3B82F6;
+  --color-info-light: #93C5FD;
+  --color-info-lighter: #0D1A2A;
+
+  /* Neutrals */
+  --color-white: #FFFFFF;
+  --color-gray-50: #1A1A1A;
+  --color-gray-100: #1E1E1E;
+  --color-gray-200: rgba(255, 255, 255, 0.08);
+  --color-gray-300: rgba(255, 255, 255, 0.12);
+  --color-gray-400: #6B7280;
+  --color-gray-500: #9CA3AF;
+  --color-gray-600: #D1D5DB;
+  --color-gray-700: #E5E7EB;
+  --color-gray-800: #F3F4F6;
+  --color-gray-900: #FFFFFF;
+
+  /* Backgrounds */
+  --color-bg-primary: #0D0D0D;
+  --color-bg-secondary: #171717;
+  --color-bg-tertiary: #1E1E1E;
+  --color-bg-dark: #000000;
+  --color-bg-overlay: rgba(0, 0, 0, 0.7);
+  --color-bg-card: #1E1E1E;
+  --color-bg-input: #252525;
+  --color-bg-glass: rgba(30, 30, 30, 0.8);
+
+  /* Text */
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #9CA3AF;
+  --color-text-tertiary: #6B7280;
+  --color-text-inverse: #0D0D0D;
+  --color-text-on-primary: #FFFFFF;
+  --color-text-on-secondary: #FFFFFF;
+  --color-text-accent: #F0513E;
+
+  /* Border */
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(255, 255, 255, 0.04);
+  --color-border-dark: rgba(255, 255, 255, 0.12);
+  --color-border-focus: #F0513E;
+  --color-border-glass: rgba(255, 255, 255, 0.06);
+
+  /* === TYPOGRAPHY === */
+  --font-family-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --font-family-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* === SPACING === */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+
+  /* === BORDERS === */
+  --border-width-thin: 1px;
+  --border-width-medium: 2px;
+  --border-width-thick: 4px;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* === SHADOWS === */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  --shadow-glow-coral: 0 0 20px rgba(240, 81, 62, 0.3);
+  --shadow-glow-coral-lg: 0 0 40px rgba(240, 81, 62, 0.4);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* === GLASSMORPHISM === */
+  --glass-bg: rgba(30, 30, 30, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-blur: blur(16px);
+  --glass-blur-lg: blur(24px);
+
+  /* === TRANSITIONS === */
+  --transition-fast: 100ms ease-in-out;
+  --transition-base: 150ms ease-in-out;
+  --transition-slow: 250ms ease-in-out;
+  --transition-spring: 150ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* === Z-INDEX === */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+
+  /* === TOUCH TARGETS === */
+  --touch-target-sm: 48px;
+  --touch-target-md: 56px;
+  --touch-target-lg: 64px;
+}
+
+/* =========================================================================
+   Global Resets
+   ========================================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-family-heading);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}

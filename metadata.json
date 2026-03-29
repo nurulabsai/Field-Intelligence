@@ -1,0 +1,9 @@
+{
+  "name": "NuruOS: Field Intelligence",
+  "description": "A professional-grade field audit application leveraging Gemini AI for real-time site analysis, voice reporting, and offline-first synchronization.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}

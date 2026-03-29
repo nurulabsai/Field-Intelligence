@@ -1,0 +1,42 @@
+
+.ai-context-help {
+  margin-top: 8px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.context-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.context-toggle:hover {
+  background: #f1f5f9;
+}
+
+.toggle-icon {
+  font-size: 10px;
+  color: #64748b;
+}
+
+.context-content {
+  padding: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.context-section {
+  margin-bottom: 8px;
+}
+
+.context-section:last-child {
+  margin-bottom: 0;
+}

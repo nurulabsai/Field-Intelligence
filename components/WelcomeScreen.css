@@ -1,0 +1,27 @@
+.bg-grid-pattern {
+    background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+.text-glow-lime {
+    text-shadow: 0 0 12px rgba(190, 242, 100, 0.5);
+}
+.glass-dark-cyan {
+    background: rgba(11, 15, 25, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(103, 232, 249, 0.3);
+}
+.logo-glow-filter {
+    filter: drop-shadow(0 0 10px rgba(190, 242, 100, 0.3));
+}
+.shadow-glow-logo {
+    box-shadow: 0 0 40px rgba(190, 242, 100, 0.12);
+}
+.shadow-soft-lime {
+    box-shadow: 0 20px 40px -12px rgba(190, 242, 100, 0.25);
+}
+.shadow-glow-cyan-subtle {
+    box-shadow: 0 0 15px rgba(103, 232, 249, 0.1);
+}

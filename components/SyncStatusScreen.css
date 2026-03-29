@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@300;600;700&display=swap');
+
+:root {
+  --bg-deep: #0B0F19;
+  --neon-lime: #BEF264;
+  --glass-slate: rgba(15, 23, 42, 0.4);
+}
+
+.glass-material {
+  background: var(--glass-slate);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+. {
+  font-family: 'Sora', sans-serif;
+}
+
+.font-sans {
+  font-family: 'Manrope', sans-serif;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+@keyframes pulse-cyan {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 2px #67E8F9); }
+  50% { opacity: 0.7; filter: drop-shadow(0 0 5px #67E8F9); }
+}
+
+.animate-pulse-cyan {
+  animation: pulse-cyan 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.table-row-alt:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.02);
+}

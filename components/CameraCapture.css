@@ -1,0 +1,32 @@
+.glass-pill {
+    @apply backdrop-blur-3xl bg-[#0B0F19]/80 border border-white/5 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)];
+}
+
+.viewfinder-bracket {
+    @apply absolute w-10 h-10 border-white/30;
+}
+
+@keyframes pulse-cyan {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+.animate-pulse-cyan {
+    animation: pulse-cyan 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.shutter-outer {
+    @apply w-[76px] h-[76px] rounded-full border-[4px] border-white flex items-center justify-center transition-all bg-black/40 active:scale-90 active:bg-white/10;
+}
+
+.shutter-inner {
+    @apply w-[60px] h-[60px] rounded-full bg-[var(--neon-lime)] transition-colors;
+}
+
+.shutter-outer:active .shutter-inner {
+    @apply bg-white;
+}
+
+.neon-cyan-text-glow {
+    text-shadow: 0 0 10px rgba(103, 232, 249, 0.4);
+}

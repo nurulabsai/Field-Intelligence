@@ -1,0 +1,18 @@
+.vital-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+.btn-shadow-lime {
+    box-shadow: 0 8px 20px -4px rgba(190, 242, 100, 0.2);
+}
+
+.btn-shadow-cyan {
+    box-shadow: 0 8px 20px -4px rgba(103, 232, 249, 0.2);
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
