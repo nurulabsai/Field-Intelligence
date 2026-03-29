@@ -24,7 +24,7 @@ const NuruBadge: React.FC<NuruBadgeProps> = ({
     md: { fontSize: '14px', padding: '4px 12px' },
   };
 
-  const colors = variantColors[variant];
+  const colors = variantColors[variant] ?? variantColors['default']!
 
   const style: React.CSSProperties = {
     display: 'inline-flex',

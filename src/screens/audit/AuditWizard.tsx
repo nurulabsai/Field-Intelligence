@@ -64,7 +64,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
   const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [stepErrors, setStepErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Load persisted state
   useEffect(() => {
@@ -120,7 +120,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
     onComplete?.(formData);
   }, [formData, onComplete]);
 
-  const StepComponent = STEPS[currentStep].component;
+  const StepComponent = STEPS[currentStep]!.component;
 
   return (
     <div

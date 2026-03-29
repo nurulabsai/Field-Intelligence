@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useRef } from 'react';
-import { Camera, MapPin, Navigation, Mic, MicOff, Trash2, X } from 'lucide-react';
+import { Camera, MapPin, Navigation, Mic, MicOff, X } from 'lucide-react';
 
 interface Step6Props {
   data: Record<string, unknown>;
@@ -34,7 +34,7 @@ function formatTZS(amount: number): string {
   return `TZS ${amount.toLocaleString('en-TZ')}`;
 }
 
-const Step6_Yield: React.FC<Step6Props> = ({ data, onChange, errors }) => {
+const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
   const [gpsLoading, setGpsLoading] = useState(false);
   const [recording, setRecording] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -114,14 +114,6 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange, errors }) => {
   const yieldLat = data.yield_latitude as number | undefined;
   const yieldLng = data.yield_longitude as number | undefined;
   const lossValue = (data.yield_loss as string) || autoLoss;
-
-  const isValid = useMemo(() => {
-    return (
-      actualYield > 0 &&
-      pricePerKg > 0 &&
-      (data.market_channel as string)
-    );
-  }, [actualYield, pricePerKg, data.market_channel]);
 
   const inputStyle: React.CSSProperties = {
     width: '100%',

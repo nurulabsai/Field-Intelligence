@@ -32,8 +32,6 @@ const AuditStepIndicator: React.FC<AuditStepIndicatorProps> = ({
         const stepNum = index + 1;
         const isCompleted = completedSteps.includes(stepNum);
         const isCurrent = currentStep === stepNum;
-        const isUpcoming = !isCompleted && !isCurrent;
-
         let circleBg = '#252525';
         let circleColor = '#6B7280';
         if (isCurrent) {

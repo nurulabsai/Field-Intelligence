@@ -109,7 +109,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
     const map: Record<string, CalendarEvent[]> = {};
     events.forEach(ev => {
       if (!map[ev.date]) map[ev.date] = [];
-      map[ev.date].push(ev);
+      map[ev.date]!.push(ev);
     });
     return map;
   }, [events]);

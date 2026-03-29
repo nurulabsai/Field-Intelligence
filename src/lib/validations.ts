@@ -328,5 +328,5 @@ export function validateStep(stepIndex: number, data: unknown) {
   if (stepIndex < 0 || stepIndex >= TOTAL_STEPS) {
     throw new RangeError(`Invalid step index: ${stepIndex}. Must be 0-${TOTAL_STEPS - 1}.`);
   }
-  return stepSchemas[stepIndex].safeParse(data);
+  return stepSchemas[stepIndex]!.safeParse(data);
 }

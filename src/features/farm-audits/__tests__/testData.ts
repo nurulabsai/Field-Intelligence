@@ -1,4 +1,4 @@
-import type { BoundaryCorner, AuditRecord } from '../../../../types';
+import type { BoundaryCorner, AuditRecord } from '../../../types';
 
 /** Test farm in Rufiji District, Pwani Region - ~-7.47°N, 39.18°E */
 export const TEST_CORNERS: BoundaryCorner[] = [

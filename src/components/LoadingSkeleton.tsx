@@ -98,7 +98,7 @@ const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
   variant = 'card',
   count = 1,
 }) => {
-  const Component = variantMap[variant];
+  const Component = variantMap[variant] ?? SkeletonCard;
 
   return (
     <>

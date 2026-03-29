@@ -125,7 +125,7 @@ const ToastItem: React.FC<{ toast: Toast; onDismiss: () => void }> = ({
 };
 
 // --- Toast Provider ---
-const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const ToastProvider: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const { toasts, removeToast } = useToastStore();
 
   return (
