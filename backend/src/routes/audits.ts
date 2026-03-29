@@ -7,19 +7,76 @@ import { z } from 'zod';
 
 const router = express.Router();
 
+// ---------------------------------------------------------------------------
+// Typed sub-schemas for farm and business audit data (replaces z.any())
+// ---------------------------------------------------------------------------
+
+const boundaryCornerSchema = z.object({
+  lat: z.number().min(-90).max(90),
+  lon: z.number().min(-180).max(180),
+  accuracy: z.number().nonnegative().optional(),
+  timestamp: z.string().optional(),
+  sequence: z.number().int().nonnegative(),
+});
+
+const farmDataSchema = z.object({
+  farmerFirstName: z.string().max(120).optional(),
+  farmerLastName: z.string().max(120).optional(),
+  primaryPhone: z.string().max(20).optional(),
+  nationalId: z.string().max(30).optional(),
+  farmName: z.string().max(200).optional(),
+  boundaryCorners: z.array(boundaryCornerSchema).min(4).max(8).optional(),
+  farmSize: z.union([z.string(), z.number()]).optional(),
+  crops: z.array(z.object({
+    type: z.string().max(100).optional(),
+    variety: z.string().max(100).optional(),
+    area_ha: z.number().nonnegative().optional(),
+  })).max(20).optional(),
+  soilType: z.string().max(50).optional(),
+  soilTexture: z.string().max(50).optional(),
+  waterSourceMain: z.string().max(50).optional(),
+  irrigationType: z.string().max(50).optional(),
+  landTenure: z.string().max(50).optional(),
+  postHarvest: z.object({
+    hasStorage: z.boolean().optional(),
+    hasFencing: z.boolean().optional(),
+    hasShed: z.boolean().optional(),
+  }).optional(),
+  region: z.string().max(100).optional(),
+  district: z.string().max(100).optional(),
+  ward: z.string().max(100).optional(),
+  village: z.string().max(100).optional(),
+  auditorId: z.string().max(200).optional(),
+  auditDate: z.string().optional(),
+}).strict().optional();
+
+const businessDataSchema = z.object({
+  businessType: z.string().max(100).optional(),
+  ownerName: z.string().max(200).optional(),
+  ownerPhone: z.string().max(20).optional(),
+  registrationNumber: z.string().max(50).optional(),
+  productsServices: z.array(z.string().max(200)).max(30).optional(),
+  employeeCount: z.number().int().nonnegative().optional(),
+  annualRevenue: z.number().nonnegative().optional(),
+  operatingSince: z.string().optional(),
+  region: z.string().max(100).optional(),
+  district: z.string().max(100).optional(),
+  notes: z.string().max(2000).optional(),
+}).strict().optional();
+
 const auditSchema = z.object({
-  id: z.string(),
+  id: z.string().uuid(),
   type: z.enum(['farm', 'business']),
-  businessName: z.string(),
+  businessName: z.string().max(200),
   location: z.object({
-    latitude: z.number(),
-    longitude: z.number(),
-    accuracy: z.number().optional(),
+    latitude: z.number().min(-90).max(90),
+    longitude: z.number().min(-180).max(180),
+    accuracy: z.number().nonnegative().optional(),
     timestamp: z.number().optional(),
   }).optional(),
-  status: z.string(),
-  farmData: z.any().optional(),
-  businessData: z.any().optional(),
+  status: z.string().max(30),
+  farmData: farmDataSchema,
+  businessData: businessDataSchema,
 });
 
 // POST /api/audits/sync
