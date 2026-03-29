@@ -41,7 +41,7 @@ const AuditStepIndicator: React.FC<AuditStepIndicatorProps> = ({
             }}
           >
             {/* Step circle + label column */}
-            <div className="flex flex-col items-center min-w-[40px]">
+            <div className="flex flex-col items-center min-w-[44px] py-1">
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-semibold transition-all duration-[250ms]"
                 style={{
@@ -55,7 +55,7 @@ const AuditStepIndicator: React.FC<AuditStepIndicatorProps> = ({
                 {isCompleted ? <Check size={16} /> : stepNum}
               </div>
               <span
-                className="text-[11px] mt-1.5 whitespace-nowrap"
+                className="text-xs mt-1.5 whitespace-nowrap"
                 style={{
                   color: isCurrent
                     ? '#FFFFFF'
