@@ -1,7 +1,14 @@
 -- ============================================================
 -- NuruOS Field Intelligence — Row Level Security Policies
--- Ensures every table enforces access control via Supabase Auth.
--- Run once against the production database.
+--
+-- STATUS: NOT NEEDED — RLS is already fully configured on
+-- the production Supabase project (gyekncktmsvdtcbhakgl).
+-- Existing policies use custom helpers:
+--   current_user_internal_id(), current_user_role(),
+--   current_user_org_id(), stakeholder_tier enum.
+--
+-- This file is kept as documentation of the intended policy
+-- structure. Do NOT run it — it would create duplicate policies.
 -- ============================================================
 
 -- ── Enable RLS on all application tables ─────────────────────
