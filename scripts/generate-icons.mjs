@@ -1,6 +1,7 @@
 /**
- * Generate PWA icons for NuruOS Field Intelligence.
- * Uses the Stitch design system: bgDeep #0B0F19, neonLime #BEF264, Sora font.
+ * Generate PWA icons using the official NuruOS logo mark.
+ * Logo: Circular badge with stylized "N" (two rounded verticals + diagonal slash).
+ * Adapted to Stitch design system: bgDeep #0B0F19, neonLime #BEF264.
  *
  * Run: node scripts/generate-icons.mjs
  */
@@ -14,19 +15,41 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const outDir = resolve(__dirname, '..', 'public', 'icons');
 mkdirSync(outDir, { recursive: true });
 
-// NuruOS icon: dark navy rounded-rect background with a neon-lime "N" monogram
-// and a subtle leaf/field element
+/**
+ * NuruOS logo mark: circle containing a stylized "N" formed by
+ * two rounded vertical pill shapes with a diagonal slash between them.
+ * Rendered on dark background with neon-lime logo for PWA use.
+ */
 function createSvg(size) {
-  const padding = Math.round(size * 0.12);
-  const cornerRadius = Math.round(size * 0.18);
-  const fontSize = Math.round(size * 0.48);
-  const centerX = size / 2;
-  const centerY = size / 2;
+  const pad = Math.round(size * 0.06);
+  const s = size - pad * 2; // usable area
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = s / 2; // circle radius
 
-  // Leaf accent coordinates (small stylized leaf near bottom-right of the N)
-  const leafX = centerX + size * 0.18;
-  const leafY = centerY + size * 0.12;
-  const leafSize = size * 0.12;
+  // The N mark is centered inside the circle
+  // Scale all logo geometry relative to the circle radius
+  const logoScale = r * 0.55; // controls how big the N is inside the circle
+
+  // Left vertical pill of the N
+  const pillW = logoScale * 0.38;
+  const pillH = logoScale * 1.6;
+  const pillR = pillW / 2; // fully rounded ends
+
+  // Left pill position
+  const leftX = cx - logoScale * 0.42;
+  const leftY = cy - pillH / 2;
+
+  // Right pill position
+  const rightX = cx + logoScale * 0.42 - pillW;
+  const rightY = cy - pillH / 2;
+
+  // Diagonal slash (the connecting stroke of the N)
+  const slashW = logoScale * 0.18;
+  const slashAngle = -32; // degrees
+
+  // Circle stroke width
+  const circleStroke = Math.max(1.5, size * 0.035);
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
   <defs>
@@ -34,49 +57,43 @@ function createSvg(size) {
       <stop offset="0%" stop-color="#0E1324"/>
       <stop offset="100%" stop-color="#0B0F19"/>
     </linearGradient>
-    <linearGradient id="lime" x1="0" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#D4F97A"/>
-      <stop offset="100%" stop-color="#BEF264"/>
-    </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="${size * 0.02}"/>
-    </filter>
+    <clipPath id="safe">
+      <rect x="0" y="0" width="${size}" height="${size}" rx="${size * 0.18}"/>
+    </clipPath>
   </defs>
 
-  <!-- Background -->
-  <rect x="${padding}" y="${padding}" width="${size - padding * 2}" height="${size - padding * 2}"
-        rx="${cornerRadius}" ry="${cornerRadius}" fill="url(#bg)"/>
+  <!-- Full background (maskable safe zone) -->
+  <rect width="${size}" height="${size}" fill="url(#bg)" clip-path="url(#safe)"/>
 
-  <!-- Subtle border -->
-  <rect x="${padding}" y="${padding}" width="${size - padding * 2}" height="${size - padding * 2}"
-        rx="${cornerRadius}" ry="${cornerRadius}" fill="none"
-        stroke="rgba(190,242,100,0.15)" stroke-width="${Math.max(1, size * 0.005)}"/>
+  <!-- Outer circle ring -->
+  <circle cx="${cx}" cy="${cy}" r="${r * 0.78}" fill="none"
+          stroke="#BEF264" stroke-width="${circleStroke}" opacity="0.9"/>
 
-  <!-- Glow behind letter -->
-  <text x="${centerX}" y="${centerY + fontSize * 0.08}" text-anchor="middle" dominant-baseline="central"
-        font-family="'Sora','Inter','SF Pro Display',system-ui,sans-serif"
-        font-weight="700" font-size="${fontSize}" fill="#BEF264" opacity="0.3"
-        filter="url(#glow)">N</text>
+  <!-- Inner filled circle (subtle dark fill) -->
+  <circle cx="${cx}" cy="${cy}" r="${r * 0.78 - circleStroke / 2}" fill="rgba(190,242,100,0.05)"/>
 
-  <!-- Main "N" letterform -->
-  <text x="${centerX}" y="${centerY + fontSize * 0.08}" text-anchor="middle" dominant-baseline="central"
-        font-family="'Sora','Inter','SF Pro Display',system-ui,sans-serif"
-        font-weight="700" font-size="${fontSize}" fill="url(#lime)">N</text>
+  <!-- Left vertical pill -->
+  <rect x="${leftX}" y="${leftY}" width="${pillW}" height="${pillH}"
+        rx="${pillR}" ry="${pillR}" fill="#BEF264"/>
 
-  <!-- Small leaf accent -->
-  <path d="M${leafX},${leafY} Q${leafX + leafSize * 0.8},${leafY - leafSize * 1.2} ${leafX + leafSize * 0.3},${leafY - leafSize * 1.5}
-           Q${leafX + leafSize * 0.1},${leafY - leafSize * 0.5} ${leafX},${leafY}Z"
-        fill="#BEF264" opacity="0.6"/>
+  <!-- Right vertical pill -->
+  <rect x="${rightX}" y="${rightY}" width="${pillW}" height="${pillH}"
+        rx="${pillR}" ry="${pillR}" fill="#BEF264"/>
 
-  <!-- Leaf vein -->
-  <line x1="${leafX}" y1="${leafY}" x2="${leafX + leafSize * 0.45}" y2="${leafY - leafSize * 1.1}"
-        stroke="#0B0F19" stroke-width="${Math.max(0.5, size * 0.004)}" opacity="0.5"/>
+  <!-- Diagonal slash connecting the two verticals -->
+  <g transform="rotate(${slashAngle} ${cx} ${cy})">
+    <rect x="${cx - slashW / 2}" y="${cy - pillH * 0.42}" width="${slashW}" height="${pillH * 0.84}"
+          rx="${slashW / 2}" ry="${slashW / 2}" fill="#0B0F19"/>
+  </g>
+
+  <!-- Subtle glow behind the mark -->
+  <circle cx="${cx}" cy="${cy}" r="${r * 0.4}" fill="#BEF264" opacity="0.04"/>
 </svg>`;
 }
 
 const sizes = [
-  { name: 'icon-192.png', size: 192 },
   { name: 'icon-512.png', size: 512 },
+  { name: 'icon-192.png', size: 192 },
   { name: 'apple-touch-icon.png', size: 180 },
   { name: 'favicon-32.png', size: 32 },
   { name: 'favicon-16.png', size: 16 },
@@ -89,9 +106,9 @@ for (const { name, size } of sizes) {
   console.log(`Generated ${name} (${size}x${size})`);
 }
 
-// Also generate a favicon.ico-compatible PNG at root
+// Favicon at public root
 const faviconSvg = createSvg(32);
 await sharp(Buffer.from(faviconSvg)).png().toFile(resolve(__dirname, '..', 'public', 'favicon.png'));
 console.log('Generated favicon.png (32x32)');
 
-console.log('\nAll PWA icons generated in public/icons/');
+console.log('\nAll PWA icons regenerated with official NuruOS logo mark.');
