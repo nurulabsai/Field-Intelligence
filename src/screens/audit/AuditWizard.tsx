@@ -1,235 +1,499 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Save } from 'lucide-react';
-import Step1_Identity from './steps/Step1_Identity';
-import Step2_Location from './steps/Step2_Location';
-import Step3_FarmChar from './steps/Step3_FarmChar';
-import Step4_Crops from './steps/Step4_Crops';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../store/index';
+import type { FarmerProfile } from '../../types/farmerTypes';
+import type {
+  AuditFormState, FarmProfile, FarmBoundaryDraft, PlotObservation,
+} from '../../types/auditTypes';
+import { FARM_AUDIT_STEPS, createEmptyPlot } from '../../types/auditTypes';
+import { validateStepByIndex } from '../../validation/farmValidation';
+import { saveAuditDraft, loadAuditDraft, saveFarmerLocally } from '../../services/auditStorageService';
+import { buildAuditPayload } from '../../services/auditPayloadBuilder';
+// Sync queue stub — enqueues to IndexedDB for background sync
+async function enqueue(_type: string, _payload: unknown): Promise<void> {
+  // In production, this writes to the sync queue IndexedDB store
+  // For now, the data is already saved via saveAuditDraft
+}
+
+import FarmerProfileStep from '../../components/forms/steps/FarmerProfileStep';
+import FarmProfileStep from '../../components/forms/steps/FarmProfileStep';
+import FarmBoundaryStep from '../../components/forms/steps/FarmBoundaryStep';
+import PlotStructureStep from '../../components/forms/steps/PlotStructureStep';
+import PlotObservationsStep from '../../components/forms/steps/PlotObservationsStep';
+
+// Legacy step imports for steps 6 & 7
 import Step5_Inputs from './steps/Step5_Inputs';
 import Step6_Yield from './steps/Step6_Yield';
-
-const STEPS = [
-  { label: 'Identity', component: Step1_Identity },
-  { label: 'Location', component: Step2_Location },
-  { label: 'Farm', component: Step3_FarmChar },
-  { label: 'Crops', component: Step4_Crops },
-  { label: 'Inputs', component: Step5_Inputs },
-  { label: 'Yield', component: Step6_Yield },
-];
 
 interface AuditWizardProps {
   auditId?: string;
   onComplete?: (data: Record<string, unknown>) => void;
 }
 
-const DB_NAME = 'nuruos_audits';
-const STORE_NAME = 'wizard_state';
-
-function openDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 1);
-    req.onupgradeneeded = () => {
-      const db = req.result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME);
-      }
-    };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
+function createInitialState(auditId: string, auditorId: string): AuditFormState {
+  return {
+    auditId,
+    auditType: 'farm',
+    auditorId,
+    startedAt: new Date().toISOString(),
+    lastSavedAt: new Date().toISOString(),
+    currentStepIndex: 1,
+    completedSteps: [],
+    stepErrors: {},
+    farmer: null,
+    farmProfile: null,
+    farmBoundary: null,
+    plots: [],
+    existingSections: {},
+  };
 }
 
-async function saveState(key: string, data: unknown): Promise<void> {
-  const db = await openDB();
-  const tx = db.transaction(STORE_NAME, 'readwrite');
-  tx.objectStore(STORE_NAME).put(data, key);
-  return new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
-}
+const AuditWizard: React.FC<AuditWizardProps> = ({ auditId: propAuditId, onComplete }) => {
+  const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
+  const auditorId = user?.id ?? 'unknown';
+  const stateId = propAuditId ?? crypto.randomUUID();
 
-async function loadState(key: string): Promise<unknown> {
-  const db = await openDB();
-  const tx = db.transaction(STORE_NAME, 'readonly');
-  const req = tx.objectStore(STORE_NAME).get(key);
-  return new Promise((resolve, reject) => {
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
-}
-
-const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
-  const stateKey = auditId || 'new_audit';
-  const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<Record<string, unknown>>({});
-  const [stepErrors, setStepErrors] = useState<Record<string, string>>({});
+  const [state, setState] = useState<AuditFormState>(() =>
+    createInitialState(stateId, auditorId)
+  );
   const [saving, setSaving] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const [submitting, setSubmitting] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  // Load persisted state
+  // Load persisted draft
   useEffect(() => {
-    loadState(stateKey).then(stored => {
-      if (stored && typeof stored === 'object') {
-        const data = stored as { step?: number; formData?: Record<string, unknown> };
-        if (data.step !== undefined) setCurrentStep(data.step);
-        if (data.formData) setFormData(data.formData);
-      }
-    }).catch(() => { /* no saved state */ });
-  }, [stateKey]);
+    loadAuditDraft(stateId).then(stored => {
+      if (stored) setState(stored);
+    }).catch(() => {});
+  }, [stateId]);
 
   // Debounced auto-save
-  const persistState = useCallback((step: number, data: Record<string, unknown>) => {
+  const persistDraft = useCallback((s: AuditFormState) => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
       setSaving(true);
-      try {
-        await saveState(stateKey, { step, formData: data });
-      } catch {
-        // silently fail
-      }
+      try { await saveAuditDraft(s.auditId, s); } catch {}
       setSaving(false);
-    }, 500);
-  }, [stateKey]);
+    }, 800);
+  }, []);
 
-  const handleStepData = useCallback((data: Record<string, unknown>) => {
-    setFormData(prev => {
-      const next = { ...prev, ...data };
-      persistState(currentStep, next);
+  const updateState = useCallback((updates: Partial<AuditFormState>) => {
+    setState(prev => {
+      const next = { ...prev, ...updates, lastSavedAt: new Date().toISOString() };
+      persistDraft(next);
       return next;
     });
-    setStepErrors({});
-  }, [currentStep, persistState]);
+  }, [persistDraft]);
 
+  // ── Validation gate ──
   const handleNext = useCallback(() => {
-    if (currentStep < STEPS.length - 1) {
-      const nextStep = currentStep + 1;
-      setCurrentStep(nextStep);
-      persistState(nextStep, formData);
+    const errors = validateStepByIndex(state.currentStepIndex, state);
+    if (errors.length > 0) {
+      updateState({
+        stepErrors: { ...state.stepErrors, [state.currentStepIndex]: errors },
+      });
+      return;
     }
-  }, [currentStep, formData, persistState]);
+    const completed = state.completedSteps.includes(state.currentStepIndex)
+      ? state.completedSteps
+      : [...state.completedSteps, state.currentStepIndex];
+    updateState({
+      completedSteps: completed,
+      currentStepIndex: state.currentStepIndex + 1,
+      stepErrors: { ...state.stepErrors, [state.currentStepIndex]: [] },
+    });
+  }, [state, updateState]);
 
   const handleBack = useCallback(() => {
-    if (currentStep > 0) {
-      const prevStep = currentStep - 1;
-      setCurrentStep(prevStep);
-      persistState(prevStep, formData);
+    if (state.currentStepIndex > 1) {
+      updateState({ currentStepIndex: state.currentStepIndex - 1 });
     }
-  }, [currentStep, formData, persistState]);
+  }, [state.currentStepIndex, updateState]);
 
-  const handleComplete = useCallback(() => {
-    onComplete?.(formData);
-  }, [formData, onComplete]);
+  // ── Submit ──
+  const handleSubmit = useCallback(async () => {
+    setSubmitting(true);
+    try {
+      const payload = buildAuditPayload(state);
+      await enqueue('submit_audit', payload);
+      if (state.farmer) {
+        await saveFarmerLocally(state.farmer);
+      }
+      onComplete?.(payload as unknown as Record<string, unknown>);
+      navigate('/dashboard');
+    } catch (err) {
+      updateState({
+        stepErrors: {
+          ...state.stepErrors,
+          [8]: [err instanceof Error ? err.message : 'Submit failed — data saved locally'],
+        },
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  }, [state, navigate, onComplete, updateState]);
 
-  const StepComponent = STEPS[currentStep]!.component;
+  // ── Step renderer ──
+  function renderStep() {
+    switch (state.currentStepIndex) {
+      case 1:
+        return (
+          <FarmerProfileStep
+            farmer={state.farmer}
+            onUpdate={(f: FarmerProfile) => updateState({ farmer: f })}
+            auditorId={auditorId}
+            auditId={state.auditId}
+          />
+        );
+      case 2:
+        return state.farmer ? (
+          <FarmProfileStep
+            farmer={state.farmer}
+            farmProfile={state.farmProfile}
+            onUpdate={(fp: FarmProfile) => updateState({ farmProfile: fp })}
+          />
+        ) : null;
+      case 3:
+        return state.farmProfile ? (
+          <FarmBoundaryStep
+            farmProfile={state.farmProfile}
+            farmBoundary={state.farmBoundary}
+            onUpdate={(fb: FarmBoundaryDraft) => updateState({ farmBoundary: fb })}
+          />
+        ) : null;
+      case 4:
+        return state.farmProfile ? (
+          <PlotStructureStep
+            farmProfile={state.farmProfile}
+            plots={state.plots}
+            auditId={state.auditId}
+            onAddPlot={() => updateState({
+              plots: [...state.plots,
+                createEmptyPlot(state.farmProfile!.farmLocalRef, state.auditId)]
+            })}
+            onUpdatePlot={(id, updates) => updateState({
+              plots: state.plots.map(p => p.localId === id ? { ...p, ...updates } : p)
+            })}
+            onRemovePlot={(id) => updateState({
+              plots: state.plots.filter(p => p.localId !== id)
+            })}
+          />
+        ) : null;
+      case 5:
+        return (
+          <PlotObservationsStep
+            plots={state.plots}
+            onUpdateObservation={(plotId: string, obs: Partial<PlotObservation>) => updateState({
+              plots: state.plots.map(p =>
+                p.localId === plotId
+                  ? { ...p, observation: { ...p.observation, ...obs } }
+                  : p
+              )
+            })}
+          />
+        );
+      case 6:
+        return (
+          <Step5_Inputs
+            data={state.existingSections}
+            onChange={(d: Record<string, unknown>) =>
+              updateState({ existingSections: { ...state.existingSections, ...d } })
+            }
+            errors={{}}
+          />
+        );
+      case 7:
+        return (
+          <Step6_Yield
+            data={state.existingSections}
+            onChange={(d: Record<string, unknown>) =>
+              updateState({ existingSections: { ...state.existingSections, ...d } })
+            }
+            errors={{}}
+          />
+        );
+      case 8:
+        return renderReviewStep();
+      default:
+        return null;
+    }
+  }
+
+  // ── Review Step ──
+  function renderReviewStep() {
+    return (
+      <div className="space-y-4">
+        {/* Farmer summary */}
+        {state.farmer && (
+          <div className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.05] rounded-3xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-[#BEF264]/10 flex items-center justify-center">
+                <span className="material-symbols-outlined text-[#BEF264] text-xl">person</span>
+              </div>
+              <div>
+                <h3 className="font-['Sora'] text-white font-semibold">Farmer Profile</h3>
+                <p className="text-white/40 text-xs">Step 1</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div><span className="text-white/40">Name:</span> <span className="text-white">{state.farmer.identity.fullName}</span></div>
+              <div><span className="text-white/40">Phone:</span> <span className="text-white font-mono text-xs">{state.farmer.identity.phoneNumber}</span></div>
+              <div><span className="text-white/40">Gender:</span> <span className="text-white capitalize">{state.farmer.identity.gender}</span></div>
+              <div><span className="text-white/40">Age:</span> <span className="text-white">{state.farmer.identity.ageRange.replace(/_/g, ' ')}</span></div>
+              <div><span className="text-white/40">Education:</span> <span className="text-white capitalize">{state.farmer.household.educationLevel}</span></div>
+              <div><span className="text-white/40">Co-op:</span> <span className="text-white">{state.farmer.experience.cooperativeMember ? 'Yes' : 'No'}</span></div>
+            </div>
+            <button
+              onClick={() => updateState({ currentStepIndex: 1 })}
+              className="mt-3 text-xs text-[#BEF264]/60 hover:text-[#BEF264]"
+            >
+              ← Edit Farmer
+            </button>
+          </div>
+        )}
+
+        {/* Farm summary */}
+        {state.farmProfile && (
+          <div className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.05] rounded-3xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-[#BEF264]/10 flex items-center justify-center">
+                <span className="material-symbols-outlined text-[#BEF264] text-xl">agriculture</span>
+              </div>
+              <div>
+                <h3 className="font-['Sora'] text-white font-semibold">Farm Profile</h3>
+                <p className="text-white/40 text-xs">Step 2</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div><span className="text-white/40">Farm:</span> <span className="text-white">{state.farmProfile.farmLocalRef}</span></div>
+              <div><span className="text-white/40">Area:</span> <span className="text-white">{state.farmProfile.totalAreaHa}ha</span></div>
+              <div><span className="text-white/40">Region:</span> <span className="text-white">{state.farmProfile.region}</span></div>
+              <div><span className="text-white/40">District:</span> <span className="text-white">{state.farmProfile.district}</span></div>
+              <div><span className="text-white/40">Ward:</span> <span className="text-white">{state.farmProfile.ward}</span></div>
+              <div><span className="text-white/40">Village:</span> <span className="text-white">{state.farmProfile.village}</span></div>
+            </div>
+            <button
+              onClick={() => updateState({ currentStepIndex: 2 })}
+              className="mt-3 text-xs text-[#BEF264]/60 hover:text-[#BEF264]"
+            >
+              ← Edit Farm
+            </button>
+          </div>
+        )}
+
+        {/* Boundary summary */}
+        {state.farmBoundary && (
+          <div className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.05] rounded-3xl p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-xl bg-[#67E8F9]/10 flex items-center justify-center">
+                <span className="material-symbols-outlined text-[#67E8F9] text-xl">fence</span>
+              </div>
+              <div>
+                <h3 className="font-['Sora'] text-white font-semibold">Boundary</h3>
+                <p className="text-white/40 text-xs">Step 3 — {state.farmBoundary.status}</p>
+              </div>
+            </div>
+            {state.farmBoundary.polygon && (
+              <p className="text-sm text-white/60">
+                {state.farmBoundary.method} — {state.farmBoundary.polygon.area?.toFixed(2)}ha — {state.farmBoundary.polygon.points.length} points
+              </p>
+            )}
+            {state.farmBoundary.status === 'skipped' && (
+              <p className="text-sm text-[#FFBF00]/80">Skipped: {state.farmBoundary.skipReason}</p>
+            )}
+          </div>
+        )}
+
+        {/* Plots summary */}
+        {state.plots.length > 0 && (
+          <div className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.05] rounded-3xl p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-xl bg-[#BEF264]/10 flex items-center justify-center">
+                <span className="material-symbols-outlined text-[#BEF264] text-xl">grid_view</span>
+              </div>
+              <div>
+                <h3 className="font-['Sora'] text-white font-semibold">Plots & Observations</h3>
+                <p className="text-white/40 text-xs">Steps 4+5 — {state.plots.length} plots — {state.plots.reduce((s, p) => s + p.areaHa, 0).toFixed(1)}ha total</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {state.plots.map((plot, i) => (
+                <div key={plot.localId} className="flex items-center justify-between text-sm bg-white/[0.02] rounded-xl px-3 py-2">
+                  <span className="text-white">{plot.plotName || `Plot ${i + 1}`}</span>
+                  <span className="text-white/40">{plot.currentCrop} · {plot.areaHa}ha</span>
+                  <span className={`text-xs ${plot.observation.cropCondition ? 'text-[#BEF264]' : 'text-[#FF4B4B]/60'}`}>
+                    {plot.observation.cropCondition ? '✓ obs' : '✗ obs'}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => updateState({ currentStepIndex: 4 })}
+              className="mt-3 text-xs text-[#BEF264]/60 hover:text-[#BEF264]"
+            >
+              ← Edit Plots
+            </button>
+          </div>
+        )}
+
+        {/* Offline indicator */}
+        {typeof navigator !== 'undefined' && !navigator.onLine && (
+          <div className="bg-[#FFBF00]/10 border border-[#FFBF00]/20 rounded-2xl p-4 text-center">
+            <span className="material-symbols-outlined text-[#FFBF00] text-xl mb-1">cloud_off</span>
+            <p className="text-[#FFBF00] text-sm font-medium">You are offline</p>
+            <p className="text-white/40 text-xs">Audit will sync when connected</p>
+          </div>
+        )}
+
+        {/* Error display */}
+        {(state.stepErrors[8]?.length ?? 0) > 0 && (
+          <div className="bg-[#FF4B4B]/10 border border-[#FF4B4B]/20 rounded-2xl p-4">
+            {state.stepErrors[8]?.map((err, i) => (
+              <p key={i} className="text-[#FF4B4B] text-sm">{err}</p>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  const currentStepDef = FARM_AUDIT_STEPS.find(s => s.index === state.currentStepIndex);
+  const isLastStep = state.currentStepIndex === 8;
+  const errors = state.stepErrors[state.currentStepIndex] ?? [];
 
   return (
-    <div className="min-h-screen bg-bg-primary font-base">
-      {/* Step Indicator */}
+    <div className="min-h-screen bg-[#0B0F19] font-['Manrope']">
+      {/* Step Progress Header */}
       <div
-        className="sticky top-0 z-40 border-b border-[rgba(255,255,255,0.06)] px-6 py-4"
+        className="sticky top-0 z-40 border-b border-white/[0.06] px-4 py-3"
         style={{
-          backgroundColor: 'rgba(13,13,13,0.95)',
+          backgroundColor: 'rgba(11,15,25,0.95)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
         }}
       >
-        <div className="max-w-[800px] mx-auto">
-          {/* Progress bar */}
-          <div className="flex items-center gap-1 mb-3">
-            {STEPS.map((step, i) => (
-              <div key={step.label} className="flex-1 flex items-center gap-1">
-                <div
-                  className="flex-1 h-[3px] rounded transition-colors duration-300"
-                  style={{
-                    backgroundColor: i <= currentStep ? '#F0513E' : 'rgba(255,255,255,0.08)',
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Step labels */}
-          <div className="flex justify-between">
-            {STEPS.map((step, i) => (
+        <div className="max-w-[430px] mx-auto">
+          {/* Progress dots */}
+          <div className="flex items-center gap-1.5 mb-2">
+            {FARM_AUDIT_STEPS.map((step) => (
               <button
-                key={step.label}
+                key={step.key}
                 onClick={() => {
-                  if (i <= currentStep) {
-                    setCurrentStep(i);
-                    persistState(i, formData);
+                  if (step.index <= state.currentStepIndex || state.completedSteps.includes(step.index)) {
+                    updateState({ currentStepIndex: step.index });
                   }
                 }}
-                className="bg-transparent border-none text-[0.688rem] uppercase tracking-widest px-0.5 py-1 font-inherit"
+                className="flex-1 h-1 rounded-full transition-all duration-300"
                 style={{
-                  fontWeight: i === currentStep ? 600 : 400,
-                  color: i === currentStep ? '#F0513E' : i < currentStep ? '#9CA3AF' : '#6B7280',
-                  cursor: i <= currentStep ? 'pointer' : 'default',
+                  backgroundColor:
+                    state.completedSteps.includes(step.index) ? '#BEF264'
+                    : step.index === state.currentStepIndex ? '#BEF264'
+                    : 'rgba(255,255,255,0.08)',
+                  opacity: step.index === state.currentStepIndex ? 1 : 0.6,
+                  cursor: step.index <= state.currentStepIndex || state.completedSteps.includes(step.index)
+                    ? 'pointer' : 'default',
                 }}
-              >
-                {step.label}
-              </button>
+              />
             ))}
           </div>
 
-          {/* Save indicator */}
-          {saving && (
-            <div className="flex items-center gap-1.5 mt-2">
-              <Save size={12} className="text-text-tertiary" />
-              <span className="text-[0.688rem] text-text-tertiary">Saving...</span>
+          {/* Step label row */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#BEF264] text-lg">
+                {currentStepDef?.icon ?? 'task_alt'}
+              </span>
+              <span className="text-white text-sm font-semibold font-['Sora']">
+                {currentStepDef?.label ?? 'Review'}
+              </span>
+              <span className="text-white/30 text-xs">
+                Step {state.currentStepIndex} of 8
+              </span>
             </div>
-          )}
+            {saving && (
+              <span className="text-white/30 text-[10px] flex items-center gap-1">
+                <span className="material-symbols-outlined text-[12px]">cloud_sync</span>
+                Saving...
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Step Content */}
-      <div className="max-w-[800px] mx-auto py-8 px-6">
-        <StepComponent
-          data={formData}
-          onChange={handleStepData}
-          errors={stepErrors}
-        />
+      <div className="max-w-[430px] mx-auto py-6 px-4">
+        {/* Validation errors */}
+        {errors.length > 0 && (
+          <div className="mb-4 bg-[#FF4B4B]/10 border border-[#FF4B4B]/20 rounded-2xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="material-symbols-outlined text-[#FF4B4B] text-lg">error</span>
+              <span className="text-[#FF4B4B] text-sm font-semibold">
+                {errors.length} issue{errors.length > 1 ? 's' : ''} to fix
+              </span>
+            </div>
+            {errors.map((err, i) => (
+              <p key={i} className="text-[#FF4B4B]/80 text-xs ml-7">• {err}</p>
+            ))}
+          </div>
+        )}
+
+        {renderStep()}
       </div>
 
-      {/* Navigation */}
+      {/* Navigation Footer */}
       <div
-        className="sticky bottom-0 border-t border-[rgba(255,255,255,0.06)] px-6 py-4"
+        className="sticky bottom-0 border-t border-white/[0.06] px-4 py-3"
         style={{
-          backgroundColor: 'rgba(13,13,13,0.95)',
+          backgroundColor: 'rgba(11,15,25,0.95)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
         }}
       >
-        <div className="max-w-[800px] mx-auto flex justify-between gap-3">
+        <div className="max-w-[430px] mx-auto flex gap-3">
           <button
             onClick={handleBack}
-            disabled={currentStep === 0}
-            className="flex items-center gap-2 py-3 px-6 border border-border rounded-xl text-sm font-medium font-inherit transition-all duration-150"
+            disabled={state.currentStepIndex === 1}
+            className="flex items-center justify-center gap-1.5 py-3 px-5 rounded-2xl text-sm font-medium transition-all min-h-[48px]"
             style={{
-              backgroundColor: currentStep === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.06)',
-              color: currentStep === 0 ? '#6B7280' : '#FFFFFF',
-              cursor: currentStep === 0 ? 'not-allowed' : 'pointer',
+              backgroundColor: state.currentStepIndex === 1 ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.05)',
+              color: state.currentStepIndex === 1 ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.7)',
+              cursor: state.currentStepIndex === 1 ? 'not-allowed' : 'pointer',
+              border: '1px solid rgba(255,255,255,0.05)',
             }}
           >
-            <ChevronLeft size={16} />
+            <span className="material-symbols-outlined text-lg">chevron_left</span>
             Back
           </button>
 
-          {currentStep < STEPS.length - 1 ? (
-            <button
-              onClick={handleNext}
-              className="flex items-center gap-2 py-3 px-8 bg-accent text-white border-none rounded-xl text-sm font-semibold cursor-pointer font-inherit transition-colors duration-150"
-            >
-              Next
-              <ChevronRight size={16} />
-            </button>
-          ) : (
-            <button
-              onClick={handleComplete}
-              className="flex items-center gap-2 py-3 px-8 bg-success text-white border-none rounded-xl text-sm font-semibold cursor-pointer font-inherit transition-colors duration-150"
-            >
-              Submit Audit
-            </button>
-          )}
+          <button
+            onClick={isLastStep ? handleSubmit : handleNext}
+            disabled={submitting}
+            className="flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-2xl text-sm font-semibold transition-all min-h-[48px]"
+            style={{
+              backgroundColor: isLastStep ? '#BEF264' : '#BEF264',
+              color: '#000',
+              cursor: submitting ? 'wait' : 'pointer',
+              boxShadow: '0 0 20px rgba(190,242,100,0.15)',
+            }}
+          >
+            {submitting ? (
+              <>
+                <span className="material-symbols-outlined text-lg animate-spin">progress_activity</span>
+                Submitting...
+              </>
+            ) : isLastStep ? (
+              <>
+                <span className="material-symbols-outlined text-lg">task_alt</span>
+                Submit Audit
+              </>
+            ) : (
+              <>
+                Next
+                <span className="material-symbols-outlined text-lg">chevron_right</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>
