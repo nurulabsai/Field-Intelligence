@@ -1,5 +1,6 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
+import { cn } from '../design-system';
 
 interface NuruButtonProps {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -14,6 +15,19 @@ interface NuruButtonProps {
   className?: string;
 }
 
+const SIZE_CLASSES: Record<string, string> = {
+  sm: 'px-4 py-2 text-[13px] h-9',
+  md: 'px-5 py-2.5 text-sm h-11',
+  lg: 'px-7 py-3.5 text-base h-[52px]',
+};
+
+const VARIANT_CLASSES: Record<string, string> = {
+  primary: 'bg-accent text-white hover:bg-accent-dark active:scale-[0.97]',
+  secondary: 'bg-bg-input text-white border border-border hover:border-border-dark hover:bg-[rgba(255,255,255,0.12)]',
+  ghost: 'bg-transparent text-white hover:bg-[rgba(255,255,255,0.05)]',
+  danger: 'bg-error text-white hover:bg-[#DC2626]',
+};
+
 const NuruButton: React.FC<NuruButtonProps> = ({
   variant = 'primary',
   size = 'md',
@@ -26,107 +40,29 @@ const NuruButton: React.FC<NuruButtonProps> = ({
   type = 'button',
   className = '',
 }) => {
-  const baseStyles: React.CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
-    borderRadius: '12px',
-    fontWeight: 600,
-    fontFamily: 'Inter, sans-serif',
-    cursor: disabled || loading ? 'not-allowed' : 'pointer',
-    transition: 'all 0.2s ease',
-    border: 'none',
-    outline: 'none',
-    opacity: disabled ? 0.5 : 1,
-    width: fullWidth ? '100%' : 'auto',
-    whiteSpace: 'nowrap',
-  };
-
-  const sizeStyles: Record<string, React.CSSProperties> = {
-    sm: { padding: '8px 16px', fontSize: '13px', height: '36px' },
-    md: { padding: '10px 20px', fontSize: '14px', height: '44px' },
-    lg: { padding: '14px 28px', fontSize: '16px', height: '52px' },
-  };
-
-  const variantStyles: Record<string, React.CSSProperties> = {
-    primary: {
-      backgroundColor: '#F0513E',
-      color: '#FFFFFF',
-    },
-    secondary: {
-      backgroundColor: '#252525',
-      color: '#FFFFFF',
-      border: '1px solid rgba(255,255,255,0.08)',
-    },
-    ghost: {
-      backgroundColor: 'transparent',
-      color: '#FFFFFF',
-    },
-    danger: {
-      backgroundColor: '#EF4444',
-      color: '#FFFFFF',
-    },
-  };
-
-  const [isHovered, setIsHovered] = React.useState(false);
-  const [isActive, setIsActive] = React.useState(false);
-
-  const getHoverStyles = (): React.CSSProperties => {
-    if (!isHovered || disabled || loading) return {};
-    switch (variant) {
-      case 'primary':
-        return { backgroundColor: '#D4402E' };
-      case 'secondary':
-        return { backgroundColor: '#2E2E2E', borderColor: 'rgba(255,255,255,0.15)' };
-      case 'ghost':
-        return { backgroundColor: 'rgba(255,255,255,0.05)' };
-      case 'danger':
-        return { backgroundColor: '#DC2626' };
-      default:
-        return {};
-    }
-  };
-
-  const activeStyles: React.CSSProperties =
-    isActive && !disabled && !loading ? { transform: 'scale(0.97)' } : {};
-
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
-      className={className}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => {
-        setIsHovered(false);
-        setIsActive(false);
-      }}
-      onMouseDown={() => setIsActive(true)}
-      onMouseUp={() => setIsActive(false)}
-      style={{
-        ...baseStyles,
-        ...sizeStyles[size],
-        ...variantStyles[variant],
-        ...getHoverStyles(),
-        ...activeStyles,
-      }}
+      className={cn(
+        'inline-flex items-center justify-center gap-2 rounded-md font-semibold font-base cursor-pointer border-none whitespace-nowrap transition-all duration-[var(--transition-base)]',
+        SIZE_CLASSES[size],
+        VARIANT_CLASSES[variant],
+        fullWidth && 'w-full',
+        (disabled || loading) && 'opacity-50 cursor-not-allowed',
+        className,
+      )}
     >
       {loading ? (
         <Loader2
           size={size === 'sm' ? 14 : size === 'md' ? 16 : 20}
-          className="animate-[nuru-spin_1s_linear_infinite]"
+          className="animate-spin"
         />
       ) : icon ? (
         icon
       ) : null}
       {children}
-      <style>{`
-        @keyframes nuru-spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </button>
   );
 };
