@@ -43,6 +43,8 @@ const SEED_SOURCES: DropdownOption[] = [
   { value: 'company', label: 'Company' },
 ];
 
+const inputClasses = "w-full py-3 px-4 bg-bg-input border border-border rounded-xl text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150";
+
 const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
@@ -50,84 +52,38 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
     onChange({ [key]: value });
   }, [onChange]);
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '12px 16px',
-    backgroundColor: 'var(--color-bg-input, #252525)',
-    border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: '12px',
-    color: '#FFFFFF',
-    fontSize: '0.938rem',
-    fontFamily: 'inherit',
-    outline: 'none',
-    transition: 'border-color 0.15s ease',
-  };
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: '0.813rem',
-    fontWeight: 500,
-    color: '#9CA3AF',
-    marginBottom: '6px',
-  };
-
   const renderDropdown = (key: string, label: string, options: DropdownOption[]) => {
     const value = (data[key] as string) || '';
     const isOpen = openDropdown === key;
 
     return (
       <div>
-        <label style={labelStyle}>{label}</label>
-        <div style={{ position: 'relative' }}>
+        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">{label}</label>
+        <div className="relative">
           <button
             type="button"
             onClick={() => setOpenDropdown(isOpen ? null : key)}
+            className={`${inputClasses} text-left cursor-pointer flex items-center justify-between`}
             style={{
-              ...inputStyle,
-              textAlign: 'left',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
               borderColor: isOpen ? '#F0513E' : 'rgba(255,255,255,0.08)',
             }}
           >
-            <span style={{ color: value ? '#FFFFFF' : '#6B7280' }}>
+            <span className={value ? 'text-white' : 'text-text-tertiary'}>
               {options.find(o => o.value === value)?.label || `Select ${label.toLowerCase()}`}
             </span>
-            <ChevronDown size={18} style={{ color: '#6B7280', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }} />
+            <ChevronDown size={18} className="text-text-tertiary transition-transform duration-150" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }} />
           </button>
           {isOpen && (
-            <div
-              style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                right: 0,
-                marginTop: '4px',
-                backgroundColor: '#1E1E1E',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '12px',
-                zIndex: 50,
-                overflow: 'hidden',
-                boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
-              }}
-            >
+            <div className="absolute top-full left-0 right-0 mt-1 bg-bg-tertiary border border-[rgba(255,255,255,0.1)] rounded-xl z-50 overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
               {options.map(opt => (
                 <button
                   key={opt.value}
                   type="button"
                   onClick={() => { handleChange(key, opt.value); setOpenDropdown(null); }}
+                  className="w-full py-2.5 px-4 border-none text-sm text-left cursor-pointer font-inherit"
                   style={{
-                    width: '100%',
-                    padding: '10px 16px',
                     background: value === opt.value ? 'rgba(240,81,62,0.15)' : 'transparent',
-                    border: 'none',
                     color: value === opt.value ? '#F0513E' : '#FFFFFF',
-                    fontSize: '0.875rem',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
                   }}
                 >
                   {opt.label}
@@ -136,38 +92,31 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
             </div>
           )}
         </div>
-        {errors[key] && <p style={{ fontSize: '0.75rem', color: '#FCA5A5', marginTop: '4px' }}>{errors[key]}</p>}
+        {errors[key] && <p className="text-xs text-[#FCA5A5] mt-1">{errors[key]}</p>}
       </div>
     );
   };
 
   return (
     <div>
-      <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '4px' }}>
+      <h2 className="text-xl font-bold text-white mb-1">
         Agricultural Inputs
       </h2>
-      <p style={{ fontSize: '0.875rem', color: '#6B7280', marginBottom: '28px' }}>
+      <p className="text-sm text-text-tertiary mb-7">
         Record fertilizers, pesticides and seed information
       </p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div className="flex flex-col gap-5">
         {/* Fertilizer Section */}
-        <div
-          style={{
-            padding: '20px',
-            backgroundColor: 'var(--color-bg-card, #1E1E1E)',
-            borderRadius: '16px',
-            border: '1px solid rgba(255,255,255,0.06)',
-          }}
-        >
-          <h3 style={{ fontSize: '0.938rem', fontWeight: 600, color: '#FFFFFF', marginBottom: '16px' }}>
+        <div className="p-5 bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)]">
+          <h3 className="text-[0.938rem] font-semibold text-white mb-4">
             Fertilizer
           </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="flex flex-col gap-4">
             {renderDropdown('fertilizer_type', 'Fertilizer Type', FERTILIZER_TYPES)}
             {(data.fertilizer_type as string) && (data.fertilizer_type as string) !== 'none' && (
               <div>
-                <label style={labelStyle}>Amount (kg)</label>
+                <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Amount (kg)</label>
                 <input
                   type="number"
                   min="0"
@@ -175,7 +124,7 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
                   value={(data.fertilizer_amount_kg as string) || ''}
                   onChange={e => handleChange('fertilizer_amount_kg', e.target.value)}
                   placeholder="Enter amount in kg"
-                  style={inputStyle}
+                  className={inputClasses}
                 />
               </div>
             )}
@@ -183,22 +132,15 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
         </div>
 
         {/* Pesticide Section */}
-        <div
-          style={{
-            padding: '20px',
-            backgroundColor: 'var(--color-bg-card, #1E1E1E)',
-            borderRadius: '16px',
-            border: '1px solid rgba(255,255,255,0.06)',
-          }}
-        >
-          <h3 style={{ fontSize: '0.938rem', fontWeight: 600, color: '#FFFFFF', marginBottom: '16px' }}>
+        <div className="p-5 bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)]">
+          <h3 className="text-[0.938rem] font-semibold text-white mb-4">
             Pesticide
           </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="flex flex-col gap-4">
             {renderDropdown('pesticide_type', 'Pesticide Type', PESTICIDE_TYPES)}
             {(data.pesticide_type as string) && (data.pesticide_type as string) !== 'none' && (
               <div>
-                <label style={labelStyle}>Amount (litres)</label>
+                <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Amount (litres)</label>
                 <input
                   type="number"
                   min="0"
@@ -206,7 +148,7 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
                   value={(data.pesticide_amount_l as string) || ''}
                   onChange={e => handleChange('pesticide_amount_l', e.target.value)}
                   placeholder="Enter amount in litres"
-                  style={inputStyle}
+                  className={inputClasses}
                 />
               </div>
             )}
@@ -214,18 +156,11 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
         </div>
 
         {/* Seed Section */}
-        <div
-          style={{
-            padding: '20px',
-            backgroundColor: 'var(--color-bg-card, #1E1E1E)',
-            borderRadius: '16px',
-            border: '1px solid rgba(255,255,255,0.06)',
-          }}
-        >
-          <h3 style={{ fontSize: '0.938rem', fontWeight: 600, color: '#FFFFFF', marginBottom: '16px' }}>
+        <div className="p-5 bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)]">
+          <h3 className="text-[0.938rem] font-semibold text-white mb-4">
             Seeds
           </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="flex flex-col gap-4">
             {renderDropdown('seed_type', 'Seed Type', SEED_TYPES)}
             {renderDropdown('seed_source', 'Seed Source', SEED_SOURCES)}
           </div>

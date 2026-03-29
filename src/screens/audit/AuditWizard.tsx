@@ -123,38 +123,25 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
   const StepComponent = STEPS[currentStep]!.component;
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        backgroundColor: 'var(--color-bg-primary, #0D0D0D)',
-        fontFamily: 'var(--font-family-base, Inter, sans-serif)',
-      }}
-    >
+    <div className="min-h-screen bg-bg-primary font-base">
       {/* Step Indicator */}
       <div
+        className="sticky top-0 z-40 border-b border-[rgba(255,255,255,0.06)] px-6 py-4"
         style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 40,
           backgroundColor: 'rgba(13,13,13,0.95)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-          padding: '16px 24px',
         }}
       >
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <div className="max-w-[800px] mx-auto">
           {/* Progress bar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '12px' }}>
+          <div className="flex items-center gap-1 mb-3">
             {STEPS.map((step, i) => (
-              <div key={step.label} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <div key={step.label} className="flex-1 flex items-center gap-1">
                 <div
+                  className="flex-1 h-[3px] rounded transition-colors duration-300"
                   style={{
-                    flex: 1,
-                    height: '3px',
-                    borderRadius: '4px',
                     backgroundColor: i <= currentStep ? '#F0513E' : 'rgba(255,255,255,0.08)',
-                    transition: 'background-color 0.3s ease',
                   }}
                 />
               </div>
@@ -162,7 +149,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
           </div>
 
           {/* Step labels */}
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div className="flex justify-between">
             {STEPS.map((step, i) => (
               <button
                 key={step.label}
@@ -172,17 +159,11 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
                     persistState(i, formData);
                   }
                 }}
+                className="bg-transparent border-none text-[0.688rem] uppercase tracking-widest px-0.5 py-1 font-inherit"
                 style={{
-                  background: 'none',
-                  border: 'none',
-                  fontSize: '0.688rem',
                   fontWeight: i === currentStep ? 600 : 400,
                   color: i === currentStep ? '#F0513E' : i < currentStep ? '#9CA3AF' : '#6B7280',
                   cursor: i <= currentStep ? 'pointer' : 'default',
-                  fontFamily: 'inherit',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  padding: '4px 2px',
                 }}
               >
                 {step.label}
@@ -192,16 +173,16 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
 
           {/* Save indicator */}
           {saving && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '8px' }}>
-              <Save size={12} style={{ color: '#6B7280' }} />
-              <span style={{ fontSize: '0.688rem', color: '#6B7280' }}>Saving...</span>
+            <div className="flex items-center gap-1.5 mt-2">
+              <Save size={12} className="text-text-tertiary" />
+              <span className="text-[0.688rem] text-text-tertiary">Saving...</span>
             </div>
           )}
         </div>
       </div>
 
       {/* Step Content */}
-      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '32px 24px' }}>
+      <div className="max-w-[800px] mx-auto py-8 px-6">
         <StepComponent
           data={formData}
           onChange={handleStepData}
@@ -211,42 +192,22 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
 
       {/* Navigation */}
       <div
+        className="sticky bottom-0 border-t border-[rgba(255,255,255,0.06)] px-6 py-4"
         style={{
-          position: 'sticky',
-          bottom: 0,
           backgroundColor: 'rgba(13,13,13,0.95)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
-          padding: '16px 24px',
         }}
       >
-        <div
-          style={{
-            maxWidth: '800px',
-            margin: '0 auto',
-            display: 'flex',
-            justifyContent: 'space-between',
-            gap: '12px',
-          }}
-        >
+        <div className="max-w-[800px] mx-auto flex justify-between gap-3">
           <button
             onClick={handleBack}
             disabled={currentStep === 0}
+            className="flex items-center gap-2 py-3 px-6 border border-border rounded-xl text-sm font-medium font-inherit transition-all duration-150"
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '12px 24px',
               backgroundColor: currentStep === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.06)',
               color: currentStep === 0 ? '#6B7280' : '#FFFFFF',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '12px',
-              fontSize: '0.875rem',
-              fontWeight: 500,
               cursor: currentStep === 0 ? 'not-allowed' : 'pointer',
-              fontFamily: 'inherit',
-              transition: 'all 0.15s ease',
             }}
           >
             <ChevronLeft size={16} />
@@ -256,21 +217,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
           {currentStep < STEPS.length - 1 ? (
             <button
               onClick={handleNext}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '12px 32px',
-                backgroundColor: '#F0513E',
-                color: '#FFFFFF',
-                border: 'none',
-                borderRadius: '12px',
-                fontSize: '0.875rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                transition: 'background-color 0.15s ease',
-              }}
+              className="flex items-center gap-2 py-3 px-8 bg-accent text-white border-none rounded-xl text-sm font-semibold cursor-pointer font-inherit transition-colors duration-150"
             >
               Next
               <ChevronRight size={16} />
@@ -278,21 +225,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
           ) : (
             <button
               onClick={handleComplete}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '12px 32px',
-                backgroundColor: '#22C55E',
-                color: '#FFFFFF',
-                border: 'none',
-                borderRadius: '12px',
-                fontSize: '0.875rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                transition: 'background-color 0.15s ease',
-              }}
+              className="flex items-center gap-2 py-3 px-8 bg-success text-white border-none rounded-xl text-sm font-semibold cursor-pointer font-inherit transition-colors duration-150"
             >
               Submit Audit
             </button>

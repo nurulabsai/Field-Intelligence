@@ -66,6 +66,8 @@ interface NewEventForm {
   notes: string;
 }
 
+const inputClasses = "w-full py-2.5 px-3.5 bg-bg-input border border-border rounded-[10px] text-white text-sm font-inherit outline-none";
+
 const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onAddEvent }) => {
   const events = propEvents || MOCK_EVENTS;
   const today = new Date();
@@ -149,107 +151,44 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
 
   const todayStr = formatDate(today.getFullYear(), today.getMonth(), today.getDate());
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '10px 14px',
-    backgroundColor: 'var(--color-bg-input, #252525)',
-    border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: '10px',
-    color: '#FFFFFF',
-    fontSize: '0.875rem',
-    fontFamily: 'inherit',
-    outline: 'none',
-  };
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: '0.75rem',
-    fontWeight: 500,
-    color: '#6B7280',
-    marginBottom: '4px',
-  };
-
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        backgroundColor: 'var(--color-bg-primary, #0D0D0D)',
-        fontFamily: 'var(--font-family-base, Inter, sans-serif)',
-        padding: '24px',
-        maxWidth: '900px',
-        margin: '0 auto',
-        position: 'relative',
-      }}
-    >
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '24px' }}>
+    <div className="min-h-screen bg-bg-primary font-base p-6 max-w-[900px] mx-auto relative">
+      <h1 className="text-2xl font-bold text-white mb-6">
         Schedule
       </h1>
 
       {/* Calendar Card */}
       <div
+        className="border border-[var(--glass-border,rgba(255,255,255,0.06))] rounded-xl p-6 mb-6"
         style={{
           backgroundColor: 'var(--glass-bg, rgba(30,30,30,0.8))',
           backdropFilter: 'var(--glass-blur, blur(16px))',
           WebkitBackdropFilter: 'var(--glass-blur, blur(16px))',
-          border: '1px solid var(--glass-border, rgba(255,255,255,0.06))',
-          borderRadius: '20px',
-          padding: '24px',
-          marginBottom: '24px',
         }}
       >
         {/* Month Navigation */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div className="flex justify-between items-center mb-6">
           <button
             onClick={prevMonth}
-            style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
-              backgroundColor: 'rgba(255,255,255,0.06)',
-              border: 'none',
-              color: '#FFFFFF',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
+            className="w-9 h-9 rounded-[10px] bg-[rgba(255,255,255,0.06)] border-none text-white cursor-pointer flex items-center justify-center"
           >
             <ChevronLeft size={18} />
           </button>
-          <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#FFFFFF' }}>{monthName}</h2>
+          <h2 className="text-lg font-semibold text-white">{monthName}</h2>
           <button
             onClick={nextMonth}
-            style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
-              backgroundColor: 'rgba(255,255,255,0.06)',
-              border: 'none',
-              color: '#FFFFFF',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
+            className="w-9 h-9 rounded-[10px] bg-[rgba(255,255,255,0.06)] border-none text-white cursor-pointer flex items-center justify-center"
           >
             <ChevronRight size={18} />
           </button>
         </div>
 
         {/* Day headers */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '8px' }}>
+        <div className="grid grid-cols-7 gap-0.5 mb-2">
           {DAYS_OF_WEEK.map(d => (
             <div
               key={d}
-              style={{
-                textAlign: 'center',
-                fontSize: '0.688rem',
-                fontWeight: 600,
-                color: '#6B7280',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                padding: '8px 0',
-              }}
+              className="text-center text-[0.688rem] font-semibold text-text-tertiary uppercase tracking-widest py-2"
             >
               {d}
             </div>
@@ -257,10 +196,10 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
         </div>
 
         {/* Days grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' }}>
+        <div className="grid grid-cols-7 gap-0.5">
           {/* Empty cells */}
           {Array.from({ length: firstDay }).map((_, i) => (
-            <div key={`empty-${i}`} style={{ aspectRatio: '1', padding: '4px' }} />
+            <div key={`empty-${i}`} className="aspect-square p-1" />
           ))}
           {/* Day cells */}
           {Array.from({ length: daysInMonth }).map((_, i) => {
@@ -274,37 +213,22 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
               <button
                 key={day}
                 onClick={() => setSelectedDate(dateStr)}
+                className="aspect-square flex flex-col items-center justify-center gap-[3px] rounded-[10px] text-sm cursor-pointer font-inherit transition-all duration-100 p-1"
                 style={{
-                  aspectRatio: '1',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '3px',
-                  borderRadius: '10px',
                   border: isSelected ? '2px solid #F0513E' : '2px solid transparent',
                   backgroundColor: isToday ? 'rgba(240,81,62,0.15)' : isSelected ? 'rgba(240,81,62,0.06)' : 'transparent',
                   color: isToday ? '#F0513E' : '#FFFFFF',
                   fontWeight: isToday ? 700 : 400,
-                  fontSize: '0.875rem',
-                  cursor: 'pointer',
-                  fontFamily: 'inherit',
-                  transition: 'all 0.1s ease',
-                  padding: '4px',
                 }}
               >
                 <span>{day}</span>
                 {dayEvents.length > 0 && (
-                  <div style={{ display: 'flex', gap: '2px' }}>
+                  <div className="flex gap-0.5">
                     {dayEvents.slice(0, 3).map(ev => (
                       <div
                         key={ev.id}
-                        style={{
-                          width: '5px',
-                          height: '5px',
-                          borderRadius: '50%',
-                          backgroundColor: EVENT_COLORS[ev.type],
-                        }}
+                        className="w-[5px] h-[5px] rounded-full"
+                        style={{ backgroundColor: EVENT_COLORS[ev.type] }}
                       />
                     ))}
                   </div>
@@ -317,54 +241,38 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
 
       {/* Selected Day Events */}
       {selectedDate && (
-        <div
-          style={{
-            backgroundColor: 'var(--color-bg-card, #1E1E1E)',
-            borderRadius: '16px',
-            border: '1px solid rgba(255,255,255,0.06)',
-            padding: '20px',
-            marginBottom: '24px',
-          }}
-        >
-          <h3 style={{ fontSize: '0.938rem', fontWeight: 600, color: '#FFFFFF', marginBottom: '14px' }}>
+        <div className="bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)] p-5 mb-6">
+          <h3 className="text-[0.938rem] font-semibold text-white mb-3.5">
             Events for {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </h3>
           {selectedEvents.length === 0 ? (
-            <p style={{ color: '#6B7280', fontSize: '0.875rem' }}>No events scheduled for this day</p>
+            <p className="text-text-tertiary text-sm">No events scheduled for this day</p>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="flex flex-col gap-2.5">
               {selectedEvents.map(ev => (
                 <div
                   key={ev.id}
-                  style={{
-                    padding: '14px 16px',
-                    backgroundColor: 'rgba(255,255,255,0.03)',
-                    borderRadius: '12px',
-                    borderLeft: `3px solid ${EVENT_COLORS[ev.type]}`,
-                  }}
+                  className="py-3.5 px-4 bg-[rgba(255,255,255,0.03)] rounded-xl"
+                  style={{ borderLeft: `3px solid ${EVENT_COLORS[ev.type]}` }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '0.938rem', fontWeight: 500, color: '#FFFFFF' }}>{ev.title}</span>
+                  <div className="flex justify-between items-start mb-1.5">
+                    <span className="text-[0.938rem] font-medium text-white">{ev.title}</span>
                     <span
+                      className="py-[3px] px-2 rounded-[6px] text-[0.688rem] font-semibold uppercase"
                       style={{
-                        padding: '3px 8px',
-                        borderRadius: '6px',
-                        fontSize: '0.688rem',
-                        fontWeight: 600,
                         backgroundColor: `${EVENT_COLORS[ev.type]}20`,
                         color: EVENT_COLORS[ev.type],
-                        textTransform: 'uppercase',
                       }}
                     >
                       {EVENT_LABELS[ev.type]}
                     </span>
                   </div>
-                  <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#6B7280' }}>
+                  <div className="flex gap-4 flex-wrap">
+                    <span className="flex items-center gap-1 text-xs text-text-tertiary">
                       <Clock size={12} /> {ev.time}
                     </span>
                     {ev.location && (
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#6B7280' }}>
+                      <span className="flex items-center gap-1 text-xs text-text-tertiary">
                         <MapPin size={12} /> {ev.location}
                       </span>
                     )}
@@ -377,67 +285,39 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
       )}
 
       {/* Upcoming Events */}
-      <div
-        style={{
-          backgroundColor: 'var(--color-bg-card, #1E1E1E)',
-          borderRadius: '16px',
-          border: '1px solid rgba(255,255,255,0.06)',
-          padding: '20px',
-          marginBottom: '80px',
-        }}
-      >
-        <h3 style={{ fontSize: '0.938rem', fontWeight: 600, color: '#FFFFFF', marginBottom: '14px' }}>
+      <div className="bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)] p-5 mb-20">
+        <h3 className="text-[0.938rem] font-semibold text-white mb-3.5">
           Upcoming Events
         </h3>
         {upcomingEvents.length === 0 ? (
-          <p style={{ color: '#6B7280', fontSize: '0.875rem' }}>No upcoming events</p>
+          <p className="text-text-tertiary text-sm">No upcoming events</p>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div className="flex flex-col gap-2.5">
             {upcomingEvents.map(ev => (
               <div
                 key={ev.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px',
-                  borderRadius: '10px',
-                  backgroundColor: 'rgba(255,255,255,0.02)',
-                }}
+                className="flex items-center gap-3 p-3 rounded-[10px] bg-[rgba(255,255,255,0.02)]"
               >
                 <div
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '10px',
-                    backgroundColor: `${EVENT_COLORS[ev.type]}15`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
+                  className="w-10 h-10 rounded-[10px] flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: `${EVENT_COLORS[ev.type]}15` }}
                 >
                   <Calendar size={16} style={{ color: EVENT_COLORS[ev.type] }} />
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 500, color: '#FFFFFF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-white overflow-hidden text-ellipsis whitespace-nowrap">
                     {ev.title}
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: '#6B7280', marginTop: '2px' }}>
+                  <div className="text-xs text-text-tertiary mt-0.5">
                     {new Date(ev.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {ev.time}
                     {ev.location ? ` \u00b7 ${ev.location}` : ''}
                   </div>
                 </div>
                 <span
+                  className="py-[3px] px-2 rounded-[6px] text-[0.625rem] font-semibold uppercase shrink-0"
                   style={{
-                    padding: '3px 8px',
-                    borderRadius: '6px',
-                    fontSize: '0.625rem',
-                    fontWeight: 600,
                     backgroundColor: `${EVENT_COLORS[ev.type]}20`,
                     color: EVENT_COLORS[ev.type],
-                    textTransform: 'uppercase',
-                    flexShrink: 0,
                   }}
                 >
                   {EVENT_LABELS[ev.type]}
@@ -457,24 +337,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
           }));
           setShowModal(true);
         }}
-        style={{
-          position: 'fixed',
-          bottom: '32px',
-          right: '32px',
-          width: '56px',
-          height: '56px',
-          borderRadius: '16px',
-          backgroundColor: '#F0513E',
-          color: '#FFFFFF',
-          border: 'none',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 8px 24px rgba(240,81,62,0.4)',
-          transition: 'transform 0.15s ease',
-          zIndex: 50,
-        }}
+        className="fixed bottom-8 right-8 w-14 h-14 rounded-lg bg-accent text-white border-none cursor-pointer flex items-center justify-center shadow-[0_8px_24px_rgba(240,81,62,0.4)] transition-transform duration-150 z-50 hover:scale-105"
         title="Add Event"
       >
         <Plus size={24} />
@@ -483,75 +346,37 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
       {/* Create Event Modal */}
       {showModal && (
         <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.7)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-            padding: '24px',
-          }}
+          className="fixed inset-0 bg-[rgba(0,0,0,0.7)] flex items-center justify-center z-[1000] p-6"
           onClick={e => { if (e.target === e.currentTarget) setShowModal(false); }}
         >
-          <div
-            style={{
-              width: '100%',
-              maxWidth: '440px',
-              backgroundColor: '#1E1E1E',
-              borderRadius: '20px',
-              border: '1px solid rgba(255,255,255,0.1)',
-              overflow: 'hidden',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
-            }}
-          >
+          <div className="w-full max-w-[440px] bg-bg-tertiary rounded-xl border border-[rgba(255,255,255,0.1)] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
             {/* Modal Header */}
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '20px 24px',
-                borderBottom: '1px solid rgba(255,255,255,0.06)',
-              }}
-            >
-              <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#FFFFFF' }}>New Event</h3>
+            <div className="flex justify-between items-center px-6 py-5 border-b border-[rgba(255,255,255,0.06)]">
+              <h3 className="text-lg font-semibold text-white">New Event</h3>
               <button
                 onClick={() => setShowModal(false)}
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '8px',
-                  backgroundColor: 'rgba(255,255,255,0.06)',
-                  border: 'none',
-                  color: '#9CA3AF',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
+                className="w-8 h-8 rounded-sm bg-[rgba(255,255,255,0.06)] border-none text-text-secondary cursor-pointer flex items-center justify-center"
               >
                 <X size={16} />
               </button>
             </div>
 
             {/* Modal Body */}
-            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="p-6 flex flex-col gap-4">
               <div>
-                <label style={labelStyle}>Title</label>
+                <label className="block text-xs font-medium text-text-tertiary mb-1">Title</label>
                 <input
                   type="text"
                   value={newEvent.title}
                   onChange={e => setNewEvent(p => ({ ...p, title: e.target.value }))}
                   placeholder="Event title"
-                  style={inputStyle}
+                  className={inputClasses}
                 />
               </div>
 
               <div>
-                <label style={labelStyle}>Type</label>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <label className="block text-xs font-medium text-text-tertiary mb-1">Type</label>
+                <div className="flex gap-2 flex-wrap">
                   {(Object.keys(EVENT_LABELS) as EventType[]).map(type => {
                     const selected = newEvent.type === type;
                     return (
@@ -559,16 +384,11 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
                         key={type}
                         type="button"
                         onClick={() => setNewEvent(p => ({ ...p, type }))}
+                        className="py-2 px-3.5 rounded-sm text-[0.813rem] font-medium cursor-pointer font-inherit"
                         style={{
-                          padding: '8px 14px',
-                          borderRadius: '8px',
-                          fontSize: '0.813rem',
-                          fontWeight: 500,
                           border: `2px solid ${selected ? EVENT_COLORS[type] : 'rgba(255,255,255,0.08)'}`,
                           backgroundColor: selected ? `${EVENT_COLORS[type]}15` : 'transparent',
                           color: selected ? EVENT_COLORS[type] : '#9CA3AF',
-                          cursor: 'pointer',
-                          fontFamily: 'inherit',
                         }}
                       >
                         {EVENT_LABELS[type]}
@@ -578,46 +398,46 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label style={labelStyle}>Date</label>
+                  <label className="block text-xs font-medium text-text-tertiary mb-1">Date</label>
                   <input
                     type="date"
                     value={newEvent.date}
                     onChange={e => setNewEvent(p => ({ ...p, date: e.target.value }))}
-                    style={{ ...inputStyle, colorScheme: 'dark' }}
+                    className={`${inputClasses} [color-scheme:dark]`}
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Time</label>
+                  <label className="block text-xs font-medium text-text-tertiary mb-1">Time</label>
                   <input
                     type="time"
                     value={newEvent.time}
                     onChange={e => setNewEvent(p => ({ ...p, time: e.target.value }))}
-                    style={{ ...inputStyle, colorScheme: 'dark' }}
+                    className={`${inputClasses} [color-scheme:dark]`}
                   />
                 </div>
               </div>
 
               <div>
-                <label style={labelStyle}>Location</label>
+                <label className="block text-xs font-medium text-text-tertiary mb-1">Location</label>
                 <input
                   type="text"
                   value={newEvent.location}
                   onChange={e => setNewEvent(p => ({ ...p, location: e.target.value }))}
                   placeholder="Event location"
-                  style={inputStyle}
+                  className={inputClasses}
                 />
               </div>
 
               <div>
-                <label style={labelStyle}>Notes</label>
+                <label className="block text-xs font-medium text-text-tertiary mb-1">Notes</label>
                 <textarea
                   value={newEvent.notes}
                   onChange={e => setNewEvent(p => ({ ...p, notes: e.target.value }))}
                   placeholder="Additional notes..."
                   rows={3}
-                  style={{ ...inputStyle, resize: 'vertical' }}
+                  className={`${inputClasses} resize-y`}
                 />
               </div>
 
@@ -625,18 +445,11 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
                 type="button"
                 onClick={handleCreateEvent}
                 disabled={!newEvent.title.trim()}
+                className="w-full py-3 border-none rounded-xl text-[0.938rem] font-semibold font-inherit mt-2"
                 style={{
-                  width: '100%',
-                  padding: '12px',
                   backgroundColor: newEvent.title.trim() ? '#F0513E' : 'rgba(240,81,62,0.3)',
                   color: newEvent.title.trim() ? '#FFFFFF' : 'rgba(255,255,255,0.5)',
-                  border: 'none',
-                  borderRadius: '12px',
-                  fontSize: '0.938rem',
-                  fontWeight: 600,
                   cursor: newEvent.title.trim() ? 'pointer' : 'not-allowed',
-                  fontFamily: 'inherit',
-                  marginTop: '8px',
                 }}
               >
                 Create Event

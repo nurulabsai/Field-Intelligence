@@ -17,17 +17,7 @@ const AuditStepIndicator: React.FC<AuditStepIndicatorProps> = ({
   const steps = STEP_LABELS.slice(0, totalSteps);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-        width: '100%',
-        padding: '16px 8px',
-        fontFamily: 'Inter, sans-serif',
-        overflowX: 'auto',
-      }}
-    >
+    <div className="flex items-start justify-center w-full py-4 px-2 font-[Inter,sans-serif] overflow-x-auto">
       {steps.map((label, index) => {
         const stepNum = index + 1;
         const isCompleted = completedSteps.includes(stepNum);
@@ -45,34 +35,18 @@ const AuditStepIndicator: React.FC<AuditStepIndicatorProps> = ({
         return (
           <div
             key={stepNum}
+            className="flex items-center"
             style={{
-              display: 'flex',
-              alignItems: 'center',
               flex: index < steps.length - 1 ? 1 : 'none',
             }}
           >
             {/* Step circle + label column */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                minWidth: '40px',
-              }}
-            >
+            <div className="flex flex-col items-center min-w-[40px]">
               <div
+                className="w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-semibold transition-all duration-[250ms]"
                 style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
                   backgroundColor: circleBg,
                   color: circleColor,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  transition: 'all 0.25s ease',
                   boxShadow: isCurrent
                     ? '0 0 0 3px rgba(240,81,62,0.25)'
                     : 'none',
@@ -81,16 +55,14 @@ const AuditStepIndicator: React.FC<AuditStepIndicatorProps> = ({
                 {isCompleted ? <Check size={16} /> : stepNum}
               </div>
               <span
+                className="text-[11px] mt-1.5 whitespace-nowrap"
                 style={{
-                  fontSize: '11px',
                   color: isCurrent
                     ? '#FFFFFF'
                     : isCompleted
                       ? '#22C55E'
                       : '#6B7280',
                   fontWeight: isCurrent ? 600 : 400,
-                  marginTop: '6px',
-                  whiteSpace: 'nowrap',
                 }}
               >
                 {label}
@@ -100,16 +72,11 @@ const AuditStepIndicator: React.FC<AuditStepIndicatorProps> = ({
             {/* Connecting line */}
             {index < steps.length - 1 && (
               <div
+                className="flex-1 h-0.5 -mt-4 mx-1 transition-colors duration-[250ms]"
                 style={{
-                  flex: 1,
-                  height: '2px',
                   backgroundColor: isCompleted
                     ? '#22C55E'
                     : 'rgba(255,255,255,0.08)',
-                  marginTop: '-16px',
-                  marginLeft: '4px',
-                  marginRight: '4px',
-                  transition: 'background-color 0.25s ease',
                 }}
               />
             )}

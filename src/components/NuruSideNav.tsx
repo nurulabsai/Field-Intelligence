@@ -36,83 +36,30 @@ const NuruSideNav: React.FC<NuruSideNavProps> = ({
 }) => {
   return (
     <aside
-      style={{
-        width: '260px',
-        height: '100vh',
-        position: 'fixed',
-        left: 0,
-        top: 0,
-        backgroundColor: 'var(--color-bg-card, #1E1E1E)',
-        borderRight: '1px solid rgba(255,255,255,0.06)',
-        display: 'flex',
-        flexDirection: 'column',
-        fontFamily: 'Inter, sans-serif',
-        zIndex: 40,
-      }}
-      className="nuru-side-nav"
+      className="nuru-side-nav w-[260px] h-screen fixed left-0 top-0 bg-bg-card border-r border-[rgba(255,255,255,0.06)] flex flex-col font-[Inter,sans-serif] z-40"
     >
       {/* Logo */}
-      <div
-        style={{
-          padding: '24px 20px',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-          }}
-        >
-          <div
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '8px',
-              backgroundColor: '#F0513E',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#FFFFFF',
-              fontWeight: 800,
-              fontSize: '14px',
-            }}
-          >
+      <div className="py-6 px-5 border-b border-[rgba(255,255,255,0.06)]">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-white font-extrabold text-sm">
             N
           </div>
-          <span
-            style={{
-              color: '#FFFFFF',
-              fontWeight: 700,
-              fontSize: '18px',
-              letterSpacing: '-0.02em',
-            }}
-          >
+          <span className="text-white font-bold text-lg tracking-tight">
             NuruOS
           </span>
         </div>
       </div>
 
       {/* Nav Items */}
-      <nav style={{ flex: 1, padding: '12px 10px' }}>
+      <nav className="flex-1 py-3 px-2.5">
         {navItems.map((item) => {
           const isActive = currentPath === item.path;
           return (
             <button
               key={item.path}
               onClick={() => onNavigate(item.path)}
+              className="flex items-center gap-3 w-full py-2.5 px-3.5 rounded-[10px] border-none cursor-pointer font-[Inter,sans-serif] text-sm transition-all duration-150 mb-1 text-left"
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                width: '100%',
-                padding: '10px 14px',
-                borderRadius: '10px',
-                border: 'none',
-                cursor: 'pointer',
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '14px',
                 fontWeight: isActive ? 600 : 400,
                 color: isActive ? '#F0513E' : '#9CA3AF',
                 backgroundColor: isActive
@@ -121,9 +68,6 @@ const NuruSideNav: React.FC<NuruSideNavProps> = ({
                 borderLeft: isActive
                   ? '3px solid #F0513E'
                   : '3px solid transparent',
-                transition: 'all 0.15s ease',
-                marginBottom: '4px',
-                textAlign: 'left',
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
@@ -145,55 +89,20 @@ const NuruSideNav: React.FC<NuruSideNavProps> = ({
       </nav>
 
       {/* User Section */}
-      <div
-        style={{
-          padding: '16px 14px',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-        }}
-      >
+      <div className="py-4 px-3.5 border-t border-[rgba(255,255,255,0.06)] flex items-center gap-3">
         <NuruAvatar name={user.name} size="sm" />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div
-            style={{
-              color: '#FFFFFF',
-              fontSize: '13px',
-              fontWeight: 600,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
+        <div className="flex-1 min-w-0">
+          <div className="text-white text-[13px] font-semibold truncate">
             {user.name}
           </div>
-          <div
-            style={{
-              color: '#6B7280',
-              fontSize: '12px',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <div className="text-text-tertiary text-xs truncate">
             {user.role}
           </div>
         </div>
         <button
           onClick={onLogout}
           title="Logout"
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#6B7280',
-            cursor: 'pointer',
-            padding: '6px',
-            borderRadius: '6px',
-            display: 'flex',
-            alignItems: 'center',
-            transition: 'color 0.15s',
-          }}
+          className="bg-transparent border-none text-text-tertiary cursor-pointer p-1.5 rounded-md flex items-center transition-colors duration-150 hover:text-[#EF4444]"
           onMouseEnter={(e) => (e.currentTarget.style.color = '#EF4444')}
           onMouseLeave={(e) => (e.currentTarget.style.color = '#6B7280')}
         >

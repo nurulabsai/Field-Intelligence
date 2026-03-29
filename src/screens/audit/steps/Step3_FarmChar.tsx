@@ -95,26 +95,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
     });
   }, [data, onChange]);
 
-  const inputStyle = (key: string): React.CSSProperties => ({
-    width: '100%',
-    padding: '12px 16px',
-    backgroundColor: 'var(--color-bg-input, #252525)',
-    border: `1px solid ${allErrors[key as keyof FieldErrors] && touched[key] ? '#EF4444' : 'rgba(255,255,255,0.08)'}`,
-    borderRadius: '12px',
-    color: '#FFFFFF',
-    fontSize: '0.938rem',
-    fontFamily: 'inherit',
-    outline: 'none',
-    transition: 'border-color 0.15s ease',
-  });
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: '0.813rem',
-    fontWeight: 500,
-    color: '#9CA3AF',
-    marginBottom: '6px',
-  };
+  const inputBaseClasses = "w-full py-3 px-4 bg-bg-input rounded-xl text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150";
 
   const renderDropdown = (
     key: string,
@@ -129,45 +110,28 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
 
     return (
       <div key={key}>
-        <label style={labelStyle}>
+        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">
           {label}
-          {required && <span style={{ color: '#F0513E', marginLeft: '4px' }}>*</span>}
+          {required && <span className="text-text-accent ml-1">*</span>}
         </label>
-        <div style={{ position: 'relative' }}>
+        <div className="relative">
           <button
             type="button"
             onClick={() => setOpenDropdown(isOpen ? null : key)}
+            className={`${inputBaseClasses} text-left cursor-pointer flex items-center justify-between`}
             style={{
-              ...inputStyle(key),
-              textAlign: 'left',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
               borderColor: showError ? '#EF4444' : isOpen ? '#F0513E' : 'rgba(255,255,255,0.08)',
+              borderWidth: '1px',
+              borderStyle: 'solid',
             }}
           >
-            <span style={{ color: value ? '#FFFFFF' : '#6B7280' }}>
+            <span className={value ? 'text-white' : 'text-text-tertiary'}>
               {options.find(o => o.value === value)?.label || `Select ${label.toLowerCase()}`}
             </span>
-            <ChevronDown size={18} style={{ color: '#6B7280', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }} />
+            <ChevronDown size={18} className="text-text-tertiary transition-transform duration-150" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }} />
           </button>
           {isOpen && (
-            <div
-              style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                right: 0,
-                marginTop: '4px',
-                backgroundColor: '#1E1E1E',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '12px',
-                zIndex: 50,
-                overflow: 'hidden',
-                boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
-              }}
-            >
+            <div className="absolute top-full left-0 right-0 mt-1 bg-bg-tertiary border border-[rgba(255,255,255,0.1)] rounded-xl z-50 overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
               {options.map(opt => (
                 <button
                   key={opt.value}
@@ -176,16 +140,10 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
                     handleChange(key, opt.value);
                     setOpenDropdown(null);
                   }}
+                  className="w-full py-2.5 px-4 border-none text-sm text-left cursor-pointer font-inherit"
                   style={{
-                    width: '100%',
-                    padding: '10px 16px',
                     background: value === opt.value ? 'rgba(240,81,62,0.15)' : 'transparent',
-                    border: 'none',
                     color: value === opt.value ? '#F0513E' : '#FFFFFF',
-                    fontSize: '0.875rem',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
                   }}
                 >
                   {opt.label}
@@ -194,41 +152,31 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
             </div>
           )}
         </div>
-        {showError && <p style={{ fontSize: '0.75rem', color: '#FCA5A5', marginTop: '4px' }}>{error}</p>}
+        {showError && <p className="text-xs text-[#FCA5A5] mt-1">{error}</p>}
       </div>
     );
   };
 
   return (
     <div>
-      <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '4px' }}>
+      <h2 className="text-xl font-bold text-white mb-1">
         Farm Characteristics
       </h2>
-      <p style={{ fontSize: '0.875rem', color: '#6B7280', marginBottom: '28px' }}>
+      <p className="text-sm text-text-tertiary mb-7">
         Record physical farm attributes and resources
       </p>
 
       {/* Error Summary Banner */}
       {hasErrors && Object.values(touched).some(Boolean) && (
-        <div
-          style={{
-            display: 'flex',
-            gap: '12px',
-            padding: '16px',
-            backgroundColor: 'rgba(239,68,68,0.08)',
-            border: '1px solid rgba(239,68,68,0.25)',
-            borderRadius: '14px',
-            marginBottom: '24px',
-          }}
-        >
-          <AlertCircle size={20} style={{ color: '#EF4444', flexShrink: 0, marginTop: '2px' }} />
+        <div className="flex gap-3 p-4 bg-[rgba(239,68,68,0.08)] border border-[rgba(239,68,68,0.25)] rounded-[14px] mb-6">
+          <AlertCircle size={20} className="text-error shrink-0 mt-0.5" />
           <div>
-            <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#FCA5A5', marginBottom: '6px' }}>
+            <p className="text-sm font-semibold text-[#FCA5A5] mb-1.5">
               Please fix the following errors
             </p>
-            <ul style={{ margin: 0, paddingLeft: '16px' }}>
+            <ul className="m-0 pl-4">
               {errorList.map((err, i) => (
-                <li key={i} style={{ fontSize: '0.813rem', color: '#FCA5A5', lineHeight: 1.5 }}>
+                <li key={i} className="text-[0.813rem] text-[#FCA5A5] leading-normal">
                   {err}
                 </li>
               ))}
@@ -237,11 +185,11 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
         </div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div className="flex flex-col gap-5">
         {/* Total Area */}
         <div>
-          <label style={labelStyle}>
-            Total Area (ha) <span style={{ color: '#F0513E' }}>*</span>
+          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">
+            Total Area (ha) <span className="text-text-accent">*</span>
           </label>
           <input
             type="number"
@@ -250,18 +198,21 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
             value={(data.total_area_ha as string) || ''}
             onChange={e => handleChange('total_area_ha', e.target.value)}
             placeholder="Enter total farm area in hectares"
-            style={inputStyle('total_area_ha')}
+            className={`${inputBaseClasses} border`}
+            style={{
+              borderColor: allErrors.total_area_ha && touched.total_area_ha ? '#EF4444' : 'rgba(255,255,255,0.08)',
+            }}
             onBlur={() => setTouched(p => ({ ...p, total_area_ha: true }))}
           />
           {allErrors.total_area_ha && touched.total_area_ha && (
-            <p style={{ fontSize: '0.75rem', color: '#FCA5A5', marginTop: '4px' }}>{allErrors.total_area_ha}</p>
+            <p className="text-xs text-[#FCA5A5] mt-1">{allErrors.total_area_ha}</p>
           )}
         </div>
 
         {/* Cultivated Area */}
         <div>
-          <label style={labelStyle}>
-            Cultivated Area (ha) <span style={{ color: '#F0513E' }}>*</span>
+          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">
+            Cultivated Area (ha) <span className="text-text-accent">*</span>
           </label>
           <input
             type="number"
@@ -270,11 +221,14 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
             value={(data.cultivated_area_ha as string) || ''}
             onChange={e => handleChange('cultivated_area_ha', e.target.value)}
             placeholder="Enter cultivated area in hectares"
-            style={inputStyle('cultivated_area_ha')}
+            className={`${inputBaseClasses} border`}
+            style={{
+              borderColor: allErrors.cultivated_area_ha && touched.cultivated_area_ha ? '#EF4444' : 'rgba(255,255,255,0.08)',
+            }}
             onBlur={() => setTouched(p => ({ ...p, cultivated_area_ha: true }))}
           />
           {allErrors.cultivated_area_ha && touched.cultivated_area_ha && (
-            <p style={{ fontSize: '0.75rem', color: '#FCA5A5', marginTop: '4px' }}>{allErrors.cultivated_area_ha}</p>
+            <p className="text-xs text-[#FCA5A5] mt-1">{allErrors.cultivated_area_ha}</p>
           )}
         </div>
 
@@ -287,15 +241,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
 
       {/* Disabled continue hint */}
       {hasErrors && Object.values(touched).some(Boolean) && (
-        <p
-          style={{
-            marginTop: '24px',
-            textAlign: 'center',
-            fontSize: '0.813rem',
-            color: '#EF4444',
-            fontWeight: 500,
-          }}
-        >
+        <p className="mt-6 text-center text-[0.813rem] text-error font-medium">
           Fix errors to continue
         </p>
       )}

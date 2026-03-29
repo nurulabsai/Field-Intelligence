@@ -71,34 +71,14 @@ const ToastItem: React.FC<{ toast: Toast; onDismiss: () => void }> = ({
 
   return (
     <div
+      className="bg-[rgba(30,30,30,0.95)] backdrop-blur-[12px] rounded-xl py-3 px-4 flex items-center justify-between gap-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] max-w-[420px] w-full font-[Inter,sans-serif] transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
       style={{
-        backgroundColor: 'rgba(30,30,30,0.95)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderRadius: '12px',
         borderLeft: `4px solid ${borderColors[t.type]}`,
-        padding: '12px 16px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: '12px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
         transform: isVisible && !isExiting ? 'translateY(0)' : 'translateY(-20px)',
         opacity: isVisible && !isExiting ? 1 : 0,
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        maxWidth: '420px',
-        width: '100%',
-        fontFamily: 'Inter, sans-serif',
       }}
     >
-      <span
-        style={{
-          color: '#FFFFFF',
-          fontSize: '14px',
-          fontWeight: 500,
-          flex: 1,
-        }}
-      >
+      <span className="text-white text-sm font-medium flex-1">
         {t.message}
       </span>
       <button
@@ -106,17 +86,7 @@ const ToastItem: React.FC<{ toast: Toast; onDismiss: () => void }> = ({
           setIsExiting(true);
           setTimeout(onDismiss, 300);
         }}
-        style={{
-          background: 'none',
-          border: 'none',
-          color: '#6B7280',
-          cursor: 'pointer',
-          padding: '4px',
-          display: 'flex',
-          alignItems: 'center',
-          borderRadius: '4px',
-          flexShrink: 0,
-        }}
+        className="bg-transparent border-none text-text-tertiary cursor-pointer p-1 flex items-center rounded shrink-0"
       >
         <X size={14} />
       </button>
@@ -131,25 +101,9 @@ const ToastProvider: React.FC<{ children?: React.ReactNode }> = ({ children }) =
   return (
     <>
       {children}
-      <div
-        style={{
-          position: 'fixed',
-          top: '16px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 9999,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px',
-          alignItems: 'center',
-          pointerEvents: 'none',
-          width: '100%',
-          maxWidth: '440px',
-          padding: '0 16px',
-        }}
-      >
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 items-center pointer-events-none w-full max-w-[440px] px-4">
         {toasts.map((t) => (
-          <div key={t.id} style={{ pointerEvents: 'auto', width: '100%' }}>
+          <div key={t.id} className="pointer-events-auto w-full">
             <ToastItem toast={t} onDismiss={() => removeToast(t.id)} />
           </div>
         ))}

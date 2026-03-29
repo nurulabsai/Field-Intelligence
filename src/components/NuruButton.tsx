@@ -115,9 +115,7 @@ const NuruButton: React.FC<NuruButtonProps> = ({
       {loading ? (
         <Loader2
           size={size === 'sm' ? 14 : size === 'md' ? 16 : 20}
-          style={{
-            animation: 'nuru-spin 1s linear infinite',
-          }}
+          className="animate-[nuru-spin_1s_linear_infinite]"
         />
       ) : icon ? (
         icon

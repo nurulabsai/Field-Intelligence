@@ -24,13 +24,7 @@ const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   if (isLoading) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        background: '#0D0D0D',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
         <LoadingSkeleton variant="card" count={1} />
       </div>
     );
@@ -68,11 +62,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      minHeight: '100vh',
-      background: 'var(--color-bg-primary)',
-    }}>
+    <div className="flex min-h-screen bg-bg-primary">
       {/* Desktop Sidebar */}
       <NuruSideNav
         currentPath={location.pathname}
@@ -85,15 +75,9 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       />
 
       {/* Main Content */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: '100vh',
-        paddingBottom: 72,
-      }}>
+      <div className="flex-1 flex flex-col min-h-screen pb-[72px]">
         {!isOnline && <OfflineBanner pendingCount={pendingSyncCount} />}
-        <main style={{ flex: 1, overflow: 'auto' }}>
+        <main className="flex-1 overflow-auto">
           {children}
         </main>
       </div>
@@ -109,14 +93,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 // ─── Suspense Wrapper ───────────────────────────────────────────────────────
 const PageLoader: React.FC = () => (
-  <div style={{
-    minHeight: '100vh',
-    background: 'var(--color-bg-primary)',
-    padding: 24,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 16,
-  }}>
+  <div className="min-h-screen bg-bg-primary p-6 flex flex-col gap-4">
     <LoadingSkeleton variant="text" count={2} />
     <LoadingSkeleton variant="card" count={3} />
   </div>
@@ -296,13 +273,7 @@ const SplashRedirect: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        background: '#0D0D0D',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
         <LoadingSkeleton variant="card" count={1} />
       </div>
     );
@@ -318,35 +289,23 @@ const SettingsPlaceholder: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div style={{ padding: 24, maxWidth: 600, margin: '0 auto' }}>
-      <h1 style={{
-        fontSize: 24,
-        fontWeight: 700,
-        color: 'var(--color-text-primary)',
-        fontFamily: 'var(--font-family-heading)',
-        marginBottom: 24,
-      }}>
+    <div className="p-6 max-w-[600px] mx-auto">
+      <h1 className="text-2xl font-bold text-text-primary font-heading mb-6">
         Settings
       </h1>
 
-      <div style={{
-        background: 'var(--color-bg-card)',
-        borderRadius: 16,
-        border: '1px solid rgba(255,255,255,0.06)',
-        padding: 24,
-        marginBottom: 16,
-      }}>
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 12, color: 'var(--color-text-tertiary)', marginBottom: 4 }}>Name</div>
-          <div style={{ fontSize: 16, color: 'var(--color-text-primary)' }}>{user?.fullName || 'N/A'}</div>
+      <div className="bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)] p-6 mb-4">
+        <div className="mb-4">
+          <div className="text-xs text-text-tertiary mb-1">Name</div>
+          <div className="text-base text-text-primary">{user?.fullName || 'N/A'}</div>
         </div>
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 12, color: 'var(--color-text-tertiary)', marginBottom: 4 }}>Email</div>
-          <div style={{ fontSize: 16, color: 'var(--color-text-primary)' }}>{user?.email || 'N/A'}</div>
+        <div className="mb-4">
+          <div className="text-xs text-text-tertiary mb-1">Email</div>
+          <div className="text-base text-text-primary">{user?.email || 'N/A'}</div>
         </div>
         <div>
-          <div style={{ fontSize: 12, color: 'var(--color-text-tertiary)', marginBottom: 4 }}>Role</div>
-          <div style={{ fontSize: 16, color: 'var(--color-text-primary)', textTransform: 'capitalize' }}>{user?.role || 'N/A'}</div>
+          <div className="text-xs text-text-tertiary mb-1">Role</div>
+          <div className="text-base text-text-primary capitalize">{user?.role || 'N/A'}</div>
         </div>
       </div>
 
@@ -355,18 +314,7 @@ const SettingsPlaceholder: React.FC = () => {
           await signOut();
           navigate('/auth/login');
         }}
-        style={{
-          width: '100%',
-          padding: '14px 24px',
-          background: 'rgba(239,68,68,0.1)',
-          color: '#EF4444',
-          border: '1px solid rgba(239,68,68,0.2)',
-          borderRadius: 12,
-          fontSize: 16,
-          fontWeight: 600,
-          cursor: 'pointer',
-          fontFamily: 'var(--font-family-base)',
-        }}
+        className="w-full py-3.5 px-6 bg-[rgba(239,68,68,0.1)] text-[#EF4444] border border-[rgba(239,68,68,0.2)] rounded-xl text-base font-semibold cursor-pointer font-base"
       >
         Sign Out
       </button>

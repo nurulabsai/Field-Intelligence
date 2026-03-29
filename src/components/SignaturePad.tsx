@@ -105,12 +105,10 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
   };
 
   return (
-    <div style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div className="font-[Inter,sans-serif]">
       <div
+        className="relative rounded-xl overflow-hidden"
         style={{
-          position: 'relative',
-          borderRadius: '12px',
-          overflow: 'hidden',
           border: hasContent
             ? '1px solid rgba(255,255,255,0.08)'
             : '2px dashed rgba(255,255,255,0.15)',
@@ -118,14 +116,7 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
       >
         <canvas
           ref={canvasRef}
-          style={{
-            width: '100%',
-            height: '160px',
-            display: 'block',
-            backgroundColor: '#1E1E1E',
-            touchAction: 'none',
-            cursor: 'crosshair',
-          }}
+          className="w-full h-40 block bg-bg-tertiary touch-none cursor-crosshair"
           onMouseDown={startDraw}
           onMouseMove={draw}
           onMouseUp={endDraw}
@@ -135,41 +126,16 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
           onTouchEnd={endDraw}
         />
         {!hasContent && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              color: '#6B7280',
-              fontSize: '13px',
-              pointerEvents: 'none',
-              userSelect: 'none',
-            }}
-          >
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-text-tertiary text-[13px] pointer-events-none select-none">
             Sign here
           </div>
         )}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+      <div className="flex justify-end mt-2">
         <button
           onClick={handleClear}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: 'none',
-            border: '1px solid rgba(255,255,255,0.08)',
-            color: '#9CA3AF',
-            fontSize: '13px',
-            fontWeight: 500,
-            fontFamily: 'Inter, sans-serif',
-            padding: '6px 12px',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            transition: 'color 0.15s, border-color 0.15s',
-          }}
+          className="inline-flex items-center gap-1.5 bg-transparent border border-border text-text-secondary text-[13px] font-medium font-[Inter,sans-serif] py-1.5 px-3 rounded-lg cursor-pointer transition-all duration-150"
           onMouseEnter={(e) => {
             e.currentTarget.style.color = '#FFFFFF';
             e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';

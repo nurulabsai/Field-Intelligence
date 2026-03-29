@@ -50,6 +50,8 @@ function createEmptyCrop(): CropEntry {
   };
 }
 
+const inputClasses = "w-full py-2.5 px-3.5 bg-bg-input border border-border rounded-[10px] text-white text-sm font-inherit outline-none transition-colors duration-150";
+
 const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
   const crops: CropEntry[] = useMemo(() => {
     const raw = data.crops as CropEntry[] | undefined;
@@ -75,88 +77,38 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
     updateCrops(crops.map(c => c.id === id ? { ...c, [field]: value } : c));
   }, [crops, updateCrops]);
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '10px 14px',
-    backgroundColor: 'var(--color-bg-input, #252525)',
-    border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: '10px',
-    color: '#FFFFFF',
-    fontSize: '0.875rem',
-    fontFamily: 'inherit',
-    outline: 'none',
-    transition: 'border-color 0.15s ease',
-  };
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: '0.75rem',
-    fontWeight: 500,
-    color: '#6B7280',
-    marginBottom: '4px',
-  };
-
   return (
     <div>
-      <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '4px' }}>
+      <h2 className="text-xl font-bold text-white mb-1">
         Crops
       </h2>
-      <p style={{ fontSize: '0.875rem', color: '#6B7280', marginBottom: '24px' }}>
+      <p className="text-sm text-text-tertiary mb-6">
         Add all crops cultivated on this farm (at least one required)
       </p>
 
       {errors.crops && (
-        <p style={{ fontSize: '0.813rem', color: '#FCA5A5', marginBottom: '16px' }}>{errors.crops}</p>
+        <p className="text-[0.813rem] text-[#FCA5A5] mb-4">{errors.crops}</p>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div className="flex flex-col gap-4">
         {crops.map((crop, index) => (
           <div
             key={crop.id}
-            style={{
-              backgroundColor: 'var(--color-bg-card, #1E1E1E)',
-              border: '1px solid rgba(255,255,255,0.06)',
-              borderRadius: '16px',
-              padding: '20px',
-            }}
+            className="bg-bg-card border border-[rgba(255,255,255,0.06)] rounded-lg p-5"
           >
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
-                    backgroundColor: 'rgba(34,197,94,0.1)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#22C55E',
-                  }}
-                >
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-sm bg-[rgba(34,197,94,0.1)] flex items-center justify-center text-[#22C55E]">
                   <Wheat size={16} />
                 </div>
-                <span style={{ fontSize: '0.938rem', fontWeight: 600, color: '#FFFFFF' }}>Crop {index + 1}</span>
+                <span className="text-[0.938rem] font-semibold text-white">Crop {index + 1}</span>
               </div>
               {crops.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeCrop(crop.id)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '6px 12px',
-                    backgroundColor: 'rgba(239,68,68,0.1)',
-                    border: '1px solid rgba(239,68,68,0.2)',
-                    borderRadius: '8px',
-                    color: '#EF4444',
-                    fontSize: '0.75rem',
-                    fontWeight: 500,
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                  }}
+                  className="flex items-center gap-1.5 py-1.5 px-3 bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.2)] rounded-sm text-error text-xs font-medium cursor-pointer font-inherit"
                 >
                   <Trash2 size={13} />
                   Remove
@@ -165,43 +117,21 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
             </div>
 
             {/* Crop Type Dropdown */}
-            <div style={{ marginBottom: '14px' }}>
-              <label style={labelStyle}>Crop Type <span style={{ color: '#F0513E' }}>*</span></label>
-              <div style={{ position: 'relative' }}>
+            <div className="mb-3.5">
+              <label className="block text-xs font-medium text-text-tertiary mb-1">Crop Type <span className="text-text-accent">*</span></label>
+              <div className="relative">
                 <button
                   type="button"
                   onClick={() => setOpenDropdowns(p => ({ ...p, [crop.id]: !p[crop.id] }))}
-                  style={{
-                    ...inputStyle,
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
+                  className={`${inputClasses} text-left cursor-pointer flex items-center justify-between`}
                 >
-                  <span style={{ color: crop.crop_id ? '#FFFFFF' : '#6B7280' }}>
+                  <span className={crop.crop_id ? 'text-white' : 'text-text-tertiary'}>
                     {CROP_OPTIONS.find(o => o.value === crop.crop_id)?.label || 'Select crop'}
                   </span>
-                  <ChevronDown size={16} style={{ color: '#6B7280' }} />
+                  <ChevronDown size={16} className="text-text-tertiary" />
                 </button>
                 {openDropdowns[crop.id] && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      right: 0,
-                      marginTop: '4px',
-                      backgroundColor: '#252525',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '10px',
-                      zIndex: 50,
-                      maxHeight: '200px',
-                      overflowY: 'auto',
-                      boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
-                    }}
-                  >
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-bg-input border border-[rgba(255,255,255,0.1)] rounded-[10px] z-50 max-h-[200px] overflow-y-auto shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
                     {CROP_OPTIONS.map(opt => (
                       <button
                         key={opt.value}
@@ -210,16 +140,10 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
                           updateCropField(crop.id, 'crop_id', opt.value);
                           setOpenDropdowns(p => ({ ...p, [crop.id]: false }));
                         }}
+                        className="w-full py-2.5 px-3.5 border-none text-sm text-left cursor-pointer font-inherit"
                         style={{
-                          width: '100%',
-                          padding: '10px 14px',
                           background: crop.crop_id === opt.value ? 'rgba(240,81,62,0.15)' : 'transparent',
-                          border: 'none',
                           color: crop.crop_id === opt.value ? '#F0513E' : '#FFFFFF',
-                          fontSize: '0.875rem',
-                          textAlign: 'left',
-                          cursor: 'pointer',
-                          fontFamily: 'inherit',
                         }}
                       >
                         {opt.label}
@@ -231,12 +155,9 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
             </div>
 
             {/* Crop details grid */}
-            <div
-              className="nuru-crop-fields"
-              style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}
-            >
+            <div className="nuru-crop-fields grid grid-cols-2 gap-3">
               <div>
-                <label style={labelStyle}>Area (ha)</label>
+                <label className="block text-xs font-medium text-text-tertiary mb-1">Area (ha)</label>
                 <input
                   type="number"
                   step="0.01"
@@ -244,35 +165,35 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
                   value={crop.area_ha}
                   onChange={e => updateCropField(crop.id, 'area_ha', e.target.value)}
                   placeholder="0.00"
-                  style={inputStyle}
+                  className={inputClasses}
                 />
               </div>
               <div>
-                <label style={labelStyle}>Variety</label>
+                <label className="block text-xs font-medium text-text-tertiary mb-1">Variety</label>
                 <input
                   type="text"
                   value={crop.variety}
                   onChange={e => updateCropField(crop.id, 'variety', e.target.value)}
                   placeholder="e.g. STUKA M1"
-                  style={inputStyle}
+                  className={inputClasses}
                 />
               </div>
               <div>
-                <label style={labelStyle}>Planting Date</label>
+                <label className="block text-xs font-medium text-text-tertiary mb-1">Planting Date</label>
                 <input
                   type="date"
                   value={crop.planting_date}
                   onChange={e => updateCropField(crop.id, 'planting_date', e.target.value)}
-                  style={{ ...inputStyle, colorScheme: 'dark' }}
+                  className={`${inputClasses} [color-scheme:dark]`}
                 />
               </div>
               <div>
-                <label style={labelStyle}>Expected Harvest</label>
+                <label className="block text-xs font-medium text-text-tertiary mb-1">Expected Harvest</label>
                 <input
                   type="date"
                   value={crop.expected_harvest}
                   onChange={e => updateCropField(crop.id, 'expected_harvest', e.target.value)}
-                  style={{ ...inputStyle, colorScheme: 'dark' }}
+                  className={`${inputClasses} [color-scheme:dark]`}
                 />
               </div>
             </div>
@@ -284,24 +205,7 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
       <button
         type="button"
         onClick={addCrop}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '8px',
-          width: '100%',
-          padding: '14px',
-          marginTop: '16px',
-          backgroundColor: 'rgba(240,81,62,0.08)',
-          border: '1px dashed rgba(240,81,62,0.3)',
-          borderRadius: '14px',
-          color: '#F0513E',
-          fontSize: '0.875rem',
-          fontWeight: 600,
-          cursor: 'pointer',
-          fontFamily: 'inherit',
-          transition: 'all 0.15s ease',
-        }}
+        className="flex items-center justify-center gap-2 w-full py-3.5 mt-4 bg-[rgba(240,81,62,0.08)] border border-dashed border-[rgba(240,81,62,0.3)] rounded-[14px] text-text-accent text-sm font-semibold cursor-pointer font-inherit transition-all duration-150"
       >
         <Plus size={16} />
         Add Another Crop

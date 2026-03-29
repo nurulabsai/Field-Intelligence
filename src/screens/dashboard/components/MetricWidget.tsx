@@ -30,40 +30,12 @@ const MetricWidget: React.FC<MetricWidgetProps> = ({
 
   return (
     <div
-      style={{
-        backgroundColor: 'var(--glass-bg, rgba(30,30,30,0.8))',
-        backdropFilter: 'var(--glass-blur, blur(16px))',
-        WebkitBackdropFilter: 'var(--glass-blur, blur(16px))',
-        border: '1px solid var(--glass-border, rgba(255,255,255,0.06))',
-        borderRadius: '20px',
-        padding: '24px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px',
-        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-        cursor: 'default',
-      }}
-      onMouseEnter={e => {
-        (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
-        (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.4)';
-      }}
-      onMouseLeave={e => {
-        (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-        (e.currentTarget as HTMLElement).style.boxShadow = 'none';
-      }}
+      className="bg-bg-glass backdrop-blur-[16px] border border-border-glass rounded-xl p-6 flex flex-col gap-4 transition-all duration-200 cursor-default hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)]"
     >
       {/* Icon */}
       <div
-        style={{
-          width: '44px',
-          height: '44px',
-          borderRadius: '12px',
-          backgroundColor: colors.bg,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: colors.accent,
-        }}
+        className="w-11 h-11 rounded-xl flex items-center justify-center"
+        style={{ backgroundColor: colors.bg, color: colors.accent }}
       >
         {icon}
       </div>
@@ -71,24 +43,12 @@ const MetricWidget: React.FC<MetricWidgetProps> = ({
       {/* Value */}
       <div>
         <div
-          style={{
-            fontSize: '2rem',
-            fontWeight: 700,
-            color: colors.accent,
-            lineHeight: 1.1,
-            letterSpacing: '-0.02em',
-          }}
+          className="text-[2rem] font-bold leading-[1.1] tracking-[-0.02em]"
+          style={{ color: colors.accent }}
         >
           {value}
         </div>
-        <div
-          style={{
-            fontSize: '0.813rem',
-            color: '#6B7280',
-            marginTop: '4px',
-            fontWeight: 500,
-          }}
-        >
+        <div className="text-[0.813rem] text-text-tertiary mt-1 font-medium">
           {label}
         </div>
       </div>
@@ -96,18 +56,11 @@ const MetricWidget: React.FC<MetricWidgetProps> = ({
       {/* Trend */}
       {trend !== undefined && (
         <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            fontSize: '0.813rem',
-            fontWeight: 600,
-            color: trendPositive ? '#22C55E' : '#EF4444',
-          }}
+          className={`flex items-center gap-1 text-[0.813rem] font-semibold ${trendPositive ? 'text-success' : 'text-error'}`}
         >
           {trendPositive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
           <span>{trendPositive ? '+' : ''}{trend}%</span>
-          <span style={{ color: '#6B7280', fontWeight: 400, marginLeft: '4px' }}>vs last week</span>
+          <span className="text-text-tertiary font-normal ml-1">vs last week</span>
         </div>
       )}
     </div>

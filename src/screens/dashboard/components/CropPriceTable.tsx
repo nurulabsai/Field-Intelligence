@@ -19,38 +19,20 @@ function formatTZS(amount: number): string {
 
 const CropPriceTable: React.FC<CropPriceTableProps> = ({ data }) => {
   return (
-    <div
-      style={{
-        backgroundColor: 'var(--glass-bg, rgba(30,30,30,0.8))',
-        backdropFilter: 'var(--glass-blur, blur(16px))',
-        WebkitBackdropFilter: 'var(--glass-blur, blur(16px))',
-        border: '1px solid var(--glass-border, rgba(255,255,255,0.06))',
-        borderRadius: '20px',
-        overflow: 'hidden',
-      }}
-    >
-      <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#FFFFFF' }}>Crop Prices</h3>
+    <div className="bg-bg-glass backdrop-blur-[16px] border border-border-glass rounded-xl overflow-hidden">
+      <div className="px-6 py-5 border-b border-border-glass">
+        <h3 className="text-base font-semibold text-white">Crop Prices</h3>
       </div>
 
       {/* Desktop table */}
-      <div className="nuru-crop-table-desktop" style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <div className="nuru-crop-table-desktop overflow-x-auto">
+        <table className="w-full border-collapse">
           <thead>
             <tr>
               {['Crop', 'Region', 'Price/kg', 'Change'].map(h => (
                 <th
                   key={h}
-                  style={{
-                    padding: '12px 24px',
-                    textAlign: 'left',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    color: '#6B7280',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    borderBottom: '1px solid rgba(255,255,255,0.06)',
-                  }}
+                  className="py-3 px-6 text-left text-xs font-semibold text-text-tertiary uppercase tracking-[0.05em] border-b border-border-glass"
                 >
                   {h}
                 </th>
@@ -61,47 +43,26 @@ const CropPriceTable: React.FC<CropPriceTableProps> = ({ data }) => {
             {data.map((row, i) => (
               <tr
                 key={row.id}
+                className="transition-colors duration-150 hover:bg-white/[0.02]"
                 style={{
                   borderBottom: i < data.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
-                  transition: 'background 0.15s ease',
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.02)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >
-                <td style={{ padding: '14px 24px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div
-                      style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '8px',
-                        backgroundColor: 'rgba(34,197,94,0.1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: '#22C55E',
-                        flexShrink: 0,
-                      }}
-                    >
+                <td className="py-3.5 px-6">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center text-success shrink-0">
                       <Wheat size={16} />
                     </div>
-                    <span style={{ fontSize: '0.875rem', fontWeight: 500, color: '#FFFFFF' }}>{row.crop}</span>
+                    <span className="text-sm font-medium text-white">{row.crop}</span>
                   </div>
                 </td>
-                <td style={{ padding: '14px 24px', fontSize: '0.875rem', color: '#9CA3AF' }}>{row.region}</td>
-                <td style={{ padding: '14px 24px', fontSize: '0.875rem', color: '#FFFFFF', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+                <td className="py-3.5 px-6 text-sm text-text-secondary">{row.region}</td>
+                <td className="py-3.5 px-6 text-sm text-white font-semibold tabular-nums">
                   {formatTZS(row.pricePerKg)}
                 </td>
-                <td style={{ padding: '14px 24px' }}>
+                <td className="py-3.5 px-6">
                   <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '0.813rem',
-                      fontWeight: 600,
-                      color: row.change > 0 ? '#22C55E' : row.change < 0 ? '#EF4444' : '#6B7280',
-                    }}
+                    className={`flex items-center gap-1 text-[0.813rem] font-semibold ${row.change > 0 ? 'text-success' : row.change < 0 ? 'text-error' : 'text-text-tertiary'}`}
                   >
                     {row.change > 0 ? <TrendingUp size={14} /> : row.change < 0 ? <TrendingDown size={14} /> : <Minus size={14} />}
                     <span>{row.change > 0 ? '+' : ''}{row.change}%</span>
@@ -114,34 +75,26 @@ const CropPriceTable: React.FC<CropPriceTableProps> = ({ data }) => {
       </div>
 
       {/* Mobile cards */}
-      <div className="nuru-crop-table-mobile" style={{ display: 'none' }}>
+      <div className="nuru-crop-table-mobile hidden">
         {data.map((row, i) => (
           <div
             key={row.id}
+            className="py-4 px-6 flex justify-between items-center"
             style={{
-              padding: '16px 24px',
               borderBottom: i < data.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
             }}
           >
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Wheat size={14} style={{ color: '#22C55E' }} />
-                <span style={{ fontSize: '0.875rem', fontWeight: 500, color: '#FFFFFF' }}>{row.crop}</span>
+              <div className="flex items-center gap-2">
+                <Wheat size={14} className="text-success" />
+                <span className="text-sm font-medium text-white">{row.crop}</span>
               </div>
-              <span style={{ fontSize: '0.75rem', color: '#6B7280', marginTop: '2px', display: 'block' }}>{row.region}</span>
+              <span className="text-xs text-text-tertiary mt-0.5 block">{row.region}</span>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#FFFFFF' }}>{formatTZS(row.pricePerKg)}</div>
+            <div className="text-right">
+              <div className="text-sm font-semibold text-white">{formatTZS(row.pricePerKg)}</div>
               <div
-                style={{
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  color: row.change > 0 ? '#22C55E' : row.change < 0 ? '#EF4444' : '#6B7280',
-                  marginTop: '2px',
-                }}
+                className={`text-xs font-semibold mt-0.5 ${row.change > 0 ? 'text-success' : row.change < 0 ? 'text-error' : 'text-text-tertiary'}`}
               >
                 {row.change > 0 ? '+' : ''}{row.change}%
               </div>

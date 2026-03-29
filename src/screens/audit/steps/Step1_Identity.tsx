@@ -30,58 +30,30 @@ const Step1_Identity: React.FC<Step1Props> = ({ data, onChange, errors }) => {
 
   return (
     <div>
-      <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '4px' }}>
+      <h2 className="text-xl font-bold text-white mb-1">
         Farmer Identity
       </h2>
-      <p style={{ fontSize: '0.875rem', color: '#6B7280', marginBottom: '28px' }}>
+      <p className="text-sm text-text-tertiary mb-7">
         Capture the farmer and farm identification details
       </p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div className="flex flex-col gap-5">
         {FIELDS.map(field => {
           const value = (data[field.key] as string) || '';
           const error = errors[field.key];
 
           return (
             <div key={field.key}>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: '0.813rem',
-                  fontWeight: 500,
-                  color: '#9CA3AF',
-                  marginBottom: '6px',
-                }}
-              >
+              <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">
                 {field.label}
-                {field.required && <span style={{ color: '#F0513E', marginLeft: '4px' }}>*</span>}
+                {field.required && <span className="text-text-accent ml-1">*</span>}
               </label>
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                <span
-                  style={{
-                    position: 'absolute',
-                    left: field.prefix ? undefined : '14px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: '#6B7280',
-                    pointerEvents: 'none',
-                    ...(field.prefix ? { left: '14px' } : {}),
-                  }}
-                >
+              <div className="relative flex items-center">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none">
                   {field.icon}
                 </span>
                 {field.prefix && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      left: '40px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      color: '#6B7280',
-                      fontSize: '0.875rem',
-                      pointerEvents: 'none',
-                    }}
-                  >
+                  <span className="absolute left-10 top-1/2 -translate-y-1/2 text-text-tertiary text-sm pointer-events-none">
                     {field.prefix}
                   </span>
                 )}
@@ -90,18 +62,10 @@ const Step1_Identity: React.FC<Step1Props> = ({ data, onChange, errors }) => {
                   value={value}
                   onChange={e => handleChange(field.key, e.target.value)}
                   placeholder={field.placeholder}
+                  className="w-full py-3 pr-4 bg-bg-input rounded-xl text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150"
                   style={{
-                    width: '100%',
-                    padding: '12px 16px',
                     paddingLeft: field.prefix ? '88px' : '44px',
-                    backgroundColor: 'var(--color-bg-input, #252525)',
                     border: `1px solid ${error ? '#EF4444' : 'rgba(255,255,255,0.08)'}`,
-                    borderRadius: '12px',
-                    color: '#FFFFFF',
-                    fontSize: '0.938rem',
-                    fontFamily: 'inherit',
-                    outline: 'none',
-                    transition: 'border-color 0.15s ease',
                   }}
                   onFocus={e => {
                     if (!error) e.currentTarget.style.borderColor = '#F0513E';
@@ -112,7 +76,7 @@ const Step1_Identity: React.FC<Step1Props> = ({ data, onChange, errors }) => {
                 />
               </div>
               {error && (
-                <p style={{ fontSize: '0.75rem', color: '#FCA5A5', marginTop: '4px' }}>{error}</p>
+                <p className="text-xs text-[#FCA5A5] mt-1">{error}</p>
               )}
             </div>
           );

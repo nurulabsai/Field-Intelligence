@@ -34,6 +34,8 @@ function formatTZS(amount: number): string {
   return `TZS ${amount.toLocaleString('en-TZ')}`;
 }
 
+const inputClasses = "w-full py-3 px-4 bg-bg-input border border-border rounded-xl text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150";
+
 const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
   const [gpsLoading, setGpsLoading] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -115,58 +117,27 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
   const yieldLng = data.yield_longitude as number | undefined;
   const lossValue = (data.yield_loss as string) || autoLoss;
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '12px 16px',
-    backgroundColor: 'var(--color-bg-input, #252525)',
-    border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: '12px',
-    color: '#FFFFFF',
-    fontSize: '0.938rem',
-    fontFamily: 'inherit',
-    outline: 'none',
-    transition: 'border-color 0.15s ease',
-  };
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: '0.813rem',
-    fontWeight: 500,
-    color: '#9CA3AF',
-    marginBottom: '6px',
-  };
-
   const enableVoice = typeof window !== 'undefined' && 'MediaRecorder' in window;
 
   return (
     <div>
-      <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '4px' }}>
+      <h2 className="text-xl font-bold text-white mb-1">
         Yield & Constraints
       </h2>
-      <p style={{ fontSize: '0.875rem', color: '#6B7280', marginBottom: '28px' }}>
+      <p className="text-sm text-text-tertiary mb-7">
         Record yield data, market information, and field constraints
       </p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div className="flex flex-col gap-6">
         {/* Yield Inputs */}
-        <div
-          style={{
-            padding: '20px',
-            backgroundColor: 'var(--color-bg-card, #1E1E1E)',
-            borderRadius: '16px',
-            border: '1px solid rgba(255,255,255,0.06)',
-          }}
-        >
-          <h3 style={{ fontSize: '0.938rem', fontWeight: 600, color: '#FFFFFF', marginBottom: '16px' }}>
+        <div className="p-5 bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)]">
+          <h3 className="text-[0.938rem] font-semibold text-white mb-4">
             Yield Data
           </h3>
-          <div
-            className="nuru-yield-grid"
-            style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}
-          >
+          <div className="nuru-yield-grid grid grid-cols-3 gap-3.5">
             <div>
-              <label style={labelStyle}>Yield Estimate</label>
-              <div style={{ position: 'relative' }}>
+              <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Yield Estimate</label>
+              <div className="relative">
                 <input
                   type="number"
                   min="0"
@@ -174,16 +145,16 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
                   value={(data.yield_estimate as string) || ''}
                   onChange={e => handleChange('yield_estimate', e.target.value)}
                   placeholder="0"
-                  style={inputStyle}
+                  className={inputClasses}
                 />
-                <span style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.75rem', color: '#6B7280' }}>
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-text-tertiary">
                   kg/ha
                 </span>
               </div>
             </div>
             <div>
-              <label style={labelStyle}>Actual Yield <span style={{ color: '#F0513E' }}>*</span></label>
-              <div style={{ position: 'relative' }}>
+              <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Actual Yield <span className="text-text-accent">*</span></label>
+              <div className="relative">
                 <input
                   type="number"
                   min="0"
@@ -191,15 +162,15 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
                   value={(data.actual_yield as string) || ''}
                   onChange={e => handleChange('actual_yield', e.target.value)}
                   placeholder="0"
-                  style={inputStyle}
+                  className={inputClasses}
                 />
-                <span style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.75rem', color: '#6B7280' }}>
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-text-tertiary">
                   kg/ha
                 </span>
               </div>
             </div>
             <div>
-              <label style={labelStyle}>Yield Loss %</label>
+              <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Yield Loss %</label>
               <input
                 type="number"
                 min="0"
@@ -208,27 +179,21 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
                 value={lossValue}
                 onChange={e => handleChange('yield_loss', e.target.value)}
                 placeholder="Auto"
-                style={{ ...inputStyle, color: parseFloat(lossValue) > 30 ? '#EF4444' : parseFloat(lossValue) > 15 ? '#F59E0B' : '#22C55E' }}
+                className={inputClasses}
+                style={{ color: parseFloat(lossValue) > 30 ? '#EF4444' : parseFloat(lossValue) > 15 ? '#F59E0B' : '#22C55E' }}
               />
             </div>
           </div>
         </div>
 
         {/* Market Channel */}
-        <div
-          style={{
-            padding: '20px',
-            backgroundColor: 'var(--color-bg-card, #1E1E1E)',
-            borderRadius: '16px',
-            border: '1px solid rgba(255,255,255,0.06)',
-          }}
-        >
-          <h3 style={{ fontSize: '0.938rem', fontWeight: 600, color: '#FFFFFF', marginBottom: '16px' }}>
+        <div className="p-5 bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)]">
+          <h3 className="text-[0.938rem] font-semibold text-white mb-4">
             Market Information
           </h3>
 
-          <label style={labelStyle}>Market Channel <span style={{ color: '#F0513E' }}>*</span></label>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
+          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Market Channel <span className="text-text-accent">*</span></label>
+          <div className="flex flex-wrap gap-2.5 mb-4">
             {MARKET_CHANNELS.map(ch => {
               const selected = (data.market_channel as string) === ch.value;
               return (
@@ -236,17 +201,11 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
                   key={ch.value}
                   type="button"
                   onClick={() => handleChange('market_channel', ch.value)}
+                  className="py-2.5 px-5 rounded-[10px] text-sm font-medium cursor-pointer font-inherit transition-all duration-150"
                   style={{
-                    padding: '10px 20px',
-                    borderRadius: '10px',
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
                     border: `2px solid ${selected ? '#F0513E' : 'rgba(255,255,255,0.08)'}`,
                     backgroundColor: selected ? 'rgba(240,81,62,0.12)' : 'transparent',
                     color: selected ? '#F0513E' : '#9CA3AF',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    transition: 'all 0.15s ease',
                   }}
                 >
                   {ch.label}
@@ -255,9 +214,9 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
             })}
           </div>
 
-          <div className="nuru-market-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+          <div className="nuru-market-grid grid grid-cols-2 gap-3.5">
             <div>
-              <label style={labelStyle}>Price per kg (TZS) <span style={{ color: '#F0513E' }}>*</span></label>
+              <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Price per kg (TZS) <span className="text-text-accent">*</span></label>
               <input
                 type="number"
                 min="0"
@@ -265,22 +224,12 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
                 value={(data.price_per_kg as string) || ''}
                 onChange={e => handleChange('price_per_kg', e.target.value)}
                 placeholder="0"
-                style={inputStyle}
+                className={inputClasses}
               />
             </div>
             <div>
-              <label style={labelStyle}>Gross Revenue</label>
-              <div
-                style={{
-                  padding: '12px 16px',
-                  backgroundColor: 'rgba(34,197,94,0.08)',
-                  border: '1px solid rgba(34,197,94,0.2)',
-                  borderRadius: '12px',
-                  fontSize: '0.938rem',
-                  fontWeight: 700,
-                  color: '#22C55E',
-                }}
-              >
+              <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Gross Revenue</label>
+              <div className="py-3 px-4 bg-[rgba(34,197,94,0.08)] border border-[rgba(34,197,94,0.2)] rounded-xl text-[0.938rem] font-bold text-[#22C55E]">
                 {formatTZS(grossRevenue)}
               </div>
             </div>
@@ -288,25 +237,18 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
         </div>
 
         {/* Constraint Severity Grid */}
-        <div
-          style={{
-            padding: '20px',
-            backgroundColor: 'var(--color-bg-card, #1E1E1E)',
-            borderRadius: '16px',
-            border: '1px solid rgba(255,255,255,0.06)',
-          }}
-        >
-          <h3 style={{ fontSize: '0.938rem', fontWeight: 600, color: '#FFFFFF', marginBottom: '16px' }}>
+        <div className="p-5 bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)]">
+          <h3 className="text-[0.938rem] font-semibold text-white mb-4">
             Constraint Severity
           </h3>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div className="flex flex-col gap-3.5">
             {CONSTRAINT_ROWS.map(row => {
               const selected = (data[row.key] as number) ?? -1;
               return (
                 <div key={row.key}>
-                  <label style={{ ...labelStyle, marginBottom: '8px' }}>{row.label}</label>
-                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  <label className="block text-[0.813rem] font-medium text-text-secondary mb-2">{row.label}</label>
+                  <div className="flex gap-1.5 flex-wrap">
                     {SEVERITY_LEVELS.map(level => {
                       const isSelected = selected === level.value;
                       return (
@@ -314,17 +256,11 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
                           key={level.value}
                           type="button"
                           onClick={() => handleChange(row.key, level.value)}
+                          className="py-2 px-3.5 rounded-sm text-xs font-semibold cursor-pointer font-inherit transition-all duration-150"
                           style={{
-                            padding: '8px 14px',
-                            borderRadius: '8px',
-                            fontSize: '0.75rem',
-                            fontWeight: 600,
                             border: `2px solid ${isSelected ? level.color : 'transparent'}`,
                             backgroundColor: isSelected ? `${level.color}20` : 'rgba(255,255,255,0.04)',
                             color: isSelected ? level.color : '#6B7280',
-                            cursor: 'pointer',
-                            fontFamily: 'inherit',
-                            transition: 'all 0.15s ease',
                             outline: isSelected ? `2px solid ${level.color}40` : 'none',
                             outlineOffset: '2px',
                           }}
@@ -341,57 +277,30 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
         </div>
 
         {/* Photo Upload */}
-        <div
-          style={{
-            padding: '20px',
-            backgroundColor: 'var(--color-bg-card, #1E1E1E)',
-            borderRadius: '16px',
-            border: '1px solid rgba(255,255,255,0.06)',
-          }}
-        >
-          <h3 style={{ fontSize: '0.938rem', fontWeight: 600, color: '#FFFFFF', marginBottom: '4px' }}>
+        <div className="p-5 bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)]">
+          <h3 className="text-[0.938rem] font-semibold text-white mb-1">
             Photos
           </h3>
-          <p style={{ fontSize: '0.75rem', color: '#6B7280', marginBottom: '14px' }}>
+          <p className="text-xs text-text-tertiary mb-3.5">
             Upload up to 5 photos ({photos.length}/5)
           </p>
 
           {/* Thumbnail grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '8px', marginBottom: '12px' }}>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2 mb-3">
             {photos.map((photo, i) => (
               <div
                 key={i}
-                style={{
-                  position: 'relative',
-                  aspectRatio: '1',
-                  borderRadius: '10px',
-                  overflow: 'hidden',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                }}
+                className="relative aspect-square rounded-[10px] overflow-hidden border border-border"
               >
                 <img
                   src={photo}
                   alt={`Photo ${i + 1}`}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  className="w-full h-full object-cover"
                 />
                 <button
                   type="button"
                   onClick={() => removePhoto(i)}
-                  style={{
-                    position: 'absolute',
-                    top: '4px',
-                    right: '4px',
-                    width: '22px',
-                    height: '22px',
-                    borderRadius: '50%',
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    border: 'none',
-                    color: '#FFFFFF',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
+                  className="absolute top-1 right-1 w-[22px] h-[22px] rounded-full bg-[rgba(0,0,0,0.7)] border-none text-white cursor-pointer flex items-center justify-center"
                 >
                   <X size={12} />
                 </button>
@@ -403,22 +312,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                width: '100%',
-                padding: '14px',
-                backgroundColor: 'rgba(255,255,255,0.04)',
-                border: '1px dashed rgba(255,255,255,0.15)',
-                borderRadius: '12px',
-                color: '#9CA3AF',
-                fontSize: '0.875rem',
-                fontWeight: 500,
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-              }}
+              className="flex items-center justify-center gap-2 w-full py-3.5 bg-[rgba(255,255,255,0.04)] border border-dashed border-[rgba(255,255,255,0.15)] rounded-xl text-text-secondary text-sm font-medium cursor-pointer font-inherit"
             >
               <Camera size={16} />
               Upload Photo
@@ -430,31 +324,22 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
             accept="image/*"
             multiple
             onChange={handlePhotoUpload}
-            style={{ display: 'none' }}
+            className="hidden"
           />
         </div>
 
         {/* GPS Capture */}
-        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+        <div className="flex gap-3 flex-wrap">
           <button
             type="button"
             onClick={captureGPS}
             disabled={gpsLoading}
+            className="flex items-center gap-2 py-3 px-5 rounded-xl text-sm font-semibold font-inherit flex-1 justify-center"
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '12px 20px',
               backgroundColor: yieldLat ? 'rgba(34,197,94,0.1)' : 'rgba(240,81,62,0.1)',
               border: `1px solid ${yieldLat ? 'rgba(34,197,94,0.25)' : 'rgba(240,81,62,0.25)'}`,
-              borderRadius: '12px',
               color: yieldLat ? '#22C55E' : '#F0513E',
-              fontSize: '0.875rem',
-              fontWeight: 600,
               cursor: gpsLoading ? 'wait' : 'pointer',
-              fontFamily: 'inherit',
-              flex: 1,
-              justifyContent: 'center',
             }}
           >
             {gpsLoading ? (
@@ -477,19 +362,11 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
             <button
               type="button"
               onClick={toggleVoice}
+              className="flex items-center gap-2 py-3 px-5 rounded-xl text-sm font-medium cursor-pointer font-inherit"
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '12px 20px',
                 backgroundColor: recording ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.06)',
                 border: `1px solid ${recording ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.08)'}`,
-                borderRadius: '12px',
                 color: recording ? '#EF4444' : '#9CA3AF',
-                fontSize: '0.875rem',
-                fontWeight: 500,
-                cursor: 'pointer',
-                fontFamily: 'inherit',
               }}
             >
               {recording ? <MicOff size={16} /> : <Mic size={16} />}
@@ -500,17 +377,13 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
 
         {/* Notes */}
         <div>
-          <label style={labelStyle}>Additional Notes</label>
+          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Additional Notes</label>
           <textarea
             value={(data.notes as string) || ''}
             onChange={e => handleChange('notes', e.target.value)}
             placeholder="Any additional observations or comments..."
             rows={4}
-            style={{
-              ...inputStyle,
-              resize: 'vertical',
-              minHeight: '100px',
-            }}
+            className={`${inputClasses} resize-y min-h-[100px]`}
           />
         </div>
 

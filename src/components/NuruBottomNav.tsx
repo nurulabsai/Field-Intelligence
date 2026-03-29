@@ -26,24 +26,8 @@ const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
   return (
     <nav className="nuru-bottom-nav">
       <div
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '64px',
-          backgroundColor: 'rgba(13,13,13,0.85)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-around',
-          padding: '0 8px',
-          paddingBottom: 'env(safe-area-inset-bottom, 0)',
-          zIndex: 50,
-          fontFamily: 'Inter, sans-serif',
-        }}
+        className="fixed bottom-0 left-0 right-0 h-16 bg-[rgba(13,13,13,0.85)] backdrop-blur-[16px] border-t border-[rgba(255,255,255,0.06)] flex items-center justify-around px-2 z-50 font-[Inter,sans-serif]"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0)' }}
       >
         {navItems.map((item) => {
           const isActive = currentPath === item.path;
@@ -53,27 +37,14 @@ const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
             <button
               key={item.path}
               onClick={() => onNavigate(item.path)}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '4px',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '6px 12px',
-                minWidth: '60px',
-                transition: 'color 0.15s',
-              }}
+              className="flex flex-col items-center justify-center gap-1 bg-transparent border-none cursor-pointer py-1.5 px-3 min-w-[60px] transition-colors duration-150"
             >
               <Icon size={22} color={color} />
               <span
+                className="text-[11px] font-[Inter,sans-serif]"
                 style={{
-                  fontSize: '11px',
                   fontWeight: isActive ? 600 : 400,
                   color,
-                  fontFamily: 'Inter, sans-serif',
                 }}
               >
                 {item.label}

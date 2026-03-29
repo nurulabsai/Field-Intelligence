@@ -35,104 +35,42 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
   }, []);
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(180deg, #171717 0%, #0D0D0D 100%)',
-        zIndex: 9999,
-        fontFamily: 'var(--font-family-base, Inter, sans-serif)',
-      }}
-    >
+    <div className="fixed inset-0 flex flex-col items-center justify-center bg-[linear-gradient(180deg,#171717_0%,#0D0D0D_100%)] z-[9999] font-base">
       {/* Logo */}
       <div
+        className="flex flex-col items-center gap-3 transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
         style={{
           opacity: logoVisible ? 1 : 0,
           transform: logoVisible ? 'scale(1)' : 'scale(0.8)',
-          transition: 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '12px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px' }}>
-          <span
-            style={{
-              fontSize: '3rem',
-              fontWeight: 700,
-              color: '#FFFFFF',
-              letterSpacing: '-0.03em',
-              fontFamily: 'var(--font-family-heading, Inter, sans-serif)',
-            }}
-          >
+        <div className="flex items-baseline gap-0.5">
+          <span className="text-[3rem] font-bold text-white tracking-[-0.03em] font-heading">
             NuruOS
           </span>
-          <span
-            style={{
-              width: '10px',
-              height: '10px',
-              borderRadius: '50%',
-              backgroundColor: '#F0513E',
-              display: 'inline-block',
-              marginLeft: '2px',
-              marginBottom: '4px',
-            }}
-          />
+          <span className="w-2.5 h-2.5 rounded-full bg-accent inline-block ml-0.5 mb-1" />
         </div>
 
-        <span
-          style={{
-            fontSize: '1rem',
-            color: '#6B7280',
-            fontWeight: 400,
-            letterSpacing: '0.05em',
-          }}
-        >
+        <span className="text-base text-text-tertiary font-normal tracking-[0.05em]">
           Field Intelligence
         </span>
       </div>
 
       {/* Progress bar */}
       <div
-        style={{
-          width: '200px',
-          height: '3px',
-          backgroundColor: 'rgba(255,255,255,0.08)',
-          borderRadius: '4px',
-          overflow: 'hidden',
-          marginTop: '48px',
-          opacity: logoVisible ? 1 : 0,
-          transition: 'opacity 0.5s ease 0.3s',
-        }}
+        className="w-[200px] h-[3px] bg-border rounded overflow-hidden mt-12 transition-opacity duration-500 delay-300"
+        style={{ opacity: logoVisible ? 1 : 0 }}
       >
         <div
-          style={{
-            width: `${progress}%`,
-            height: '100%',
-            backgroundColor: '#F0513E',
-            borderRadius: '4px',
-            transition: 'width 0.05s linear',
-          }}
+          className="h-full bg-accent rounded transition-[width] duration-[50ms] linear"
+          style={{ width: `${progress}%` }}
         />
       </div>
 
       {/* Tagline */}
       <p
-        style={{
-          marginTop: '64px',
-          fontSize: '0.875rem',
-          color: '#6B7280',
-          fontWeight: 400,
-          opacity: logoVisible ? 1 : 0,
-          transition: 'opacity 0.6s ease 0.5s',
-          textAlign: 'center',
-          padding: '0 24px',
-        }}
+        className="mt-16 text-sm text-text-tertiary font-normal text-center px-6 transition-opacity duration-[600ms] delay-500"
+        style={{ opacity: logoVisible ? 1 : 0 }}
       >
         Smarter Field Audits. Powered by AI.
       </p>

@@ -40,52 +40,21 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
   };
 
   return (
-    <div style={{ fontFamily: 'Inter, sans-serif' }}>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
-          gap: '10px',
-        }}
-      >
+    <div className="font-[Inter,sans-serif]">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2.5">
         {previews.map((src, i) => (
           <div
             key={i}
-            style={{
-              position: 'relative',
-              aspectRatio: '1',
-              borderRadius: '12px',
-              overflow: 'hidden',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
+            className="relative aspect-square rounded-xl overflow-hidden border border-border"
           >
             <img
               src={src}
               alt={`Photo ${i + 1}`}
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-              }}
+              className="w-full h-full object-cover"
             />
             <button
               onClick={() => handleRemove(i)}
-              style={{
-                position: 'absolute',
-                top: '4px',
-                right: '4px',
-                width: '22px',
-                height: '22px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(0,0,0,0.7)',
-                color: '#FFFFFF',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 0,
-              }}
+              className="absolute top-1 right-1 w-[22px] h-[22px] rounded-full bg-[rgba(0,0,0,0.7)] text-white border-none cursor-pointer flex items-center justify-center p-0"
             >
               <X size={12} />
             </button>
@@ -95,20 +64,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
         {photos.length < maxPhotos && (
           <button
             onClick={handleAdd}
-            style={{
-              aspectRatio: '1',
-              borderRadius: '12px',
-              border: '2px dashed rgba(255,255,255,0.12)',
-              backgroundColor: 'var(--color-bg-input, #252525)',
-              color: '#6B7280',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '4px',
-              transition: 'border-color 0.15s, color 0.15s',
-            }}
+            className="aspect-square rounded-xl border-2 border-dashed border-[rgba(255,255,255,0.12)] bg-bg-input text-text-tertiary cursor-pointer flex flex-col items-center justify-center gap-1 transition-all duration-150"
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)';
               e.currentTarget.style.color = '#9CA3AF';
@@ -119,19 +75,12 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
             }}
           >
             <Camera size={20} />
-            <span style={{ fontSize: '11px', fontWeight: 500 }}>Add</span>
+            <span className="text-[11px] font-medium">Add</span>
           </button>
         )}
       </div>
 
-      <div
-        style={{
-          marginTop: '8px',
-          fontSize: '12px',
-          color: '#6B7280',
-          textAlign: 'right',
-        }}
-      >
+      <div className="mt-2 text-xs text-text-tertiary text-right">
         {photos.length}/{maxPhotos}
       </div>
 
@@ -142,7 +91,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
         capture="environment"
         multiple
         onChange={handleFileChange}
-        style={{ display: 'none' }}
+        className="hidden"
       />
     </div>
   );

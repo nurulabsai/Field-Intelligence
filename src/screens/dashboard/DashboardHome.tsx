@@ -44,53 +44,25 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
   const dateStr = now.toLocaleDateString('en-TZ', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        backgroundColor: 'var(--color-bg-primary, #0D0D0D)',
-        fontFamily: 'var(--font-family-base, Inter, sans-serif)',
-        padding: '24px',
-        maxWidth: '1280px',
-        margin: '0 auto',
-      }}
-    >
+    <div className="min-h-screen bg-bg-primary font-base p-6 max-w-[1280px] mx-auto">
       {/* Stress Alert */}
       {stressAlert && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '14px 20px',
-            backgroundColor: 'rgba(245,158,11,0.1)',
-            border: '1px solid rgba(245,158,11,0.25)',
-            borderRadius: '14px',
-            marginBottom: '24px',
-          }}
-        >
-          <AlertTriangle size={20} style={{ color: '#F59E0B', flexShrink: 0 }} />
-          <span style={{ fontSize: '0.875rem', color: '#FCD34D', fontWeight: 500 }}>{stressAlert}</span>
+        <div className="flex items-center gap-3 py-3.5 px-5 bg-warning/10 border border-warning/25 rounded-[14px] mb-6">
+          <AlertTriangle size={20} className="text-warning shrink-0" />
+          <span className="text-sm text-warning-light font-medium">{stressAlert}</span>
         </div>
       )}
 
       {/* Greeting */}
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '4px' }}>
+      <div className="mb-8">
+        <h1 className="text-[1.75rem] font-bold text-white mb-1">
           Hi {userName}! Welcome Back,
         </h1>
-        <p style={{ fontSize: '0.875rem', color: '#6B7280' }}>{dateStr}</p>
+        <p className="text-sm text-text-tertiary">{dateStr}</p>
       </div>
 
       {/* KPI Row */}
-      <div
-        className="nuru-kpi-grid"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '16px',
-          marginBottom: '32px',
-        }}
-      >
+      <div className="nuru-kpi-grid grid grid-cols-4 gap-4 mb-8">
         <MetricWidget
           icon={<ClipboardList size={20} />}
           value="128"
@@ -121,14 +93,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
       </div>
 
       {/* Content Grid */}
-      <div
-        className="nuru-dashboard-content"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '24px',
-        }}
-      >
+      <div className="nuru-dashboard-content grid grid-cols-2 gap-6">
         <AuditFeed
           items={MOCK_AUDITS}
           onItemClick={onAuditClick}

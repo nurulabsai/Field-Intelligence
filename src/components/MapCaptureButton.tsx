@@ -61,17 +61,12 @@ const MapCaptureButton: React.FC<MapCaptureButtonProps> = ({
   const hasLowAccuracy = value && value.accuracy > 50;
 
   return (
-    <div style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div className="font-[Inter,sans-serif]">
       <button
         onClick={handleCapture}
         disabled={loading}
+        className="flex items-center gap-2.5 w-full py-3.5 px-4 rounded-xl bg-bg-input text-white font-[Inter,sans-serif] text-sm font-medium transition-all duration-200"
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          width: '100%',
-          padding: '14px 16px',
-          borderRadius: '12px',
           border: `1px solid ${
             value
               ? hasLowAccuracy
@@ -79,82 +74,52 @@ const MapCaptureButton: React.FC<MapCaptureButtonProps> = ({
                 : 'rgba(34,197,94,0.3)'
               : 'rgba(255,255,255,0.08)'
           }`,
-          backgroundColor: 'var(--color-bg-input, #252525)',
-          color: '#FFFFFF',
           cursor: loading ? 'wait' : 'pointer',
-          fontFamily: 'Inter, sans-serif',
-          fontSize: '14px',
-          fontWeight: 500,
-          transition: 'all 0.2s ease',
         }}
       >
         {loading ? (
           <Loader2
             size={20}
-            style={{ animation: 'nuru-geo-spin 1s linear infinite', flexShrink: 0 }}
+            className="animate-[nuru-geo-spin_1s_linear_infinite] shrink-0"
           />
         ) : (
           <MapPin
             size={20}
             color={value ? (hasLowAccuracy ? '#F59E0B' : '#22C55E') : '#9CA3AF'}
-            style={{ flexShrink: 0 }}
+            className="shrink-0"
           />
         )}
 
-        <div style={{ flex: 1, textAlign: 'left' }}>
+        <div className="flex-1 text-left">
           {loading ? (
-            <span style={{ color: '#9CA3AF' }}>Getting location...</span>
+            <span className="text-text-secondary">Getting location...</span>
           ) : value ? (
             <div>
-              <div style={{ fontSize: '13px' }}>
+              <div className="text-[13px]">
                 {value.lat.toFixed(6)}, {value.lng.toFixed(6)}
               </div>
               <div
-                style={{
-                  fontSize: '11px',
-                  color: hasLowAccuracy ? '#F59E0B' : '#6B7280',
-                  marginTop: '2px',
-                }}
+                className="text-[11px] mt-0.5"
+                style={{ color: hasLowAccuracy ? '#F59E0B' : '#6B7280' }}
               >
                 Accuracy: {Math.round(value.accuracy)}m
               </div>
             </div>
           ) : (
-            <span style={{ color: '#9CA3AF' }}>Capture GPS Location</span>
+            <span className="text-text-secondary">Capture GPS Location</span>
           )}
         </div>
       </button>
 
       {hasLowAccuracy && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            marginTop: '8px',
-            padding: '8px 12px',
-            borderRadius: '8px',
-            backgroundColor: 'rgba(245,158,11,0.1)',
-            fontSize: '12px',
-            color: '#F59E0B',
-          }}
-        >
+        <div className="flex items-center gap-1.5 mt-2 py-2 px-3 rounded-lg bg-[rgba(245,158,11,0.1)] text-xs text-[#F59E0B]">
           <AlertTriangle size={14} />
           Low accuracy ({Math.round(value.accuracy)}m). Move to an open area and try again.
         </div>
       )}
 
       {error && (
-        <div
-          style={{
-            marginTop: '8px',
-            padding: '8px 12px',
-            borderRadius: '8px',
-            backgroundColor: 'rgba(239,68,68,0.1)',
-            fontSize: '12px',
-            color: '#EF4444',
-          }}
-        >
+        <div className="mt-2 py-2 px-3 rounded-lg bg-[rgba(239,68,68,0.1)] text-xs text-[#EF4444]">
           {error}
         </div>
       )}

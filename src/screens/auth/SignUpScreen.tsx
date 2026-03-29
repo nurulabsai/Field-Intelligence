@@ -81,218 +81,132 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
 
   const strength = getPasswordStrength(form.password);
 
-  const inputStyle = (hasError: boolean): React.CSSProperties => ({
-    width: '100%',
-    padding: '12px 16px',
-    paddingLeft: '44px',
-    backgroundColor: 'var(--color-bg-input, #252525)',
-    border: `1px solid ${hasError ? '#EF4444' : 'rgba(255,255,255,0.08)'}`,
-    borderRadius: '12px',
-    color: '#FFFFFF',
-    fontSize: '0.938rem',
-    fontFamily: 'inherit',
-    outline: 'none',
-    transition: 'border-color 0.15s ease',
-  });
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: '0.813rem',
-    fontWeight: 500,
-    color: '#9CA3AF',
-    marginBottom: '6px',
-  };
-
-  const errorStyle: React.CSSProperties = {
-    fontSize: '0.75rem',
-    color: '#FCA5A5',
-    marginTop: '4px',
-  };
-
-  const iconWrapStyle: React.CSSProperties = {
-    position: 'absolute',
-    left: '14px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    color: '#6B7280',
-    pointerEvents: 'none',
-  };
+  const inputClasses = (hasError: boolean) =>
+    `w-full py-3 px-4 pl-11 bg-bg-input border rounded-xl text-white text-[0.938rem] font-[inherit] outline-none transition-colors duration-150 ${hasError ? 'border-error' : 'border-border'}`;
 
   const formContent = (
-    <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: '420px' }}>
-      <div style={{ marginBottom: '32px' }}>
-        <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '8px' }}>
+    <form onSubmit={handleSubmit} className="w-full max-w-[420px]">
+      <div className="mb-8">
+        <h2 className="text-[1.75rem] font-bold text-white mb-2">
           Create Account
         </h2>
-        <p style={{ color: '#6B7280', fontSize: '0.938rem' }}>
+        <p className="text-text-tertiary text-[0.938rem]">
           Start your field intelligence journey
         </p>
       </div>
 
       {/* Full Name */}
-      <div style={{ marginBottom: '20px' }}>
-        <label style={labelStyle}>Full Name</label>
-        <div style={{ position: 'relative' }}>
-          <span style={iconWrapStyle}><User size={18} /></span>
+      <div className="mb-5">
+        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Full Name</label>
+        <div className="relative">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"><User size={18} /></span>
           <input
             type="text"
             value={form.full_name}
             onChange={e => handleChange('full_name', e.target.value)}
             placeholder="Enter your full name"
-            style={inputStyle(!!errors.full_name)}
+            className={inputClasses(!!errors.full_name)}
           />
         </div>
-        {errors.full_name && <p style={errorStyle}>{errors.full_name}</p>}
+        {errors.full_name && <p className="text-xs text-error-light mt-1">{errors.full_name}</p>}
       </div>
 
       {/* Email */}
-      <div style={{ marginBottom: '20px' }}>
-        <label style={labelStyle}>Email Address</label>
-        <div style={{ position: 'relative' }}>
-          <span style={iconWrapStyle}><Mail size={18} /></span>
+      <div className="mb-5">
+        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Email Address</label>
+        <div className="relative">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"><Mail size={18} /></span>
           <input
             type="email"
             value={form.email}
             onChange={e => handleChange('email', e.target.value)}
             placeholder="you@example.com"
-            style={inputStyle(!!errors.email)}
+            className={inputClasses(!!errors.email)}
           />
         </div>
-        {errors.email && <p style={errorStyle}>{errors.email}</p>}
+        {errors.email && <p className="text-xs text-error-light mt-1">{errors.email}</p>}
       </div>
 
       {/* Password */}
-      <div style={{ marginBottom: '20px' }}>
-        <label style={labelStyle}>Password</label>
-        <div style={{ position: 'relative' }}>
-          <span style={iconWrapStyle}><Lock size={18} /></span>
+      <div className="mb-5">
+        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Password</label>
+        <div className="relative">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"><Lock size={18} /></span>
           <input
             type={showPassword ? 'text' : 'password'}
             value={form.password}
             onChange={e => handleChange('password', e.target.value)}
             placeholder="Minimum 8 characters"
-            style={inputStyle(!!errors.password)}
+            className={inputClasses(!!errors.password)}
           />
           <button
             type="button"
             onClick={() => setShowPassword(p => !p)}
-            style={{
-              position: 'absolute',
-              right: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              background: 'none',
-              border: 'none',
-              color: '#6B7280',
-              cursor: 'pointer',
-              padding: '4px',
-            }}
+            className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none text-text-tertiary cursor-pointer p-1"
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
-        {errors.password && <p style={errorStyle}>{errors.password}</p>}
+        {errors.password && <p className="text-xs text-error-light mt-1">{errors.password}</p>}
         {form.password && (
-          <div style={{ marginTop: '8px' }}>
-            <div style={{ height: '3px', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '4px', overflow: 'hidden' }}>
-              <div style={{ width: strength.width, height: '100%', backgroundColor: strength.color, borderRadius: '4px', transition: 'all 0.3s ease' }} />
+          <div className="mt-2">
+            <div className="h-[3px] bg-border rounded overflow-hidden">
+              <div
+                className="h-full rounded transition-all duration-300"
+                style={{ width: strength.width, backgroundColor: strength.color }}
+              />
             </div>
-            <span style={{ fontSize: '0.75rem', color: strength.color, marginTop: '4px', display: 'block' }}>{strength.label}</span>
+            <span className="text-xs mt-1 block" style={{ color: strength.color }}>{strength.label}</span>
           </div>
         )}
       </div>
 
       {/* Confirm Password */}
-      <div style={{ marginBottom: '20px' }}>
-        <label style={labelStyle}>Confirm Password</label>
-        <div style={{ position: 'relative' }}>
-          <span style={iconWrapStyle}><Lock size={18} /></span>
+      <div className="mb-5">
+        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Confirm Password</label>
+        <div className="relative">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"><Lock size={18} /></span>
           <input
             type={showConfirm ? 'text' : 'password'}
             value={form.confirm_password}
             onChange={e => handleChange('confirm_password', e.target.value)}
             placeholder="Repeat your password"
-            style={inputStyle(!!errors.confirm_password)}
+            className={inputClasses(!!errors.confirm_password)}
           />
           <button
             type="button"
             onClick={() => setShowConfirm(p => !p)}
-            style={{
-              position: 'absolute',
-              right: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              background: 'none',
-              border: 'none',
-              color: '#6B7280',
-              cursor: 'pointer',
-              padding: '4px',
-            }}
+            className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none text-text-tertiary cursor-pointer p-1"
           >
             {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
-        {errors.confirm_password && <p style={errorStyle}>{errors.confirm_password}</p>}
+        {errors.confirm_password && <p className="text-xs text-error-light mt-1">{errors.confirm_password}</p>}
       </div>
 
       {/* Role Selector */}
-      <div style={{ marginBottom: '20px' }}>
-        <label style={labelStyle}>Role</label>
-        <div style={{ position: 'relative' }}>
-          <span style={iconWrapStyle}><ShieldCheck size={18} /></span>
+      <div className="mb-5">
+        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Role</label>
+        <div className="relative">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"><ShieldCheck size={18} /></span>
           <button
             type="button"
             onClick={() => setRoleOpen(p => !p)}
-            style={{
-              ...inputStyle(!!errors.role),
-              textAlign: 'left',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingRight: '40px',
-            }}
+            className={`${inputClasses(!!errors.role)} text-left cursor-pointer flex items-center justify-between pr-10`}
           >
-            <span style={{ color: form.role ? '#FFFFFF' : '#6B7280' }}>
+            <span className={form.role ? 'text-white' : 'text-text-tertiary'}>
               {form.role || 'Select your role'}
             </span>
-            <ChevronDown size={18} style={{ position: 'absolute', right: '14px', color: '#6B7280' }} />
+            <ChevronDown size={18} className="absolute right-3.5 text-text-tertiary" />
           </button>
           {roleOpen && (
-            <div
-              style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                right: 0,
-                marginTop: '4px',
-                backgroundColor: '#1E1E1E',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '12px',
-                zIndex: 50,
-                overflow: 'hidden',
-                boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
-              }}
-            >
+            <div className="absolute top-full left-0 right-0 mt-1 bg-bg-tertiary border border-white/10 rounded-xl z-50 overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
               {ROLES.map(role => (
                 <button
                   key={role}
                   type="button"
                   onClick={() => { handleChange('role', role); setRoleOpen(false); }}
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    background: form.role === role ? 'rgba(240,81,62,0.15)' : 'transparent',
-                    border: 'none',
-                    color: form.role === role ? '#F0513E' : '#FFFFFF',
-                    fontSize: '0.938rem',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    transition: 'background 0.15s ease',
-                  }}
-                  onMouseEnter={e => { if (form.role !== role) (e.target as HTMLElement).style.background = 'rgba(255,255,255,0.05)'; }}
-                  onMouseLeave={e => { if (form.role !== role) (e.target as HTMLElement).style.background = 'transparent'; }}
+                  className={`w-full py-3 px-4 border-none text-[0.938rem] text-left cursor-pointer font-[inherit] transition-colors duration-150 ${form.role === role ? 'bg-accent/15 text-text-accent' : 'text-white bg-transparent hover:bg-white/5'}`}
                 >
                   {role}
                 </button>
@@ -300,59 +214,34 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
             </div>
           )}
         </div>
-        {errors.role && <p style={errorStyle}>{errors.role}</p>}
+        {errors.role && <p className="text-xs text-error-light mt-1">{errors.role}</p>}
       </div>
 
       {/* Organization */}
-      <div style={{ marginBottom: '28px' }}>
-        <label style={labelStyle}>Organization</label>
-        <div style={{ position: 'relative' }}>
-          <span style={iconWrapStyle}><Building2 size={18} /></span>
+      <div className="mb-7">
+        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Organization</label>
+        <div className="relative">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"><Building2 size={18} /></span>
           <input
             type="text"
             value={form.organization}
             onChange={e => handleChange('organization', e.target.value)}
             placeholder="Your organization name"
-            style={inputStyle(!!errors.organization)}
+            className={inputClasses(!!errors.organization)}
           />
         </div>
-        {errors.organization && <p style={errorStyle}>{errors.organization}</p>}
+        {errors.organization && <p className="text-xs text-error-light mt-1">{errors.organization}</p>}
       </div>
 
       {/* Submit */}
       <button
         type="submit"
         disabled={loading}
-        style={{
-          width: '100%',
-          padding: '14px',
-          backgroundColor: loading ? 'rgba(240,81,62,0.6)' : '#F0513E',
-          color: '#FFFFFF',
-          border: 'none',
-          borderRadius: '12px',
-          fontSize: '1rem',
-          fontWeight: 600,
-          cursor: loading ? 'not-allowed' : 'pointer',
-          fontFamily: 'inherit',
-          transition: 'background-color 0.15s ease, transform 0.1s ease',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '8px',
-        }}
+        className={`w-full py-3.5 border-none rounded-xl text-base font-semibold font-[inherit] transition-all duration-150 flex items-center justify-center gap-2 ${loading ? 'bg-accent/60 text-white cursor-not-allowed' : 'bg-accent text-white cursor-pointer'}`}
       >
         {loading ? (
           <>
-            <span
-              style={{
-                width: '18px',
-                height: '18px',
-                border: '2px solid rgba(255,255,255,0.3)',
-                borderTopColor: '#FFFFFF',
-                borderRadius: '50%',
-                animation: 'nuru-spin 0.6s linear infinite',
-              }}
-            />
+            <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-[nuru-spin_0.6s_linear_infinite]" />
             Creating Account...
           </>
         ) : (
@@ -360,21 +249,12 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
         )}
       </button>
 
-      <p style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.875rem', color: '#6B7280' }}>
+      <p className="text-center mt-6 text-sm text-text-tertiary">
         Already have an account?{' '}
         <button
           type="button"
           onClick={onNavigateToLogin}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#F0513E',
-            cursor: 'pointer',
-            fontWeight: 600,
-            fontSize: '0.875rem',
-            fontFamily: 'inherit',
-            textDecoration: 'none',
-          }}
+          className="bg-transparent border-none text-text-accent cursor-pointer font-semibold text-sm font-[inherit] no-underline"
         >
           Login
         </button>
@@ -389,64 +269,25 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
   );
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        backgroundColor: 'var(--color-bg-primary, #0D0D0D)',
-        fontFamily: 'var(--font-family-base, Inter, sans-serif)',
-      }}
-    >
+    <div className="min-h-screen flex bg-bg-primary font-base">
       {/* Left Panel - Desktop Only */}
       <div
-        style={{
-          flex: '0 0 45%',
-          background: 'linear-gradient(135deg, #171717 0%, #0D0D0D 50%, rgba(240,81,62,0.08) 100%)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '48px',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-        className="nuru-signup-left-panel"
+        className="nuru-signup-left-panel basis-[45%] shrink-0 grow-0 bg-[linear-gradient(135deg,#171717_0%,#0D0D0D_50%,rgba(240,81,62,0.08)_100%)] flex flex-col items-center justify-center p-12 relative overflow-hidden"
       >
-        <div
-          style={{
-            position: 'absolute',
-            width: '400px',
-            height: '400px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(240,81,62,0.12) 0%, transparent 70%)',
-            top: '20%',
-            left: '-10%',
-          }}
-        />
-        <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '2px', marginBottom: '12px' }}>
-            <span style={{ fontSize: '2.5rem', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.03em' }}>NuruOS</span>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#F0513E', display: 'inline-block' }} />
+        <div className="absolute w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(240,81,62,0.12)_0%,transparent_70%)] top-[20%] -left-[10%]" />
+        <div className="relative z-[1] text-center">
+          <div className="flex items-baseline justify-center gap-0.5 mb-3">
+            <span className="text-[2.5rem] font-bold text-white tracking-[-0.03em]">NuruOS</span>
+            <span className="w-2 h-2 rounded-full bg-accent inline-block" />
           </div>
-          <p style={{ color: '#9CA3AF', fontSize: '1.125rem', lineHeight: 1.6, maxWidth: '340px' }}>
+          <p className="text-text-secondary text-lg leading-relaxed max-w-[340px]">
             Smarter Field Audits.<br />Powered by AI.
           </p>
-          <div
-            style={{
-              marginTop: '48px',
-              padding: '24px',
-              backgroundColor: 'rgba(30,30,30,0.8)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
-              borderRadius: '16px',
-              border: '1px solid rgba(255,255,255,0.06)',
-              maxWidth: '300px',
-            }}
-          >
-            <p style={{ color: '#9CA3AF', fontSize: '0.875rem', fontStyle: 'italic', lineHeight: 1.6 }}>
+          <div className="mt-12 p-6 bg-[rgba(30,30,30,0.8)] backdrop-blur-[16px] rounded-2xl border border-[rgba(255,255,255,0.06)] max-w-[300px]">
+            <p className="text-text-secondary text-sm italic leading-relaxed">
               "NuruOS transformed how we collect field data across Tanzania. The AI insights save us hours every week."
             </p>
-            <p style={{ color: '#6B7280', fontSize: '0.75rem', marginTop: '12px' }}>
+            <p className="text-text-tertiary text-xs mt-3">
               - Agricultural Extension Officer, Dodoma
             </p>
           </div>
@@ -454,22 +295,13 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
       </div>
 
       {/* Right Panel - Form */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '32px 24px',
-          overflowY: 'auto',
-        }}
-      >
-        <div style={{ width: '100%', maxWidth: '420px' }}>
+      <div className="flex-1 flex items-center justify-center py-8 px-6 overflow-y-auto">
+        <div className="w-full max-w-[420px]">
           {/* Mobile logo */}
-          <div className="nuru-signup-mobile-logo" style={{ display: 'none', marginBottom: '32px', textAlign: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '2px' }}>
-              <span style={{ fontSize: '1.75rem', fontWeight: 700, color: '#FFFFFF' }}>NuruOS</span>
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#F0513E', display: 'inline-block' }} />
+          <div className="nuru-signup-mobile-logo hidden mb-8 text-center">
+            <div className="flex items-baseline justify-center gap-0.5">
+              <span className="text-[1.75rem] font-bold text-white">NuruOS</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
             </div>
           </div>
           {formContent}

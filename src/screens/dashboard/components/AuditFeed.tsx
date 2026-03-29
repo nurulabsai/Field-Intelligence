@@ -28,20 +28,10 @@ const STATUS_CONFIG: Record<AuditStatus, { label: string; bg: string; color: str
 const AuditFeed: React.FC<AuditFeedProps> = ({ items, onItemClick, onViewAll }) => {
   if (items.length === 0) {
     return (
-      <div
-        style={{
-          backgroundColor: 'var(--glass-bg, rgba(30,30,30,0.8))',
-          backdropFilter: 'var(--glass-blur, blur(16px))',
-          WebkitBackdropFilter: 'var(--glass-blur, blur(16px))',
-          border: '1px solid var(--glass-border, rgba(255,255,255,0.06))',
-          borderRadius: '20px',
-          padding: '48px 24px',
-          textAlign: 'center',
-        }}
-      >
-        <FileText size={48} style={{ color: '#6B7280', margin: '0 auto 16px' }} />
-        <p style={{ color: '#9CA3AF', fontSize: '1rem', fontWeight: 500 }}>No audits yet</p>
-        <p style={{ color: '#6B7280', fontSize: '0.875rem', marginTop: '4px' }}>
+      <div className="bg-bg-glass backdrop-blur-[16px] border border-border-glass rounded-xl py-12 px-6 text-center">
+        <FileText size={48} className="text-text-tertiary mx-auto mb-4" />
+        <p className="text-text-secondary text-base font-medium">No audits yet</p>
+        <p className="text-text-tertiary text-sm mt-1">
           Start your first field audit to see it here
         </p>
       </div>
@@ -49,42 +39,14 @@ const AuditFeed: React.FC<AuditFeedProps> = ({ items, onItemClick, onViewAll }) 
   }
 
   return (
-    <div
-      style={{
-        backgroundColor: 'var(--glass-bg, rgba(30,30,30,0.8))',
-        backdropFilter: 'var(--glass-blur, blur(16px))',
-        WebkitBackdropFilter: 'var(--glass-blur, blur(16px))',
-        border: '1px solid var(--glass-border, rgba(255,255,255,0.06))',
-        borderRadius: '20px',
-        overflow: 'hidden',
-      }}
-    >
+    <div className="bg-bg-glass backdrop-blur-[16px] border border-border-glass rounded-xl overflow-hidden">
       {/* Header */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '20px 24px',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-        }}
-      >
-        <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#FFFFFF' }}>Recent Audits</h3>
+      <div className="flex justify-between items-center px-6 py-5 border-b border-border-glass">
+        <h3 className="text-base font-semibold text-white">Recent Audits</h3>
         {onViewAll && (
           <button
             onClick={onViewAll}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#F0513E',
-              fontSize: '0.813rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-              fontFamily: 'inherit',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-            }}
+            className="bg-transparent border-none text-text-accent text-[0.813rem] font-semibold cursor-pointer font-[inherit] flex items-center gap-1"
           >
             View All
             <ChevronRight size={14} />
@@ -100,63 +62,30 @@ const AuditFeed: React.FC<AuditFeedProps> = ({ items, onItemClick, onViewAll }) 
             <button
               key={item.id}
               onClick={() => onItemClick?.(item.id)}
+              className="w-full flex items-center gap-3.5 py-4 px-6 bg-transparent border-none cursor-pointer transition-colors duration-150 font-[inherit] text-left hover:bg-white/[0.03]"
               style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '14px',
-                padding: '16px 24px',
-                background: 'transparent',
-                border: 'none',
                 borderBottom: i < items.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
-                cursor: 'pointer',
-                transition: 'background 0.15s ease',
-                fontFamily: 'inherit',
-                textAlign: 'left',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
             >
               {/* Icon */}
-              <div
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '10px',
-                  backgroundColor: 'rgba(240,81,62,0.1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#F0513E',
-                  flexShrink: 0,
-                }}
-              >
+              <div className="w-10 h-10 rounded-[10px] bg-accent/10 flex items-center justify-center text-text-accent shrink-0">
                 <ClipboardCheck size={18} />
               </div>
 
               {/* Info */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '0.938rem', fontWeight: 500, color: '#FFFFFF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div className="flex-1 min-w-0">
+                <div className="text-[0.938rem] font-medium text-white overflow-hidden text-ellipsis whitespace-nowrap">
                   {item.farmName}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#6B7280', marginTop: '2px' }}>
+                <div className="text-xs text-text-tertiary mt-0.5">
                   {item.auditType} &middot; {item.date}
                 </div>
               </div>
 
               {/* Status badge */}
               <span
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: '20px',
-                  fontSize: '0.688rem',
-                  fontWeight: 600,
-                  backgroundColor: status.bg,
-                  color: status.color,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.03em',
-                  flexShrink: 0,
-                }}
+                className="px-2.5 py-1 rounded-full text-[0.688rem] font-semibold uppercase tracking-[0.03em] shrink-0"
+                style={{ backgroundColor: status.bg, color: status.color }}
               >
                 {status.label}
               </span>

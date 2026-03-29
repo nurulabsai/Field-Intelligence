@@ -55,92 +55,48 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
   const region = (data.region as string) || '';
 
-  const inputStyle = (hasError: boolean): React.CSSProperties => ({
-    width: '100%',
-    padding: '12px 16px',
-    backgroundColor: 'var(--color-bg-input, #252525)',
-    border: `1px solid ${hasError ? '#EF4444' : 'rgba(255,255,255,0.08)'}`,
-    borderRadius: '12px',
-    color: '#FFFFFF',
-    fontSize: '0.938rem',
-    fontFamily: 'inherit',
-    outline: 'none',
-    transition: 'border-color 0.15s ease',
-  });
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: '0.813rem',
-    fontWeight: 500,
-    color: '#9CA3AF',
-    marginBottom: '6px',
-  };
+  const inputBaseClasses = "w-full py-3 px-4 bg-bg-input rounded-xl text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150";
 
   return (
     <div>
-      <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '4px' }}>
+      <h2 className="text-xl font-bold text-white mb-1">
         Location Details
       </h2>
-      <p style={{ fontSize: '0.875rem', color: '#6B7280', marginBottom: '28px' }}>
+      <p className="text-sm text-text-tertiary mb-7">
         Capture farm location and administrative details
       </p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div className="flex flex-col gap-5">
         {/* Region Dropdown */}
         <div>
-          <label style={labelStyle}>
-            Region <span style={{ color: '#F0513E' }}>*</span>
+          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">
+            Region <span className="text-text-accent">*</span>
           </label>
-          <div style={{ position: 'relative' }}>
+          <div className="relative">
             <button
               type="button"
               onClick={() => setRegionOpen(p => !p)}
+              className={`${inputBaseClasses} text-left cursor-pointer flex items-center justify-between`}
               style={{
-                ...inputStyle(!!errors.region),
-                textAlign: 'left',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
+                border: `1px solid ${errors.region ? '#EF4444' : 'rgba(255,255,255,0.08)'}`,
               }}
             >
-              <span style={{ color: region ? '#FFFFFF' : '#6B7280' }}>
+              <span className={region ? 'text-white' : 'text-text-tertiary'}>
                 {region || 'Select region'}
               </span>
-              <ChevronDown size={18} style={{ color: '#6B7280' }} />
+              <ChevronDown size={18} className="text-text-tertiary" />
             </button>
             {regionOpen && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '100%',
-                  left: 0,
-                  right: 0,
-                  marginTop: '4px',
-                  backgroundColor: '#1E1E1E',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '12px',
-                  zIndex: 50,
-                  maxHeight: '240px',
-                  overflowY: 'auto',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
-                }}
-              >
+              <div className="absolute top-full left-0 right-0 mt-1 bg-bg-tertiary border border-[rgba(255,255,255,0.1)] rounded-xl z-50 max-h-60 overflow-y-auto shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
                 {TANZANIA_REGIONS.map(r => (
                   <button
                     key={r}
                     type="button"
                     onClick={() => { handleChange('region', r); setRegionOpen(false); }}
+                    className="w-full py-2.5 px-4 border-none text-sm text-left cursor-pointer font-inherit"
                     style={{
-                      width: '100%',
-                      padding: '10px 16px',
                       background: region === r ? 'rgba(240,81,62,0.15)' : 'transparent',
-                      border: 'none',
                       color: region === r ? '#F0513E' : '#FFFFFF',
-                      fontSize: '0.875rem',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                      fontFamily: 'inherit',
                     }}
                   >
                     {r}
@@ -149,83 +105,69 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
               </div>
             )}
           </div>
-          {errors.region && <p style={{ fontSize: '0.75rem', color: '#FCA5A5', marginTop: '4px' }}>{errors.region}</p>}
+          {errors.region && <p className="text-xs text-[#FCA5A5] mt-1">{errors.region}</p>}
         </div>
 
         {/* District */}
         <div>
-          <label style={labelStyle}>District <span style={{ color: '#F0513E' }}>*</span></label>
+          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">
+            District <span className="text-text-accent">*</span>
+          </label>
           <input
             type="text"
             value={(data.district as string) || ''}
             onChange={e => handleChange('district', e.target.value)}
             placeholder="Enter district"
-            style={inputStyle(!!errors.district)}
+            className={inputBaseClasses}
+            style={{
+              border: `1px solid ${errors.district ? '#EF4444' : 'rgba(255,255,255,0.08)'}`,
+            }}
           />
-          {errors.district && <p style={{ fontSize: '0.75rem', color: '#FCA5A5', marginTop: '4px' }}>{errors.district}</p>}
+          {errors.district && <p className="text-xs text-[#FCA5A5] mt-1">{errors.district}</p>}
         </div>
 
         {/* Ward */}
         <div>
-          <label style={labelStyle}>Ward</label>
+          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Ward</label>
           <input
             type="text"
             value={(data.ward as string) || ''}
             onChange={e => handleChange('ward', e.target.value)}
             placeholder="Enter ward"
-            style={inputStyle(false)}
+            className={`${inputBaseClasses} border border-border`}
           />
         </div>
 
         {/* Village */}
         <div>
-          <label style={labelStyle}>Village</label>
+          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Village</label>
           <input
             type="text"
             value={(data.village as string) || ''}
             onChange={e => handleChange('village', e.target.value)}
             placeholder="Enter village"
-            style={inputStyle(false)}
+            className={`${inputBaseClasses} border border-border`}
           />
         </div>
 
         {/* GPS Capture */}
         <div>
-          <label style={labelStyle}>GPS Coordinates</label>
+          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">GPS Coordinates</label>
           <button
             type="button"
             onClick={captureGPS}
             disabled={gpsLoading}
+            className="flex items-center gap-2.5 py-3.5 px-5 rounded-xl text-sm font-semibold font-inherit w-full justify-center transition-all duration-150"
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '14px 20px',
               backgroundColor: lat ? 'rgba(34,197,94,0.1)' : 'rgba(240,81,62,0.1)',
               border: `1px solid ${lat ? 'rgba(34,197,94,0.25)' : 'rgba(240,81,62,0.25)'}`,
-              borderRadius: '12px',
               color: lat ? '#22C55E' : '#F0513E',
-              fontSize: '0.875rem',
-              fontWeight: 600,
               cursor: gpsLoading ? 'wait' : 'pointer',
-              fontFamily: 'inherit',
-              width: '100%',
-              justifyContent: 'center',
-              transition: 'all 0.15s ease',
             }}
           >
             {gpsLoading ? (
               <>
-                <span
-                  style={{
-                    width: '16px',
-                    height: '16px',
-                    border: '2px solid rgba(240,81,62,0.3)',
-                    borderTopColor: '#F0513E',
-                    borderRadius: '50%',
-                    animation: 'nuru-spin 0.6s linear infinite',
-                  }}
-                />
+                <span className="w-4 h-4 border-2 border-[rgba(240,81,62,0.3)] border-t-accent rounded-full animate-[nuru-spin_0.6s_linear_infinite]" />
                 Capturing GPS...
               </>
             ) : lat ? (
@@ -243,32 +185,23 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
           {/* GPS Data Display */}
           {lat !== undefined && lng !== undefined && (
-            <div
-              style={{
-                marginTop: '12px',
-                padding: '14px 16px',
-                backgroundColor: 'var(--color-bg-input, #252525)',
-                borderRadius: '12px',
-                border: '1px solid rgba(255,255,255,0.06)',
-              }}
-            >
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            <div className="mt-3 py-3.5 px-4 bg-bg-input rounded-xl border border-[rgba(255,255,255,0.06)]">
+              <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <span style={{ fontSize: '0.688rem', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Latitude</span>
-                  <div style={{ fontSize: '0.875rem', color: '#FFFFFF', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>{lat.toFixed(6)}</div>
+                  <span className="text-[0.688rem] text-text-tertiary uppercase tracking-widest">Latitude</span>
+                  <div className="text-sm text-white font-medium tabular-nums">{lat.toFixed(6)}</div>
                 </div>
                 <div>
-                  <span style={{ fontSize: '0.688rem', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Longitude</span>
-                  <div style={{ fontSize: '0.875rem', color: '#FFFFFF', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>{lng.toFixed(6)}</div>
+                  <span className="text-[0.688rem] text-text-tertiary uppercase tracking-widest">Longitude</span>
+                  <div className="text-sm text-white font-medium tabular-nums">{lng.toFixed(6)}</div>
                 </div>
               </div>
               {accuracy !== undefined && (
-                <div style={{ marginTop: '8px' }}>
-                  <span style={{ fontSize: '0.688rem', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Accuracy</span>
+                <div className="mt-2">
+                  <span className="text-[0.688rem] text-text-tertiary uppercase tracking-widest">Accuracy</span>
                   <div
+                    className="text-sm font-medium"
                     style={{
-                      fontSize: '0.875rem',
-                      fontWeight: 500,
                       color: accuracy <= 50 ? '#22C55E' : '#F59E0B',
                     }}
                   >
@@ -281,47 +214,24 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
           {/* Accuracy Warning */}
           {accuracy !== undefined && accuracy > 50 && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                marginTop: '8px',
-                padding: '10px 14px',
-                backgroundColor: 'rgba(245,158,11,0.1)',
-                border: '1px solid rgba(245,158,11,0.25)',
-                borderRadius: '10px',
-              }}
-            >
-              <AlertTriangle size={16} style={{ color: '#F59E0B', flexShrink: 0 }} />
-              <span style={{ fontSize: '0.813rem', color: '#FCD34D' }}>
+            <div className="flex items-center gap-2 mt-2 py-2.5 px-3.5 bg-[rgba(245,158,11,0.1)] border border-[rgba(245,158,11,0.25)] rounded-[10px]">
+              <AlertTriangle size={16} className="text-[#F59E0B] shrink-0" />
+              <span className="text-[0.813rem] text-[#FCD34D]">
                 GPS accuracy is low ({accuracy.toFixed(0)}m). Move to an open area and try again.
               </span>
             </div>
           )}
 
           {gpsError && (
-            <p style={{ fontSize: '0.75rem', color: '#FCA5A5', marginTop: '8px' }}>{gpsError}</p>
+            <p className="text-xs text-[#FCA5A5] mt-2">{gpsError}</p>
           )}
         </div>
 
         {/* Map Placeholder */}
-        <div
-          style={{
-            width: '100%',
-            height: '200px',
-            backgroundColor: 'var(--color-bg-input, #252525)',
-            borderRadius: '16px',
-            border: '1px solid rgba(255,255,255,0.06)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#6B7280',
-          }}
-        >
-          <div style={{ textAlign: 'center' }}>
-            <MapPin size={32} style={{ margin: '0 auto 8px', opacity: 0.5 }} />
-            <p style={{ fontSize: '0.813rem' }}>
+        <div className="w-full h-[200px] bg-bg-input rounded-lg border border-[rgba(255,255,255,0.06)] flex items-center justify-center text-text-tertiary">
+          <div className="text-center">
+            <MapPin size={32} className="mx-auto mb-2 opacity-50" />
+            <p className="text-[0.813rem]">
               {lat ? `Location: ${lat.toFixed(4)}, ${lng?.toFixed(4)}` : 'Map will display after GPS capture'}
             </p>
           </div>

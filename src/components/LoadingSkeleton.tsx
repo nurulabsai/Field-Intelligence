@@ -16,71 +16,47 @@ const shimmerKeyframes = `
 }
 `;
 
-const shimmerStyle: React.CSSProperties = {
-  background:
-    'linear-gradient(90deg, #252525 0%, #2E2E2E 40%, #353535 50%, #2E2E2E 60%, #252525 100%)',
-  backgroundSize: '800px 100%',
-  animation: 'nuru-shimmer 1.8s ease-in-out infinite',
-  borderRadius: '8px',
-};
+const shimmerClass = "bg-[linear-gradient(90deg,#252525_0%,#2E2E2E_40%,#353535_50%,#2E2E2E_60%,#252525_100%)] bg-[length:800px_100%] animate-[nuru-shimmer_1.8s_ease-in-out_infinite] rounded-lg";
 
 const SkeletonCard: React.FC = () => (
-  <div
-    style={{
-      backgroundColor: 'var(--color-bg-card, #1E1E1E)',
-      borderRadius: '16px',
-      padding: '16px',
-      border: '1px solid rgba(255,255,255,0.06)',
-    }}
-  >
-    <div style={{ ...shimmerStyle, height: '20px', width: '60%', marginBottom: '12px' }} />
-    <div style={{ ...shimmerStyle, height: '14px', width: '100%', marginBottom: '8px' }} />
-    <div style={{ ...shimmerStyle, height: '14px', width: '80%', marginBottom: '12px' }} />
-    <div style={{ display: 'flex', gap: '8px' }}>
-      <div style={{ ...shimmerStyle, height: '32px', width: '80px', borderRadius: '9999px' }} />
-      <div style={{ ...shimmerStyle, height: '32px', width: '60px', borderRadius: '9999px' }} />
+  <div className="bg-bg-card rounded-lg p-4 border border-[rgba(255,255,255,0.06)]">
+    <div className={`${shimmerClass} h-5 w-3/5 mb-3`} />
+    <div className={`${shimmerClass} h-3.5 w-full mb-2`} />
+    <div className={`${shimmerClass} h-3.5 w-4/5 mb-3`} />
+    <div className="flex gap-2">
+      <div className={`${shimmerClass} h-8 w-20 !rounded-full`} />
+      <div className={`${shimmerClass} h-8 w-[60px] !rounded-full`} />
     </div>
   </div>
 );
 
 const SkeletonText: React.FC = () => (
-  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-    <div style={{ ...shimmerStyle, height: '14px', width: '100%' }} />
-    <div style={{ ...shimmerStyle, height: '14px', width: '90%' }} />
-    <div style={{ ...shimmerStyle, height: '14px', width: '75%' }} />
+  <div className="flex flex-col gap-2">
+    <div className={`${shimmerClass} h-3.5 w-full`} />
+    <div className={`${shimmerClass} h-3.5 w-[90%]`} />
+    <div className={`${shimmerClass} h-3.5 w-3/4`} />
   </div>
 );
 
 const SkeletonAvatar: React.FC = () => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-    <div style={{ ...shimmerStyle, width: '40px', height: '40px', borderRadius: '50%', flexShrink: 0 }} />
-    <div style={{ flex: 1 }}>
-      <div style={{ ...shimmerStyle, height: '14px', width: '120px', marginBottom: '6px' }} />
-      <div style={{ ...shimmerStyle, height: '12px', width: '80px' }} />
+  <div className="flex items-center gap-3">
+    <div className={`${shimmerClass} w-10 h-10 !rounded-full shrink-0`} />
+    <div className="flex-1">
+      <div className={`${shimmerClass} h-3.5 w-[120px] mb-1.5`} />
+      <div className={`${shimmerClass} h-3 w-20`} />
     </div>
   </div>
 );
 
 const SkeletonChart: React.FC = () => (
-  <div
-    style={{
-      backgroundColor: 'var(--color-bg-card, #1E1E1E)',
-      borderRadius: '16px',
-      padding: '16px',
-      border: '1px solid rgba(255,255,255,0.06)',
-    }}
-  >
-    <div style={{ ...shimmerStyle, height: '16px', width: '40%', marginBottom: '16px' }} />
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', height: '120px' }}>
+  <div className="bg-bg-card rounded-lg p-4 border border-[rgba(255,255,255,0.06)]">
+    <div className={`${shimmerClass} h-4 w-2/5 mb-4`} />
+    <div className="flex items-end gap-2 h-[120px]">
       {[60, 80, 45, 90, 70, 55, 85].map((h, i) => (
         <div
           key={i}
-          style={{
-            ...shimmerStyle,
-            flex: 1,
-            height: `${h}%`,
-            borderRadius: '4px 4px 0 0',
-          }}
+          className={`${shimmerClass} flex-1 !rounded-b-none !rounded-t`}
+          style={{ height: `${h}%` }}
         />
       ))}
     </div>
@@ -103,7 +79,7 @@ const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
   return (
     <>
       <style>{shimmerKeyframes}</style>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div className="flex flex-col gap-3">
         {Array.from({ length: count }, (_, i) => (
           <Component key={i} />
         ))}

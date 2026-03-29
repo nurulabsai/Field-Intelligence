@@ -58,11 +58,7 @@ const NuruAvatar: React.FC<NuruAvatarProps> = ({
           src={imageUrl}
           alt={name}
           onError={() => setImgError(true)}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
+          className="w-full h-full object-cover"
         />
       </div>
     );

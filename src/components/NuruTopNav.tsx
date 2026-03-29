@@ -18,41 +18,14 @@ const NuruTopNav: React.FC<NuruTopNavProps> = ({
 }) => {
   return (
     <nav
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '56px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 16px',
-        backgroundColor: 'rgba(13,13,13,0.8)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-        zIndex: 50,
-        fontFamily: 'Inter, sans-serif',
-      }}
+      className="fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-4 bg-[rgba(13,13,13,0.8)] backdrop-blur-[16px] border-b border-[rgba(255,255,255,0.06)] z-50 font-[Inter,sans-serif]"
     >
       {/* Left */}
-      <div style={{ width: '48px', display: 'flex', alignItems: 'center' }}>
+      <div className="w-12 flex items-center">
         {onBack && (
           <button
             onClick={onBack}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#FFFFFF',
-              cursor: 'pointer',
-              padding: '8px',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'background 0.15s',
-            }}
+            className="bg-transparent border-none text-white cursor-pointer p-2 rounded-lg flex items-center justify-center transition-colors duration-150 hover:bg-[rgba(255,255,255,0.05)]"
             onMouseEnter={(e) =>
               (e.currentTarget.style.backgroundColor =
                 'rgba(255,255,255,0.05)')
@@ -67,47 +40,15 @@ const NuruTopNav: React.FC<NuruTopNavProps> = ({
       </div>
 
       {/* Center */}
-      <h1
-        style={{
-          fontSize: '16px',
-          fontWeight: 600,
-          color: '#FFFFFF',
-          margin: 0,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          flex: 1,
-          textAlign: 'center',
-        }}
-      >
+      <h1 className="text-base font-semibold text-white m-0 truncate flex-1 text-center">
         {title}
       </h1>
 
       {/* Right */}
-      <div
-        style={{
-          width: '48px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-          gap: '8px',
-        }}
-      >
+      <div className="w-12 flex items-center justify-end gap-2">
         {showNotifications && (
           <button
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#FFFFFF',
-              cursor: 'pointer',
-              padding: '8px',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative',
-              transition: 'background 0.15s',
-            }}
+            className="bg-transparent border-none text-white cursor-pointer p-2 rounded-lg flex items-center justify-center relative transition-colors duration-150 hover:bg-[rgba(255,255,255,0.05)]"
             onMouseEnter={(e) =>
               (e.currentTarget.style.backgroundColor =
                 'rgba(255,255,255,0.05)')
@@ -118,24 +59,7 @@ const NuruTopNav: React.FC<NuruTopNavProps> = ({
           >
             <Bell size={20} />
             {notificationCount > 0 && (
-              <span
-                style={{
-                  position: 'absolute',
-                  top: '4px',
-                  right: '4px',
-                  backgroundColor: '#F0513E',
-                  color: '#FFFFFF',
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  minWidth: '16px',
-                  height: '16px',
-                  borderRadius: '9999px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '0 4px',
-                }}
-              >
+              <span className="absolute top-1 right-1 bg-accent text-white text-[10px] font-bold min-w-4 h-4 rounded-full flex items-center justify-center px-1">
                 {notificationCount > 99 ? '99+' : notificationCount}
               </span>
             )}

@@ -49,65 +49,41 @@ const AuditList: React.FC<AuditListProps> = ({ audits, onAuditClick, onNewAudit 
   }, []);
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        backgroundColor: 'var(--color-bg-primary, #0D0D0D)',
-        fontFamily: 'var(--font-family-base, Inter, sans-serif)',
-        position: 'relative',
-      }}
-    >
+    <div className="min-h-screen bg-bg-primary font-base relative">
       {/* Header */}
-      <div style={{ padding: '24px 24px 0', maxWidth: '800px', margin: '0 auto' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '20px' }}>
+      <div className="pt-6 px-6 max-w-[800px] mx-auto">
+        <h1 className="text-2xl font-bold text-white mb-5">
           All Audits
         </h1>
 
         {/* Search */}
-        <div style={{ position: 'relative', marginBottom: '16px' }}>
+        <div className="relative mb-4">
           <Search
             size={18}
-            style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#6B7280', pointerEvents: 'none' }}
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"
           />
           <input
             type="text"
             value={search}
             onChange={handleSearch}
             placeholder="Search audits..."
-            style={{
-              width: '100%',
-              padding: '12px 16px 12px 44px',
-              backgroundColor: 'var(--color-bg-input, #252525)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '12px',
-              color: '#FFFFFF',
-              fontSize: '0.875rem',
-              fontFamily: 'inherit',
-              outline: 'none',
-            }}
+            className="w-full py-3 pr-4 pl-11 bg-bg-input border border-border rounded-xl text-white text-sm font-inherit outline-none"
           />
         </div>
 
         {/* Filter chips */}
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap' }}>
+        <div className="flex gap-2 mb-6 flex-wrap">
           {FILTERS.map(f => (
             <button
               key={f.value}
               onClick={() => setFilter(f.value)}
+              className="px-4 py-2 rounded-[20px] text-[0.813rem] font-medium border-none cursor-pointer font-inherit transition-all duration-150"
               style={{
-                padding: '8px 16px',
-                borderRadius: '20px',
-                fontSize: '0.813rem',
-                fontWeight: 500,
-                border: 'none',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                transition: 'all 0.15s ease',
                 backgroundColor: filter === f.value ? 'rgba(240,81,62,0.15)' : 'rgba(255,255,255,0.06)',
                 color: filter === f.value ? '#F0513E' : '#9CA3AF',
               }}
             >
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span className="flex items-center gap-1.5">
                 {f.value !== 'all' && <Filter size={12} />}
                 {f.label}
               </span>
@@ -117,78 +93,43 @@ const AuditList: React.FC<AuditListProps> = ({ audits, onAuditClick, onNewAudit 
       </div>
 
       {/* Audit cards */}
-      <div style={{ padding: '0 24px 120px', maxWidth: '800px', margin: '0 auto' }}>
+      <div className="px-6 pb-[120px] max-w-[800px] mx-auto">
         {filtered.length === 0 ? (
-          <div
-            style={{
-              textAlign: 'center',
-              padding: '64px 24px',
-              backgroundColor: 'var(--color-bg-card, #1E1E1E)',
-              borderRadius: '20px',
-              border: '1px solid rgba(255,255,255,0.06)',
-            }}
-          >
-            <FileText size={48} style={{ color: '#6B7280', margin: '0 auto 16px' }} />
-            <p style={{ color: '#9CA3AF', fontSize: '1rem', fontWeight: 500 }}>No audits found</p>
-            <p style={{ color: '#6B7280', fontSize: '0.875rem', marginTop: '4px' }}>
+          <div className="text-center py-16 px-6 bg-bg-card rounded-xl border border-[rgba(255,255,255,0.06)]">
+            <FileText size={48} className="text-text-tertiary mx-auto mb-4" />
+            <p className="text-text-secondary text-base font-medium">No audits found</p>
+            <p className="text-text-tertiary text-sm mt-1">
               {search ? 'Try a different search term' : 'Start a new audit to get going'}
             </p>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div className="flex flex-col gap-3">
             {filtered.map(audit => {
               const status = STATUS_CONFIG[audit.status];
               return (
                 <button
                   key={audit.id}
                   onClick={() => onAuditClick?.(audit.id)}
-                  style={{
-                    width: '100%',
-                    padding: '20px',
-                    backgroundColor: 'var(--color-bg-card, #1E1E1E)',
-                    border: '1px solid rgba(255,255,255,0.06)',
-                    borderRadius: '16px',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    textAlign: 'left',
-                    transition: 'all 0.15s ease',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '12px',
-                  }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.12)';
-                    (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.06)';
-                    (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-                  }}
+                  className="w-full p-5 bg-bg-card border border-[rgba(255,255,255,0.06)] rounded-lg cursor-pointer font-inherit text-left transition-all duration-150 flex flex-col gap-3 hover:border-[rgba(255,255,255,0.12)] hover:-translate-y-px"
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div style={{ fontSize: '1rem', fontWeight: 600, color: '#FFFFFF' }}>{audit.farmName}</div>
+                  <div className="flex justify-between items-start">
+                    <div className="text-base font-semibold text-white">{audit.farmName}</div>
                     <span
+                      className="px-2.5 py-1 rounded-[20px] text-[0.688rem] font-semibold uppercase tracking-wide shrink-0"
                       style={{
-                        padding: '4px 10px',
-                        borderRadius: '20px',
-                        fontSize: '0.688rem',
-                        fontWeight: 600,
                         backgroundColor: status.bg,
                         color: status.color,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.03em',
-                        flexShrink: 0,
                       }}
                     >
                       {status.label}
                     </span>
                   </div>
-                  <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.813rem', color: '#6B7280' }}>
+                  <div className="flex gap-4 flex-wrap">
+                    <div className="flex items-center gap-1.5 text-[0.813rem] text-text-tertiary">
                       <Calendar size={13} />
                       {audit.date}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.813rem', color: '#6B7280' }}>
+                    <div className="flex items-center gap-1.5 text-[0.813rem] text-text-tertiary">
                       <MapPin size={13} />
                       {audit.location}
                     </div>
@@ -203,30 +144,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, onAuditClick, onNewAudit 
       {/* FAB */}
       <button
         onClick={onNewAudit}
-        style={{
-          position: 'fixed',
-          bottom: '32px',
-          right: '32px',
-          width: '56px',
-          height: '56px',
-          borderRadius: '16px',
-          backgroundColor: '#F0513E',
-          color: '#FFFFFF',
-          border: 'none',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 8px 24px rgba(240,81,62,0.4)',
-          transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-          zIndex: 50,
-        }}
-        onMouseEnter={e => {
-          (e.currentTarget as HTMLElement).style.transform = 'scale(1.05)';
-        }}
-        onMouseLeave={e => {
-          (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
-        }}
+        className="fixed bottom-8 right-8 w-14 h-14 rounded-lg bg-accent text-white border-none cursor-pointer flex items-center justify-center shadow-[0_8px_24px_rgba(240,81,62,0.4)] transition-transform duration-150 z-50 hover:scale-105"
         title="New Audit"
       >
         <Plus size={24} />

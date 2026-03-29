@@ -2,6 +2,75 @@
 @import "tailwindcss";
 
 /* =========================================================================
+   Tailwind v4 Theme — maps CSS vars to utility classes
+   Usage: bg-bg-primary, text-text-secondary, border-border, etc.
+   ========================================================================= */
+
+@theme {
+  /* Background colors */
+  --color-bg-primary: var(--color-bg-primary);
+  --color-bg-secondary: var(--color-bg-secondary);
+  --color-bg-tertiary: var(--color-bg-tertiary);
+  --color-bg-dark: var(--color-bg-dark);
+  --color-bg-card: var(--color-bg-card);
+  --color-bg-input: var(--color-bg-input);
+  --color-bg-glass: var(--color-bg-glass);
+  --color-bg-overlay: var(--color-bg-overlay);
+
+  /* Brand colors */
+  --color-accent: var(--color-accent);
+  --color-accent-dark: var(--color-accent-dark);
+  --color-accent-light: var(--color-accent-light);
+  --color-secondary-lighter: var(--color-secondary-lighter);
+
+  /* Semantic colors */
+  --color-success: var(--color-success);
+  --color-success-light: var(--color-success-light);
+  --color-success-lighter: var(--color-success-lighter);
+  --color-warning: var(--color-warning);
+  --color-warning-light: var(--color-warning-light);
+  --color-warning-lighter: var(--color-warning-lighter);
+  --color-error: var(--color-error);
+  --color-error-light: var(--color-error-light);
+  --color-error-lighter: var(--color-error-lighter);
+  --color-info: var(--color-info);
+  --color-info-light: var(--color-info-light);
+  --color-info-lighter: var(--color-info-lighter);
+
+  /* Text colors */
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-tertiary: var(--color-text-tertiary);
+  --color-text-inverse: var(--color-text-inverse);
+  --color-text-accent: var(--color-text-accent);
+
+  /* Border colors */
+  --color-border: var(--color-border);
+  --color-border-light: var(--color-border-light);
+  --color-border-dark: var(--color-border-dark);
+  --color-border-focus: var(--color-border-focus);
+  --color-border-glass: var(--color-border-glass);
+
+  /* Neutrals */
+  --color-gray-400: var(--color-gray-400);
+  --color-gray-500: var(--color-gray-500);
+  --color-gray-600: var(--color-gray-600);
+
+  /* Radius */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+  --radius-full: var(--radius-full);
+
+  /* Font families */
+  --font-heading: var(--font-family-heading);
+  --font-base: var(--font-family-base);
+  --font-mono: var(--font-family-mono);
+}
+
+/* =========================================================================
    Design System Tokens
    ========================================================================= */
 

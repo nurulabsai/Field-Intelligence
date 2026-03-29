@@ -45,27 +45,14 @@ const ConstraintSeverityGrid: React.FC<ConstraintSeverityGridProps> = ({
   };
 
   return (
-    <div style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div className="font-[Inter,sans-serif]">
       {/* Header row */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '90px repeat(5, 1fr)',
-          gap: '6px',
-          marginBottom: '8px',
-          padding: '0 2px',
-        }}
-      >
+      <div className="grid grid-cols-[90px_repeat(5,1fr)] gap-1.5 mb-2 px-0.5">
         <div />
         {severityLevels.map((level) => (
           <div
             key={level.value}
-            style={{
-              textAlign: 'center',
-              fontSize: '11px',
-              color: '#6B7280',
-              fontWeight: 500,
-            }}
+            className="text-center text-[11px] text-text-tertiary font-medium"
           >
             {level.label}
           </div>
@@ -76,21 +63,9 @@ const ConstraintSeverityGrid: React.FC<ConstraintSeverityGridProps> = ({
       {constraints.map((constraint) => (
         <div
           key={constraint.key}
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '90px repeat(5, 1fr)',
-            gap: '6px',
-            marginBottom: '8px',
-            alignItems: 'center',
-          }}
+          className="grid grid-cols-[90px_repeat(5,1fr)] gap-1.5 mb-2 items-center"
         >
-          <span
-            style={{
-              fontSize: '13px',
-              color: '#FFFFFF',
-              fontWeight: 500,
-            }}
-          >
+          <span className="text-[13px] text-white font-medium">
             {constraint.label}
           </span>
           {severityLevels.map((level) => {
@@ -99,20 +74,14 @@ const ConstraintSeverityGrid: React.FC<ConstraintSeverityGridProps> = ({
               <button
                 key={level.value}
                 onClick={() => handleSelect(constraint.key, level.value)}
+                className="h-9 rounded-lg cursor-pointer transition-all duration-150 flex items-center justify-center"
                 style={{
-                  height: '36px',
-                  borderRadius: '8px',
                   border: isSelected
                     ? `2px solid ${level.color}`
                     : '1px solid rgba(255,255,255,0.06)',
                   backgroundColor: isSelected
                     ? level.bgColor
                     : 'var(--color-bg-input, #252525)',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
                 }}
                 onMouseEnter={(e) => {
                   if (!isSelected) {
@@ -126,12 +95,11 @@ const ConstraintSeverityGrid: React.FC<ConstraintSeverityGridProps> = ({
                 }}
               >
                 <div
+                  className="rounded-full transition-all duration-150"
                   style={{
                     width: isSelected ? '12px' : '8px',
                     height: isSelected ? '12px' : '8px',
-                    borderRadius: '50%',
                     backgroundColor: isSelected ? level.color : 'rgba(255,255,255,0.1)',
-                    transition: 'all 0.15s ease',
                   }}
                 />
               </button>
