@@ -97,7 +97,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
 
       {/* Full Name */}
       <div className="mb-5">
-        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Full Name</label>
+        <label className="block text-sm font-medium text-text-secondary mb-1.5">Full Name</label>
         <div className="relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"><User size={18} /></span>
           <input
@@ -113,7 +113,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
 
       {/* Email */}
       <div className="mb-5">
-        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Email Address</label>
+        <label className="block text-sm font-medium text-text-secondary mb-1.5">Email Address</label>
         <div className="relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"><Mail size={18} /></span>
           <input
@@ -129,7 +129,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
 
       {/* Password */}
       <div className="mb-5">
-        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Password</label>
+        <label className="block text-sm font-medium text-text-secondary mb-1.5">Password</label>
         <div className="relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"><Lock size={18} /></span>
           <input
@@ -163,7 +163,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
 
       {/* Confirm Password */}
       <div className="mb-5">
-        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Confirm Password</label>
+        <label className="block text-sm font-medium text-text-secondary mb-1.5">Confirm Password</label>
         <div className="relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"><Lock size={18} /></span>
           <input
@@ -186,7 +186,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
 
       {/* Role Selector */}
       <div className="mb-5">
-        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Role</label>
+        <label className="block text-sm font-medium text-text-secondary mb-1.5">Role</label>
         <div className="relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"><ShieldCheck size={18} /></span>
           <button
@@ -219,7 +219,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
 
       {/* Organization */}
       <div className="mb-7">
-        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Organization</label>
+        <label className="block text-sm font-medium text-text-secondary mb-1.5">Organization</label>
         <div className="relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"><Building2 size={18} /></span>
           <input

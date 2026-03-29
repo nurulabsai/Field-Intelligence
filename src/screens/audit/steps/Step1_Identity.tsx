@@ -44,7 +44,7 @@ const Step1_Identity: React.FC<Step1Props> = ({ data, onChange, errors }) => {
 
           return (
             <div key={field.key}>
-              <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">
                 {field.label}
                 {field.required && <span className="text-text-accent ml-1">*</span>}
               </label>

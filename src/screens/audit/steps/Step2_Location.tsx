@@ -69,7 +69,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
       <div className="flex flex-col gap-5">
         {/* Region Dropdown */}
         <div>
-          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">
+          <label className="block text-sm font-medium text-text-secondary mb-1.5">
             Region <span className="text-text-accent">*</span>
           </label>
           <div className="relative">
@@ -110,7 +110,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
         {/* District */}
         <div>
-          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">
+          <label className="block text-sm font-medium text-text-secondary mb-1.5">
             District <span className="text-text-accent">*</span>
           </label>
           <input
@@ -128,7 +128,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
         {/* Ward */}
         <div>
-          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Ward</label>
+          <label className="block text-sm font-medium text-text-secondary mb-1.5">Ward</label>
           <input
             type="text"
             value={(data.ward as string) || ''}
@@ -140,7 +140,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
         {/* Village */}
         <div>
-          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Village</label>
+          <label className="block text-sm font-medium text-text-secondary mb-1.5">Village</label>
           <input
             type="text"
             value={(data.village as string) || ''}
@@ -152,7 +152,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
         {/* GPS Capture */}
         <div>
-          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">GPS Coordinates</label>
+          <label className="block text-sm font-medium text-text-secondary mb-1.5">GPS Coordinates</label>
           <button
             type="button"
             onClick={captureGPS}

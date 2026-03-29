@@ -110,7 +110,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
 
     return (
       <div key={key}>
-        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">
+        <label className="block text-sm font-medium text-text-secondary mb-1.5">
           {label}
           {required && <span className="text-text-accent ml-1">*</span>}
         </label>
@@ -188,7 +188,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
       <div className="flex flex-col gap-5">
         {/* Total Area */}
         <div>
-          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">
+          <label className="block text-sm font-medium text-text-secondary mb-1.5">
             Total Area (ha) <span className="text-text-accent">*</span>
           </label>
           <input
@@ -211,7 +211,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
 
         {/* Cultivated Area */}
         <div>
-          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">
+          <label className="block text-sm font-medium text-text-secondary mb-1.5">
             Cultivated Area (ha) <span className="text-text-accent">*</span>
           </label>
           <input

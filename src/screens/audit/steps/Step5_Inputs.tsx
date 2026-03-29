@@ -58,7 +58,7 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
 
     return (
       <div>
-        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">{label}</label>
+        <label className="block text-sm font-medium text-text-secondary mb-1.5">{label}</label>
         <div className="relative">
           <button
             type="button"
@@ -116,7 +116,7 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
             {renderDropdown('fertilizer_type', 'Fertilizer Type', FERTILIZER_TYPES)}
             {(data.fertilizer_type as string) && (data.fertilizer_type as string) !== 'none' && (
               <div>
-                <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Amount (kg)</label>
+                <label className="block text-sm font-medium text-text-secondary mb-1.5">Amount (kg)</label>
                 <input
                   type="number"
                   min="0"
@@ -140,7 +140,7 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
             {renderDropdown('pesticide_type', 'Pesticide Type', PESTICIDE_TYPES)}
             {(data.pesticide_type as string) && (data.pesticide_type as string) !== 'none' && (
               <div>
-                <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Amount (litres)</label>
+                <label className="block text-sm font-medium text-text-secondary mb-1.5">Amount (litres)</label>
                 <input
                   type="number"
                   min="0"

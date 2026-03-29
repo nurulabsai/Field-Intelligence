@@ -50,7 +50,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
 
       {/* Email */}
       <div className="mb-5">
-        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">
+        <label className="block text-sm font-medium text-text-secondary mb-1.5">
           Email Address
         </label>
         <div className="relative">
@@ -68,7 +68,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
 
       {/* Password */}
       <div className="mb-4">
-        <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">
+        <label className="block text-sm font-medium text-text-secondary mb-1.5">
           Password
         </label>
         <div className="relative">

@@ -136,7 +136,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
           </h3>
           <div className="nuru-yield-grid grid grid-cols-3 gap-3.5">
             <div>
-              <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Yield Estimate</label>
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">Yield Estimate</label>
               <div className="relative">
                 <input
                   type="number"
@@ -153,7 +153,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
               </div>
             </div>
             <div>
-              <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Actual Yield <span className="text-text-accent">*</span></label>
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">Actual Yield <span className="text-text-accent">*</span></label>
               <div className="relative">
                 <input
                   type="number"
@@ -170,7 +170,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
               </div>
             </div>
             <div>
-              <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Yield Loss %</label>
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">Yield Loss %</label>
               <input
                 type="number"
                 min="0"
@@ -192,7 +192,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
             Market Information
           </h3>
 
-          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Market Channel <span className="text-text-accent">*</span></label>
+          <label className="block text-sm font-medium text-text-secondary mb-1.5">Market Channel <span className="text-text-accent">*</span></label>
           <div className="flex flex-wrap gap-2.5 mb-4">
             {MARKET_CHANNELS.map(ch => {
               const selected = (data.market_channel as string) === ch.value;
@@ -216,7 +216,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
 
           <div className="nuru-market-grid grid grid-cols-2 gap-3.5">
             <div>
-              <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Price per kg (TZS) <span className="text-text-accent">*</span></label>
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">Price per kg (TZS) <span className="text-text-accent">*</span></label>
               <input
                 type="number"
                 min="0"
@@ -228,7 +228,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
               />
             </div>
             <div>
-              <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Gross Revenue</label>
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">Gross Revenue</label>
               <div className="py-3 px-4 bg-[rgba(34,197,94,0.08)] border border-[rgba(34,197,94,0.2)] rounded-xl text-[0.938rem] font-bold text-[#22C55E]">
                 {formatTZS(grossRevenue)}
               </div>
@@ -247,7 +247,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
               const selected = (data[row.key] as number) ?? -1;
               return (
                 <div key={row.key}>
-                  <label className="block text-[0.813rem] font-medium text-text-secondary mb-2">{row.label}</label>
+                  <label className="block text-sm font-medium text-text-secondary mb-2">{row.label}</label>
                   <div className="flex gap-1.5 flex-wrap">
                     {SEVERITY_LEVELS.map(level => {
                       const isSelected = selected === level.value;
@@ -377,7 +377,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
 
         {/* Notes */}
         <div>
-          <label className="block text-[0.813rem] font-medium text-text-secondary mb-1.5">Additional Notes</label>
+          <label className="block text-sm font-medium text-text-secondary mb-1.5">Additional Notes</label>
           <textarea
             value={(data.notes as string) || ''}
             onChange={e => handleChange('notes', e.target.value)}
