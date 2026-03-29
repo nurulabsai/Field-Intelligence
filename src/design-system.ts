@@ -1,366 +1,131 @@
 /**
- * Design System Tokens — NuruOS Field Intelligence
+ * Design System Tokens — NuruOS Field Intelligence (Stitch Design)
  *
- * Extracted from styles/design-system.css.
- * This module exposes every design token as a typed JS object,
- * a ready-to-inject CSS custom-properties string, and a lightweight
- * className-merging helper.
+ * Single source of truth for the entire visual system.
+ * Aesthetic: Dark precision. Neon-lime (#BEF264) as the one commanding accent.
+ * Typography: Sora (headings/display), Manrope (body/UI), IBM Plex Mono (data).
+ *
+ * DO NOT define colors, fonts, or radii anywhere else.
  */
 
 // ---------------------------------------------------------------------------
-// Token definitions
+// Color palette
 // ---------------------------------------------------------------------------
 
-export const tokens = {
-  colors: {
-    primary: {
-      DEFAULT: '#171717',
-      dark: '#0D0D0D',
-      darker: '#000000',
-      light: '#1E1E1E',
-      lighter: '#252525',
-    },
-    secondary: {
-      DEFAULT: '#F0513E',
-      dark: '#D4402E',
-      light: '#F4705F',
-      lighter: '#2A1A17',
-    },
-    accent: {
-      DEFAULT: '#F0513E',
-      dark: '#D4402E',
-      light: '#F4705F',
-    },
-    success: {
-      DEFAULT: '#22C55E',
-      light: '#86EFAC',
-      lighter: '#0D2818',
-    },
-    warning: {
-      DEFAULT: '#F59E0B',
-      light: '#FCD34D',
-      lighter: '#2A2008',
-    },
-    error: {
-      DEFAULT: '#EF4444',
-      light: '#FCA5A5',
-      lighter: '#2A1010',
-    },
-    info: {
-      DEFAULT: '#3B82F6',
-      light: '#93C5FD',
-      lighter: '#0D1A2A',
-    },
-    white: '#FFFFFF',
-    gray: {
-      50: '#1A1A1A',
-      100: '#1E1E1E',
-      200: 'rgba(255,255,255,0.08)',
-      300: 'rgba(255,255,255,0.12)',
-      400: '#6B7280',
-      500: '#9CA3AF',
-      600: '#D1D5DB',
-      700: '#E5E7EB',
-      800: '#F3F4F6',
-      900: '#FFFFFF',
-    },
-    bg: {
-      primary: '#0D0D0D',
-      secondary: '#171717',
-      tertiary: '#1E1E1E',
-      dark: '#000000',
-      overlay: 'rgba(0,0,0,0.7)',
-      card: '#1E1E1E',
-      input: '#252525',
-      glass: 'rgba(30,30,30,0.8)',
-    },
-    text: {
-      primary: '#FFFFFF',
-      secondary: '#9CA3AF',
-      tertiary: '#6B7280',
-      inverse: '#0D0D0D',
-      onPrimary: '#FFFFFF',
-      onSecondary: '#FFFFFF',
-      accent: '#F0513E',
-    },
-    border: {
-      DEFAULT: 'rgba(255,255,255,0.08)',
-      light: 'rgba(255,255,255,0.04)',
-      dark: 'rgba(255,255,255,0.12)',
-      focus: '#F0513E',
-      glass: 'rgba(255,255,255,0.06)',
-    },
-  },
+export const colors = {
+  // Backgrounds
+  bgDeep: '#0B0F19',
+  bgCard: '#111622',
+  bgSlate: '#161C2A',
 
-  typography: {
-    fontFamily: {
-      heading: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      base: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
-      mono: "'IBM Plex Mono', 'Courier New', monospace",
-    },
-    fontSize: {
-      xs: '0.75rem',   // 12px
-      sm: '0.875rem',  // 14px
-      base: '1rem',    // 16px
-      lg: '1.125rem',  // 18px
-      xl: '1.25rem',   // 20px
-      '2xl': '1.5rem', // 24px
-      '3xl': '1.875rem', // 30px
-      '4xl': '2.25rem',  // 36px
-    },
-    fontWeight: {
-      normal: 400,
-      medium: 500,
-      semibold: 600,
-      bold: 700,
-    },
-    lineHeight: {
-      tight: 1.25,
-      normal: 1.5,
-      relaxed: 1.75,
-    },
-  },
+  // Neon accents
+  neonLime: '#BEF264',
+  neonCyan: '#67E8F9',
+  neonRed: '#FF4B4B',
+  neonAmber: '#FFBF00',
+  neonPurple: '#D8B4FE',
 
-  spacing: {
-    xs: '0.25rem',  // 4px
-    sm: '0.5rem',   // 8px
-    md: '1rem',     // 16px
-    lg: '1.5rem',   // 24px
-    xl: '2rem',     // 32px
-    '2xl': '3rem',  // 48px
-    '3xl': '4rem',  // 64px
-  },
+  // Glass system
+  glass: 'rgba(255,255,255,0.03)',
+  glassBorder: 'rgba(255,255,255,0.05)',
+  glassMid: 'rgba(255,255,255,0.08)',
 
-  borderWidth: {
-    thin: '1px',
-    medium: '2px',
-    thick: '4px',
-  },
-
-  borderRadius: {
-    sm: '0.5rem',   // 8px
-    md: '0.75rem',  // 12px
-    lg: '1rem',     // 16px
-    xl: '1.25rem',  // 20px
-    '2xl': '1.5rem', // 24px
-    full: '9999px',
-  },
-
-  shadows: {
-    sm: '0 1px 2px 0 rgba(0,0,0,0.3)',
-    md: '0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -1px rgba(0,0,0,0.3)',
-    lg: '0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -2px rgba(0,0,0,0.3)',
-    xl: '0 20px 25px -5px rgba(0,0,0,0.4), 0 10px 10px -5px rgba(0,0,0,0.3)',
-    '2xl': '0 25px 50px -12px rgba(0,0,0,0.5)',
-    glowCoral: '0 0 20px rgba(240,81,62,0.3)',
-    glowCoralLg: '0 0 40px rgba(240,81,62,0.4)',
-    glass: '0 8px 32px rgba(0,0,0,0.4)',
-  },
-
-  glass: {
-    bg: 'rgba(30,30,30,0.8)',
-    border: 'rgba(255,255,255,0.06)',
-    blur: 'blur(16px)',
-    blurLg: 'blur(24px)',
-  },
-
-  transitions: {
-    fast: '100ms ease-in-out',
-    base: '150ms ease-in-out',
-    slow: '250ms ease-in-out',
-    spring: '150ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-  },
-
-  zIndex: {
-    dropdown: 1000,
-    sticky: 1020,
-    fixed: 1030,
-    modalBackdrop: 1040,
-    modal: 1050,
-    popover: 1060,
-    tooltip: 1070,
-  },
-
-  touchTarget: {
-    sm: '48px',
-    md: '56px',
-    lg: '64px',
-  },
+  // Text
+  textPrimary: '#FFFFFF',
+  textSecondary: '#94A3B8',
+  textMuted: 'rgba(255,255,255,0.30)',
+  textDisabled: 'rgba(255,255,255,0.20)',
 } as const;
 
 // ---------------------------------------------------------------------------
-// CSS custom properties string (inject via <style> or import in CSS)
+// Typography
 // ---------------------------------------------------------------------------
 
-export const cssVariables = `
-:root {
-  /* Colors — Primary */
-  --color-primary: ${tokens.colors.primary.DEFAULT};
-  --color-primary-dark: ${tokens.colors.primary.dark};
-  --color-primary-darker: ${tokens.colors.primary.darker};
-  --color-primary-light: ${tokens.colors.primary.light};
-  --color-primary-lighter: ${tokens.colors.primary.lighter};
+export const typography = {
+  display: "'Sora', sans-serif",
+  body: "'Manrope', sans-serif",
+  mono: "'IBM Plex Mono', monospace",
+} as const;
 
-  /* Colors — Secondary */
-  --color-secondary: ${tokens.colors.secondary.DEFAULT};
-  --color-secondary-dark: ${tokens.colors.secondary.dark};
-  --color-secondary-light: ${tokens.colors.secondary.light};
-  --color-secondary-lighter: ${tokens.colors.secondary.lighter};
+// ---------------------------------------------------------------------------
+// Spacing
+// ---------------------------------------------------------------------------
 
-  /* Colors — Accent */
-  --color-accent: ${tokens.colors.accent.DEFAULT};
-  --color-accent-dark: ${tokens.colors.accent.dark};
-  --color-accent-light: ${tokens.colors.accent.light};
+export const spacing = {
+  screenX: '1.5rem',
+  screenXLg: '2rem',
+  screenTop: '3rem',
+  cardPad: '2rem',
+  cardPadSm: '1.5rem',
+  navClear: '10rem',
+} as const;
 
-  /* Semantic */
-  --color-success: ${tokens.colors.success.DEFAULT};
-  --color-success-light: ${tokens.colors.success.light};
-  --color-success-lighter: ${tokens.colors.success.lighter};
+// ---------------------------------------------------------------------------
+// Border radius
+// ---------------------------------------------------------------------------
 
-  --color-warning: ${tokens.colors.warning.DEFAULT};
-  --color-warning-light: ${tokens.colors.warning.light};
-  --color-warning-lighter: ${tokens.colors.warning.lighter};
+export const radius = {
+  card: '32px',
+  cardMd: '24px',
+  input: '16px',
+  iconBox: '20px',
+  pill: '9999px',
+} as const;
 
-  --color-error: ${tokens.colors.error.DEFAULT};
-  --color-error-light: ${tokens.colors.error.light};
-  --color-error-lighter: ${tokens.colors.error.lighter};
+// ---------------------------------------------------------------------------
+// Shadows
+// ---------------------------------------------------------------------------
 
-  --color-info: ${tokens.colors.info.DEFAULT};
-  --color-info-light: ${tokens.colors.info.light};
-  --color-info-lighter: ${tokens.colors.info.lighter};
+export const shadows = {
+  lime: '0 4px 20px rgba(190,242,100,0.20)',
+  limeStrong: '0 8px 24px -4px rgba(190,242,100,0.35)',
+  cyan: '0 4px 20px rgba(103,232,249,0.15)',
+  red: '0 4px 20px rgba(255,75,75,0.15)',
+  glass: '0 10px 40px -10px rgba(0,0,0,0.30)',
+  soft: '0 20px 50px -12px rgba(0,0,0,0.50)',
+  nav: '0 20px 60px -12px rgba(0,0,0,0.60)',
+} as const;
 
-  /* Neutrals */
-  --color-white: ${tokens.colors.white};
-  --color-gray-50: ${tokens.colors.gray[50]};
-  --color-gray-100: ${tokens.colors.gray[100]};
-  --color-gray-200: ${tokens.colors.gray[200]};
-  --color-gray-300: ${tokens.colors.gray[300]};
-  --color-gray-400: ${tokens.colors.gray[400]};
-  --color-gray-500: ${tokens.colors.gray[500]};
-  --color-gray-600: ${tokens.colors.gray[600]};
-  --color-gray-700: ${tokens.colors.gray[700]};
-  --color-gray-800: ${tokens.colors.gray[800]};
-  --color-gray-900: ${tokens.colors.gray[900]};
+// ---------------------------------------------------------------------------
+// Animation
+// ---------------------------------------------------------------------------
 
-  /* Backgrounds */
-  --color-bg-primary: ${tokens.colors.bg.primary};
-  --color-bg-secondary: ${tokens.colors.bg.secondary};
-  --color-bg-tertiary: ${tokens.colors.bg.tertiary};
-  --color-bg-dark: ${tokens.colors.bg.dark};
-  --color-bg-overlay: ${tokens.colors.bg.overlay};
-  --color-bg-card: ${tokens.colors.bg.card};
-  --color-bg-input: ${tokens.colors.bg.input};
-  --color-bg-glass: ${tokens.colors.bg.glass};
+export const animation = {
+  fast: '150ms ease',
+  normal: '200ms ease',
+  slow: '350ms ease',
+  spring: '200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+} as const;
 
-  /* Text */
-  --color-text-primary: ${tokens.colors.text.primary};
-  --color-text-secondary: ${tokens.colors.text.secondary};
-  --color-text-tertiary: ${tokens.colors.text.tertiary};
-  --color-text-inverse: ${tokens.colors.text.inverse};
-  --color-text-on-primary: ${tokens.colors.text.onPrimary};
-  --color-text-on-secondary: ${tokens.colors.text.onSecondary};
-  --color-text-accent: ${tokens.colors.text.accent};
+// ---------------------------------------------------------------------------
+// Z-index scale
+// ---------------------------------------------------------------------------
 
-  /* Border */
-  --color-border: ${tokens.colors.border.DEFAULT};
-  --color-border-light: ${tokens.colors.border.light};
-  --color-border-dark: ${tokens.colors.border.dark};
-  --color-border-focus: ${tokens.colors.border.focus};
-  --color-border-glass: ${tokens.colors.border.glass};
+export const zIndex = {
+  nav: 100,
+  sticky: 1020,
+  fixed: 1030,
+  modalBackdrop: 1040,
+  modal: 1050,
+  popover: 1060,
+  tooltip: 1070,
+} as const;
 
-  /* Typography */
-  --font-family-heading: ${tokens.typography.fontFamily.heading};
-  --font-family-base: ${tokens.typography.fontFamily.base};
-  --font-family-mono: ${tokens.typography.fontFamily.mono};
+// ---------------------------------------------------------------------------
+// Touch targets (WCAG 2.5.5)
+// ---------------------------------------------------------------------------
 
-  --font-size-xs: ${tokens.typography.fontSize.xs};
-  --font-size-sm: ${tokens.typography.fontSize.sm};
-  --font-size-base: ${tokens.typography.fontSize.base};
-  --font-size-lg: ${tokens.typography.fontSize.lg};
-  --font-size-xl: ${tokens.typography.fontSize.xl};
-  --font-size-2xl: ${tokens.typography.fontSize['2xl']};
-  --font-size-3xl: ${tokens.typography.fontSize['3xl']};
-  --font-size-4xl: ${tokens.typography.fontSize['4xl']};
-
-  --font-weight-normal: ${tokens.typography.fontWeight.normal};
-  --font-weight-medium: ${tokens.typography.fontWeight.medium};
-  --font-weight-semibold: ${tokens.typography.fontWeight.semibold};
-  --font-weight-bold: ${tokens.typography.fontWeight.bold};
-
-  --line-height-tight: ${tokens.typography.lineHeight.tight};
-  --line-height-normal: ${tokens.typography.lineHeight.normal};
-  --line-height-relaxed: ${tokens.typography.lineHeight.relaxed};
-
-  /* Spacing */
-  --spacing-xs: ${tokens.spacing.xs};
-  --spacing-sm: ${tokens.spacing.sm};
-  --spacing-md: ${tokens.spacing.md};
-  --spacing-lg: ${tokens.spacing.lg};
-  --spacing-xl: ${tokens.spacing.xl};
-  --spacing-2xl: ${tokens.spacing['2xl']};
-  --spacing-3xl: ${tokens.spacing['3xl']};
-
-  /* Borders */
-  --border-width-thin: ${tokens.borderWidth.thin};
-  --border-width-medium: ${tokens.borderWidth.medium};
-  --border-width-thick: ${tokens.borderWidth.thick};
-
-  --radius-sm: ${tokens.borderRadius.sm};
-  --radius-md: ${tokens.borderRadius.md};
-  --radius-lg: ${tokens.borderRadius.lg};
-  --radius-xl: ${tokens.borderRadius.xl};
-  --radius-2xl: ${tokens.borderRadius['2xl']};
-  --radius-full: ${tokens.borderRadius.full};
-
-  /* Shadows */
-  --shadow-sm: ${tokens.shadows.sm};
-  --shadow-md: ${tokens.shadows.md};
-  --shadow-lg: ${tokens.shadows.lg};
-  --shadow-xl: ${tokens.shadows.xl};
-  --shadow-2xl: ${tokens.shadows['2xl']};
-  --shadow-glow-coral: ${tokens.shadows.glowCoral};
-  --shadow-glow-coral-lg: ${tokens.shadows.glowCoralLg};
-  --shadow-glass: ${tokens.shadows.glass};
-
-  /* Glass */
-  --glass-bg: ${tokens.glass.bg};
-  --glass-border: ${tokens.glass.border};
-  --glass-blur: ${tokens.glass.blur};
-  --glass-blur-lg: ${tokens.glass.blurLg};
-
-  /* Transitions */
-  --transition-fast: ${tokens.transitions.fast};
-  --transition-base: ${tokens.transitions.base};
-  --transition-slow: ${tokens.transitions.slow};
-  --transition-spring: ${tokens.transitions.spring};
-
-  /* Z-Index */
-  --z-dropdown: ${tokens.zIndex.dropdown};
-  --z-sticky: ${tokens.zIndex.sticky};
-  --z-fixed: ${tokens.zIndex.fixed};
-  --z-modal-backdrop: ${tokens.zIndex.modalBackdrop};
-  --z-modal: ${tokens.zIndex.modal};
-  --z-popover: ${tokens.zIndex.popover};
-  --z-tooltip: ${tokens.zIndex.tooltip};
-
-  /* Touch targets */
-  --touch-target-sm: ${tokens.touchTarget.sm};
-  --touch-target-md: ${tokens.touchTarget.md};
-  --touch-target-lg: ${tokens.touchTarget.lg};
-}
-`.trim();
+export const touchTarget = {
+  sm: '44px',
+  md: '48px',
+  lg: '56px',
+  xl: '64px',
+} as const;
 
 // ---------------------------------------------------------------------------
 // Utility: className merging (zero-dependency)
 // ---------------------------------------------------------------------------
 
-/**
- * Merge class name values, filtering out falsy entries and deduplicating.
- *
- * @example
- *   cn('btn', isActive && 'btn-active', undefined, 'px-4')
- *   // => 'btn btn-active px-4'
- */
 export function cn(
   ...inputs: Array<string | false | null | undefined | 0 | ''>
 ): string {

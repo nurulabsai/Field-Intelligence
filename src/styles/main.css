@@ -1,244 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+/* Fonts — Sora (display), Manrope (body), IBM Plex Mono (data), Material Symbols */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
 @import "tailwindcss";
 
 /* =========================================================================
-   Tailwind v4 Theme — maps CSS vars to utility classes
-   Usage: bg-bg-primary, text-text-secondary, border-border, etc.
+   Tailwind v4 @theme — maps tokens to utility classes
+   Usage: bg-bg-deep, text-neon-lime, rounded-card, font-sora, etc.
    ========================================================================= */
 
 @theme {
-  /* Background colors */
-  --color-bg-primary: var(--color-bg-primary);
-  --color-bg-secondary: var(--color-bg-secondary);
-  --color-bg-tertiary: var(--color-bg-tertiary);
-  --color-bg-dark: var(--color-bg-dark);
-  --color-bg-card: var(--color-bg-card);
-  --color-bg-input: var(--color-bg-input);
-  --color-bg-glass: var(--color-bg-glass);
-  --color-bg-overlay: var(--color-bg-overlay);
+  --color-bg-deep:     #0B0F19;
+  --color-bg-card:     #111622;
+  --color-bg-slate:    #161C2A;
 
-  /* Brand colors */
-  --color-accent: var(--color-accent);
-  --color-accent-dark: var(--color-accent-dark);
-  --color-accent-light: var(--color-accent-light);
-  --color-secondary-lighter: var(--color-secondary-lighter);
+  --color-neon-lime:   #BEF264;
+  --color-neon-cyan:   #67E8F9;
+  --color-neon-red:    #FF4B4B;
+  --color-neon-amber:  #FFBF00;
+  --color-neon-purple: #D8B4FE;
 
-  /* Semantic colors */
-  --color-success: var(--color-success);
-  --color-success-light: var(--color-success-light);
-  --color-success-lighter: var(--color-success-lighter);
-  --color-warning: var(--color-warning);
-  --color-warning-light: var(--color-warning-light);
-  --color-warning-lighter: var(--color-warning-lighter);
-  --color-error: var(--color-error);
-  --color-error-light: var(--color-error-light);
-  --color-error-lighter: var(--color-error-lighter);
-  --color-info: var(--color-info);
-  --color-info-light: var(--color-info-light);
-  --color-info-lighter: var(--color-info-lighter);
+  --color-slate-400:   #94A3B8;
+  --color-zinc-400:    #A1A1AA;
 
-  /* Text colors */
-  --color-text-primary: var(--color-text-primary);
-  --color-text-secondary: var(--color-text-secondary);
-  --color-text-tertiary: var(--color-text-tertiary);
-  --color-text-inverse: var(--color-text-inverse);
-  --color-text-accent: var(--color-text-accent);
+  --font-sora:    'Sora', sans-serif;
+  --font-manrope: 'Manrope', sans-serif;
+  --font-mono:    'IBM Plex Mono', monospace;
 
-  /* Border colors */
-  --color-border: var(--color-border);
-  --color-border-light: var(--color-border-light);
-  --color-border-dark: var(--color-border-dark);
-  --color-border-focus: var(--color-border-focus);
-  --color-border-glass: var(--color-border-glass);
-
-  /* Neutrals */
-  --color-gray-400: var(--color-gray-400);
-  --color-gray-500: var(--color-gray-500);
-  --color-gray-600: var(--color-gray-600);
-
-  /* Radius */
-  --radius-sm: var(--radius-sm);
-  --radius-md: var(--radius-md);
-  --radius-lg: var(--radius-lg);
-  --radius-xl: var(--radius-xl);
-  --radius-2xl: var(--radius-2xl);
-  --radius-full: var(--radius-full);
-
-  /* Font families */
-  --font-heading: var(--font-family-heading);
-  --font-base: var(--font-family-base);
-  --font-mono: var(--font-family-mono);
-}
-
-/* =========================================================================
-   Design System Tokens
-   ========================================================================= */
-
-:root {
-  /* === COLORS === */
-
-  /* Primary - Dark Charcoal */
-  --color-primary: #171717;
-  --color-primary-dark: #0D0D0D;
-  --color-primary-darker: #000000;
-  --color-primary-light: #1E1E1E;
-  --color-primary-lighter: #252525;
-
-  /* Secondary - Coral Red */
-  --color-secondary: #F0513E;
-  --color-secondary-dark: #D4402E;
-  --color-secondary-light: #F4705F;
-  --color-secondary-lighter: #2A1A17;
-
-  /* Accent */
-  --color-accent: #F0513E;
-  --color-accent-dark: #D4402E;
-  --color-accent-light: #F4705F;
-
-  /* Semantic */
-  --color-success: #22C55E;
-  --color-success-light: #86EFAC;
-  --color-success-lighter: #0D2818;
-
-  --color-warning: #F59E0B;
-  --color-warning-light: #FCD34D;
-  --color-warning-lighter: #2A2008;
-
-  --color-error: #EF4444;
-  --color-error-light: #FCA5A5;
-  --color-error-lighter: #2A1010;
-
-  --color-info: #3B82F6;
-  --color-info-light: #93C5FD;
-  --color-info-lighter: #0D1A2A;
-
-  /* Neutrals */
-  --color-white: #FFFFFF;
-  --color-gray-50: #1A1A1A;
-  --color-gray-100: #1E1E1E;
-  --color-gray-200: rgba(255, 255, 255, 0.08);
-  --color-gray-300: rgba(255, 255, 255, 0.12);
-  --color-gray-400: #6B7280;
-  --color-gray-500: #9CA3AF;
-  --color-gray-600: #D1D5DB;
-  --color-gray-700: #E5E7EB;
-  --color-gray-800: #F3F4F6;
-  --color-gray-900: #FFFFFF;
-
-  /* Backgrounds */
-  --color-bg-primary: #0D0D0D;
-  --color-bg-secondary: #171717;
-  --color-bg-tertiary: #1E1E1E;
-  --color-bg-dark: #000000;
-  --color-bg-overlay: rgba(0, 0, 0, 0.7);
-  --color-bg-card: #1E1E1E;
-  --color-bg-input: #252525;
-  --color-bg-glass: rgba(30, 30, 30, 0.8);
-
-  /* Text */
-  --color-text-primary: #FFFFFF;
-  --color-text-secondary: #9CA3AF;
-  --color-text-tertiary: #6B7280;
-  --color-text-inverse: #0D0D0D;
-  --color-text-on-primary: #FFFFFF;
-  --color-text-on-secondary: #FFFFFF;
-  --color-text-accent: #F0513E;
-
-  /* Border */
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-light: rgba(255, 255, 255, 0.04);
-  --color-border-dark: rgba(255, 255, 255, 0.12);
-  --color-border-focus: #F0513E;
-  --color-border-glass: rgba(255, 255, 255, 0.06);
-
-  /* === TYPOGRAPHY === */
-  --font-family-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  --font-family-mono: 'IBM Plex Mono', 'Courier New', monospace;
-
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
-  --font-size-4xl: 2.25rem;
-
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-
-  --line-height-tight: 1.25;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.75;
-
-  /* === SPACING === */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
-  --spacing-3xl: 4rem;
-
-  /* === BORDERS === */
-  --border-width-thin: 1px;
-  --border-width-medium: 2px;
-  --border-width-thick: 4px;
-
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.25rem;
-  --radius-2xl: 1.5rem;
-  --radius-full: 9999px;
-
-  /* === SHADOWS === */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
-  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  --shadow-glow-coral: 0 0 20px rgba(240, 81, 62, 0.3);
-  --shadow-glow-coral-lg: 0 0 40px rgba(240, 81, 62, 0.4);
-  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.4);
-
-  /* === GLASSMORPHISM === */
-  --glass-bg: rgba(30, 30, 30, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.06);
-  --glass-blur: blur(16px);
-  --glass-blur-lg: blur(24px);
-
-  /* === TRANSITIONS === */
-  --transition-fast: 100ms ease-in-out;
-  --transition-base: 150ms ease-in-out;
-  --transition-slow: 250ms ease-in-out;
-  --transition-spring: 150ms cubic-bezier(0.34, 1.56, 0.64, 1);
-
-  /* === Z-INDEX === */
-  --z-dropdown: 1000;
-  --z-sticky: 1020;
-  --z-fixed: 1030;
-  --z-modal-backdrop: 1040;
-  --z-modal: 1050;
-  --z-popover: 1060;
-  --z-tooltip: 1070;
-
-  /* === TOUCH TARGETS === */
-  --touch-target-sm: 48px;
-  --touch-target-md: 56px;
-  --touch-target-lg: 64px;
+  --radius-card:    32px;
+  --radius-card-md: 24px;
+  --radius-input:   16px;
+  --radius-icon:    20px;
 }
 
 /* =========================================================================
    Global Resets
    ========================================================================= */
 
-*,
-*::before,
-*::after {
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -253,37 +53,130 @@ html {
 }
 
 body {
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-normal);
-  color: var(--color-text-primary);
-  background: var(--color-bg-primary);
+  background-color: #0B0F19;
+  color: #FFFFFF;
+  font-family: 'Manrope', sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
   overflow-x: hidden;
+  min-height: 100dvh;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-family-heading);
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Sora', sans-serif;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
+/* =========================================================================
+   Typography utilities
+   ========================================================================= */
+
+.font-sora    { font-family: 'Sora', sans-serif; }
+.font-manrope { font-family: 'Manrope', sans-serif; }
+.font-mono    { font-family: 'IBM Plex Mono', monospace; }
+
+/* =========================================================================
+   Glassmorphism system
+   ========================================================================= */
+
+.glass-card {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.30);
 }
 
-::-webkit-scrollbar-track {
-  background: var(--color-bg-primary);
+.glass-card-md {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-full);
+.glass-pill {
+  background: rgba(11,15,25,0.70);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.10);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+/* =========================================================================
+   Neon glow system
+   ========================================================================= */
+
+.glow-lime        { box-shadow: 0 4px 20px rgba(190,242,100,0.20); }
+.glow-lime-strong { box-shadow: 0 8px 24px -4px rgba(190,242,100,0.35); }
+.glow-cyan        { box-shadow: 0 4px 20px rgba(103,232,249,0.15); }
+.glow-red         { box-shadow: 0 4px 20px rgba(255,75,75,0.15); }
+
+/* Neon text glow */
+.text-glow-lime   { text-shadow: 0 0 12px rgba(190,242,100,0.50); }
+.text-glow-cyan   { text-shadow: 0 0 10px rgba(103,232,249,0.40); }
+
+/* =========================================================================
+   Scrollbar
+   ========================================================================= */
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0B0F19; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* =========================================================================
+   Progress ring
+   ========================================================================= */
+
+.progress-ring { transform: rotate(-90deg); transform-origin: 50% 50%; }
+.progress-ring-track { transition: stroke-dashoffset 0.35s ease; }
+
+/* =========================================================================
+   Pulse animations
+   ========================================================================= */
+
+@keyframes pulse-glow-cyan {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 3px #67E8F9); }
+  50%      { opacity: 0.6; filter: drop-shadow(0 0 8px #67E8F9); }
+}
+@keyframes pulse-glow-lime {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 3px #BEF264); }
+  50%      { opacity: 0.6; filter: drop-shadow(0 0 8px #BEF264); }
+}
+@keyframes pulse-glow-red {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 3px #FF4B4B); }
+  50%      { opacity: 0.6; filter: drop-shadow(0 0 8px #FF4B4B); }
+}
+
+.animate-pulse-cyan { animation: pulse-glow-cyan 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+.animate-pulse-lime { animation: pulse-glow-lime 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+.animate-pulse-red  { animation: pulse-glow-red  2s cubic-bezier(0.4,0,0.6,1) infinite; }
+
+/* =========================================================================
+   Grid background texture
+   ========================================================================= */
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* =========================================================================
+   Safe area / PWA support
+   ========================================================================= */
+
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* =========================================================================
+   Material Symbols sizing helper
+   ========================================================================= */
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.material-symbols-outlined.filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
