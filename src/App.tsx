@@ -74,8 +74,8 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         }}
       />
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen pb-[72px]">
+      {/* Main Content — offset by sidebar width on desktop */}
+      <div className="flex-1 flex flex-col min-h-screen pb-[72px] md:ml-[260px]">
         {!isOnline && <OfflineBanner pendingCount={pendingSyncCount} />}
         <main className="flex-1 overflow-auto">
           {children}
