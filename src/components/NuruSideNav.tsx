@@ -65,9 +65,6 @@ const NuruSideNav: React.FC<NuruSideNavProps> = ({
                 backgroundColor: isActive
                   ? 'rgba(240,81,62,0.1)'
                   : 'transparent',
-                borderLeft: isActive
-                  ? '3px solid #F0513E'
-                  : '3px solid transparent',
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
