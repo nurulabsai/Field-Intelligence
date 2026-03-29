@@ -9,10 +9,14 @@ import { createClient, type SupabaseClient, type RealtimeChannel } from '@supaba
 // Client singleton
 // ---------------------------------------------------------------------------
 
-const SUPABASE_URL =
-  import.meta.env.VITE_SUPABASE_URL ?? 'https://gyekncktmsvdtcbhakgl.supabase.co';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  throw new Error(
+    'Missing Supabase config: set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables',
+  );
+}
 
 export const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {

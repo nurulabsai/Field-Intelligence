@@ -334,8 +334,9 @@ if (typeof window !== 'undefined') {
   window.addEventListener('online', () => useUIStore.getState().setOnline(true));
   window.addEventListener('offline', () => useUIStore.getState().setOnline(false));
 
-  // Debug: expose stores on window for testing
-  (window as any).__authStore = useAuthStore;
-  (window as any).__auditStore = useAuditStore;
-  (window as any).__uiStore = useUIStore;
+  if (import.meta.env.DEV) {
+    (window as any).__authStore = useAuthStore;
+    (window as any).__auditStore = useAuditStore;
+    (window as any).__uiStore = useUIStore;
+  }
 }

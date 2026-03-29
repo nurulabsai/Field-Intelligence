@@ -62,18 +62,24 @@ router.post('/login', async (req, res) => {
   }
 });
 
+const registerSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  name: z.string().min(1).max(100),
+});
+
 // POST /api/auth/register (optional - for creating users)
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, name } = req.body;
-    
+    const { email, password, name } = registerSchema.parse(req.body);
+
     if (users.has(email)) {
       return res.status(400).json({ error: 'User already exists' });
     }
-    
-    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const hashedPassword = await bcrypt.hash(password, 12);
     const userId = Date.now().toString();
-    
+
     users.set(email, {
       id: userId,
       email,
@@ -81,18 +87,21 @@ router.post('/register', async (req, res) => {
       name,
       role: 'auditor',
     });
-    
+
     const token = generateToken({
       id: userId,
       email,
       role: 'auditor',
     });
-    
+
     res.status(201).json({
       token,
       user: { id: userId, email, name, role: 'auditor' },
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: 'Invalid input', details: error.errors });
+    }
     console.error('[Auth] Register error:', error);
     res.status(500).json({ error: 'Registration failed' });
   }

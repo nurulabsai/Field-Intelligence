@@ -13,11 +13,25 @@ const SUPPORTED_TYPES = {
   documents: ['application/pdf', 'application/json'],
 };
 
+const ALL_SUPPORTED_TYPES = [
+  ...SUPPORTED_TYPES.images,
+  ...SUPPORTED_TYPES.audio,
+  ...SUPPORTED_TYPES.video,
+  ...SUPPORTED_TYPES.documents,
+] as const;
+
+const safeFileName = z.string().min(1).max(255).refine(
+  (val) => !val.includes('..') && !val.includes('/') && !val.includes('\\'),
+  { message: 'Invalid file name' },
+);
+
+const safeId = z.string().uuid('Invalid ID format');
+
 const presignRequestSchema = z.object({
-  fileName: z.string(),
-  contentType: z.string().default('image/jpeg'),
+  fileName: safeFileName,
+  contentType: z.enum(ALL_SUPPORTED_TYPES as unknown as [string, ...string[]]).default('image/jpeg'),
   mediaType: z.enum(['image', 'audio', 'video', 'document']).optional(),
-  auditId: z.string().optional(),
+  auditId: safeId.optional(),
 });
 
 // POST /api/upload/presign - Get presigned URL for uploading
@@ -45,52 +59,61 @@ router.post('/presign', authenticate, async (req: AuthRequest, res) => {
   }
 });
 
+const voiceNoteSchema = z.object({
+  auditId: safeId,
+  fieldId: z.string().regex(/^[a-zA-Z0-9_-]+$/).max(100).optional(),
+});
+
 // POST /api/upload/voice-note - Special endpoint for voice notes
 router.post('/voice-note', authenticate, async (req: AuthRequest, res) => {
   try {
-    const { auditId, fieldId } = req.body;
-    
-    if (!auditId) {
-      return res.status(400).json({ error: 'auditId is required' });
-    }
-    
+    const { auditId, fieldId } = voiceNoteSchema.parse(req.body);
+
     const fileName = `voice_${fieldId || 'note'}_${Date.now()}.webm`;
     const key = `audits/${auditId}/audio/${fileName}`;
-    
+
     const result = await generatePresignedUploadUrl(key, 'audio/webm');
-    
+
     res.json({
       ...result,
       mediaType: 'audio',
       fileName,
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: 'Invalid input', details: error.errors });
+    }
     console.error('[Upload] Voice note error:', error);
     res.status(500).json({ error: 'Failed to generate voice note upload URL' });
   }
 });
 
+const photoSchema = z.object({
+  auditId: safeId,
+  label: z.string().max(100).optional(),
+  contentType: z.enum(SUPPORTED_TYPES.images as unknown as [string, ...string[]]).default('image/jpeg'),
+});
+
 // POST /api/upload/photo - Special endpoint for audit photos
 router.post('/photo', authenticate, async (req: AuthRequest, res) => {
   try {
-    const { auditId, label, contentType = 'image/jpeg' } = req.body;
-    
-    if (!auditId) {
-      return res.status(400).json({ error: 'auditId is required' });
-    }
-    
+    const { auditId, label, contentType } = photoSchema.parse(req.body);
+
     const safeLabel = (label || 'photo').replace(/[^a-zA-Z0-9]/g, '_');
     const fileName = `${safeLabel}_${Date.now()}.jpg`;
     const key = `audits/${auditId}/images/${fileName}`;
-    
+
     const result = await generatePresignedUploadUrl(key, contentType);
-    
+
     res.json({
       ...result,
       mediaType: 'image',
       fileName,
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: 'Invalid input', details: error.errors });
+    }
     console.error('[Upload] Photo error:', error);
     res.status(500).json({ error: 'Failed to generate photo upload URL' });
   }
