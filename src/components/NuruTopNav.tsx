@@ -18,21 +18,14 @@ const NuruTopNav: React.FC<NuruTopNavProps> = ({
 }) => {
   return (
     <nav
-      className="fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-4 bg-[rgba(13,13,13,0.8)] backdrop-blur-[16px] border-b border-[rgba(255,255,255,0.06)] z-50 font-[Inter,sans-serif]"
+      className="fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-4 bg-bg-primary/80 backdrop-blur-[var(--glass-blur)] border-b border-border-glass z-50 font-base"
     >
       {/* Left */}
       <div className="w-12 flex items-center">
         {onBack && (
           <button
             onClick={onBack}
-            className="bg-transparent border-none text-white cursor-pointer p-2 rounded-lg flex items-center justify-center transition-colors duration-150 hover:bg-[rgba(255,255,255,0.05)]"
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                'rgba(255,255,255,0.05)')
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = 'transparent')
-            }
+            className="bg-transparent border-none text-white cursor-pointer p-2 rounded-lg flex items-center justify-center transition-colors duration-[var(--transition-base)] hover:bg-white/[0.05]"
           >
             <ArrowLeft size={20} />
           </button>
@@ -48,14 +41,7 @@ const NuruTopNav: React.FC<NuruTopNavProps> = ({
       <div className="w-12 flex items-center justify-end gap-2">
         {showNotifications && (
           <button
-            className="bg-transparent border-none text-white cursor-pointer p-2 rounded-lg flex items-center justify-center relative transition-colors duration-150 hover:bg-[rgba(255,255,255,0.05)]"
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                'rgba(255,255,255,0.05)')
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = 'transparent')
-            }
+            className="bg-transparent border-none text-white cursor-pointer p-2 rounded-lg flex items-center justify-center relative transition-colors duration-[var(--transition-base)] hover:bg-white/[0.05]"
           >
             <Bell size={20} />
             {notificationCount > 0 && (

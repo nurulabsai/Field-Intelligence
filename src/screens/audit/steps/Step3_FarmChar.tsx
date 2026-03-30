@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { ChevronDown, AlertCircle } from 'lucide-react';
+import { cn } from '../../../design-system';
 
 interface Step3Props {
   data: Record<string, unknown>;
@@ -118,12 +119,11 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
           <button
             type="button"
             onClick={() => setOpenDropdown(isOpen ? null : key)}
-            className={`${inputBaseClasses} text-left cursor-pointer flex items-center justify-between`}
-            style={{
-              borderColor: showError ? '#EF4444' : isOpen ? '#F0513E' : 'rgba(255,255,255,0.08)',
-              borderWidth: '1px',
-              borderStyle: 'solid',
-            }}
+            className={cn(
+              inputBaseClasses,
+              'text-left cursor-pointer flex items-center justify-between border',
+              showError ? 'border-error' : isOpen ? 'border-accent' : 'border-border',
+            )}
           >
             <span className={value ? 'text-white' : 'text-text-tertiary'}>
               {options.find(o => o.value === value)?.label || `Select ${label.toLowerCase()}`}
@@ -131,7 +131,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
             <ChevronDown size={18} className="text-text-tertiary transition-transform duration-150" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }} />
           </button>
           {isOpen && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-bg-tertiary border border-[rgba(255,255,255,0.1)] rounded-xl z-50 overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-bg-tertiary border border-border-dark rounded-xl z-50 overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
               {options.map(opt => (
                 <button
                   key={opt.value}
@@ -140,11 +140,10 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
                     handleChange(key, opt.value);
                     setOpenDropdown(null);
                   }}
-                  className="w-full py-2.5 px-4 border-none text-sm text-left cursor-pointer font-inherit"
-                  style={{
-                    background: value === opt.value ? 'rgba(240,81,62,0.15)' : 'transparent',
-                    color: value === opt.value ? '#F0513E' : '#FFFFFF',
-                  }}
+                  className={cn(
+                    'w-full py-2.5 px-4 border-none text-sm text-left cursor-pointer font-inherit',
+                    value === opt.value ? 'bg-accent/15 text-accent' : 'bg-transparent text-white',
+                  )}
                 >
                   {opt.label}
                 </button>
@@ -152,7 +151,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
             </div>
           )}
         </div>
-        {showError && <p className="text-xs text-[#FCA5A5] mt-1">{error}</p>}
+        {showError && <p className="text-xs text-error-light mt-1">{error}</p>}
       </div>
     );
   };
@@ -168,15 +167,15 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
 
       {/* Error Summary Banner */}
       {hasErrors && Object.values(touched).some(Boolean) && (
-        <div className="flex gap-3 p-4 bg-[rgba(239,68,68,0.08)] border border-[rgba(239,68,68,0.25)] rounded-[14px] mb-6">
+        <div className="flex gap-3 p-4 bg-error/[0.08] border border-error/25 rounded-[14px] mb-6">
           <AlertCircle size={20} className="text-error shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-semibold text-[#FCA5A5] mb-1.5">
+            <p className="text-sm font-semibold text-error-light mb-1.5">
               Please fix the following errors
             </p>
             <ul className="m-0 pl-4">
               {errorList.map((err, i) => (
-                <li key={i} className="text-[0.813rem] text-[#FCA5A5] leading-normal">
+                <li key={i} className="text-[0.813rem] text-error-light leading-normal">
                   {err}
                 </li>
               ))}
@@ -198,14 +197,16 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
             value={(data.total_area_ha as string) || ''}
             onChange={e => handleChange('total_area_ha', e.target.value)}
             placeholder="Enter total farm area in hectares"
-            className={`${inputBaseClasses} border`}
-            style={{
-              borderColor: allErrors.total_area_ha && touched.total_area_ha ? '#EF4444' : 'rgba(255,255,255,0.08)',
-            }}
+            className={cn(
+              inputBaseClasses,
+              'border',
+              allErrors.total_area_ha && touched.total_area_ha ? 'border-error' : 'border-border',
+              'focus:border-accent',
+            )}
             onBlur={() => setTouched(p => ({ ...p, total_area_ha: true }))}
           />
           {allErrors.total_area_ha && touched.total_area_ha && (
-            <p className="text-xs text-[#FCA5A5] mt-1">{allErrors.total_area_ha}</p>
+            <p className="text-xs text-error-light mt-1">{allErrors.total_area_ha}</p>
           )}
         </div>
 
@@ -221,14 +222,16 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
             value={(data.cultivated_area_ha as string) || ''}
             onChange={e => handleChange('cultivated_area_ha', e.target.value)}
             placeholder="Enter cultivated area in hectares"
-            className={`${inputBaseClasses} border`}
-            style={{
-              borderColor: allErrors.cultivated_area_ha && touched.cultivated_area_ha ? '#EF4444' : 'rgba(255,255,255,0.08)',
-            }}
+            className={cn(
+              inputBaseClasses,
+              'border',
+              allErrors.cultivated_area_ha && touched.cultivated_area_ha ? 'border-error' : 'border-border',
+              'focus:border-accent',
+            )}
             onBlur={() => setTouched(p => ({ ...p, cultivated_area_ha: true }))}
           />
           {allErrors.cultivated_area_ha && touched.cultivated_area_ha && (
-            <p className="text-xs text-[#FCA5A5] mt-1">{allErrors.cultivated_area_ha}</p>
+            <p className="text-xs text-error-light mt-1">{allErrors.cultivated_area_ha}</p>
           )}
         </div>
 

@@ -36,3 +36,4 @@ dist-ssr
 
 # Claude Code
 .claude/
+.gstack/

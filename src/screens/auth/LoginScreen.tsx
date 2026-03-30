@@ -119,11 +119,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
       <button
         type="submit"
         disabled={loading}
-        className={`w-full py-3.5 border-none rounded-xl text-base font-semibold font-[inherit] transition-colors duration-150 flex items-center justify-center gap-2 ${loading ? 'bg-accent/60 text-white cursor-not-allowed' : 'bg-accent text-white cursor-pointer'}`}
+        className={`w-full py-3.5 border-none rounded-xl text-base font-semibold font-[inherit] transition-colors duration-150 flex items-center justify-center gap-2 ${loading ? 'bg-accent/60 text-black cursor-not-allowed' : 'bg-accent text-black cursor-pointer'}`}
       >
         {loading ? (
           <>
-            <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-[nuru-spin_0.6s_linear_infinite]" />
+            <span className="w-[18px] h-[18px] border-2 border-black/30 border-t-black rounded-full animate-[nuru-spin_0.6s_linear_infinite]" />
             Signing in...
           </>
         ) : (
@@ -154,9 +154,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
     <div className="min-h-screen flex bg-bg-primary font-base">
       {/* Left Panel - Desktop Only */}
       <div
-        className="nuru-login-left-panel basis-[45%] shrink-0 grow-0 bg-[linear-gradient(135deg,#171717_0%,#0D0D0D_50%,rgba(240,81,62,0.08)_100%)] flex flex-col items-center justify-center p-12 relative overflow-hidden"
+        className="nuru-login-left-panel basis-[45%] shrink-0 grow-0 bg-[linear-gradient(135deg,#111622_0%,#0B0F19_50%,rgba(190,242,100,0.08)_100%)] flex flex-col items-center justify-center p-12 relative overflow-hidden"
       >
-        <div className="absolute w-[350px] h-[350px] rounded-full bg-[radial-gradient(circle,rgba(240,81,62,0.1)_0%,transparent_70%)] bottom-[10%] -right-[5%]" />
+        <div className="absolute w-[350px] h-[350px] rounded-full bg-[radial-gradient(circle,rgba(190,242,100,0.1)_0%,transparent_70%)] bottom-[10%] -right-[5%]" />
         <div className="relative z-[1] text-center">
           <div className="flex items-baseline justify-center gap-0.5 mb-3">
             <span className="text-[2.5rem] font-bold text-white tracking-[-0.03em]">NuruOS</span>
@@ -174,7 +174,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
             ].map(stat => (
               <div
                 key={stat.label}
-                className="p-4 bg-[rgba(30,30,30,0.8)] backdrop-blur-[16px] rounded-xl border border-[rgba(255,255,255,0.06)] text-center"
+                className="p-4 bg-bg-glass backdrop-blur-[var(--glass-blur)] rounded-xl border border-border-glass text-center"
               >
                 <div className="text-xl font-bold text-text-accent">{stat.value}</div>
                 <div className="text-xs text-text-tertiary mt-1">{stat.label}</div>

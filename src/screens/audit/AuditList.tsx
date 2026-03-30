@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Search, Plus, MapPin, Calendar, FileText, Filter } from 'lucide-react';
+import { cn } from '../../design-system';
 
 type AuditStatus = 'draft' | 'submitted' | 'verified' | 'synced' | 'failed';
 
@@ -17,12 +18,12 @@ interface AuditListProps {
   onNewAudit?: () => void;
 }
 
-const STATUS_CONFIG: Record<AuditStatus, { label: string; bg: string; color: string }> = {
-  draft: { label: 'Draft', bg: 'rgba(107,114,128,0.15)', color: '#9CA3AF' },
-  submitted: { label: 'Submitted', bg: 'rgba(59,130,246,0.15)', color: '#3B82F6' },
-  verified: { label: 'Verified', bg: 'rgba(34,197,94,0.15)', color: '#22C55E' },
-  synced: { label: 'Synced', bg: 'rgba(20,184,166,0.15)', color: '#14B8A6' },
-  failed: { label: 'Failed', bg: 'rgba(239,68,68,0.15)', color: '#EF4444' },
+const STATUS_CLASSES: Record<AuditStatus, { label: string; className: string }> = {
+  draft: { label: 'Draft', className: 'bg-gray-400/15 text-text-secondary' },
+  submitted: { label: 'Submitted', className: 'bg-info/15 text-info' },
+  verified: { label: 'Verified', className: 'bg-success/15 text-success' },
+  synced: { label: 'Synced', className: 'bg-[rgba(20,184,166,0.15)] text-[#14B8A6]' },
+  failed: { label: 'Failed', className: 'bg-error/15 text-error' },
 };
 
 const FILTERS: { label: string; value: string }[] = [
@@ -77,11 +78,12 @@ const AuditList: React.FC<AuditListProps> = ({ audits, onAuditClick, onNewAudit 
             <button
               key={f.value}
               onClick={() => setFilter(f.value)}
-              className="px-4 py-2 rounded-[20px] text-[0.813rem] font-medium border-none cursor-pointer font-inherit transition-all duration-150"
-              style={{
-                backgroundColor: filter === f.value ? 'rgba(240,81,62,0.15)' : 'rgba(255,255,255,0.06)',
-                color: filter === f.value ? '#F0513E' : '#9CA3AF',
-              }}
+              className={cn(
+                'px-4 py-2 rounded-[20px] text-sm font-medium border-none cursor-pointer font-inherit transition-all duration-[var(--transition-base)]',
+                filter === f.value
+                  ? 'bg-accent/15 text-accent'
+                  : 'bg-border-glass text-text-secondary',
+              )}
             >
               <span className="flex items-center gap-1.5">
                 {f.value !== 'all' && <Filter size={12} />}
@@ -95,7 +97,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, onAuditClick, onNewAudit 
       {/* Audit cards */}
       <div className="px-6 pb-[120px] max-w-[800px] mx-auto">
         {filtered.length === 0 ? (
-          <div className="text-center py-16 px-6 bg-bg-card rounded-xl border border-[rgba(255,255,255,0.06)]">
+          <div className="text-center py-16 px-6 bg-bg-card rounded-xl border border-border-glass">
             <FileText size={48} className="text-text-tertiary mx-auto mb-4" />
             <p className="text-text-secondary text-base font-medium">No audits found</p>
             <p className="text-text-tertiary text-sm mt-1">
@@ -105,31 +107,30 @@ const AuditList: React.FC<AuditListProps> = ({ audits, onAuditClick, onNewAudit 
         ) : (
           <div className="flex flex-col gap-3">
             {filtered.map(audit => {
-              const status = STATUS_CONFIG[audit.status];
+              const status = STATUS_CLASSES[audit.status];
               return (
                 <button
                   key={audit.id}
                   onClick={() => onAuditClick?.(audit.id)}
-                  className="w-full p-5 bg-bg-card border border-[rgba(255,255,255,0.06)] rounded-lg cursor-pointer font-inherit text-left transition-all duration-150 flex flex-col gap-3 hover:border-[rgba(255,255,255,0.12)] hover:-translate-y-px"
+                  className="w-full p-5 bg-bg-card border border-border-glass rounded-lg cursor-pointer font-inherit text-left transition-all duration-[var(--transition-base)] flex flex-col gap-3 hover:border-border-dark hover:-translate-y-px"
                 >
                   <div className="flex justify-between items-start">
                     <div className="text-base font-semibold text-white">{audit.farmName}</div>
                     <span
-                      className="px-2.5 py-1 rounded-[20px] text-[0.688rem] font-semibold uppercase tracking-wide shrink-0"
-                      style={{
-                        backgroundColor: status.bg,
-                        color: status.color,
-                      }}
+                      className={cn(
+                        'px-2.5 py-1 rounded-[20px] text-[0.688rem] font-semibold uppercase tracking-wide shrink-0',
+                        status.className,
+                      )}
                     >
                       {status.label}
                     </span>
                   </div>
                   <div className="flex gap-4 flex-wrap">
-                    <div className="flex items-center gap-1.5 text-[0.813rem] text-text-tertiary">
+                    <div className="flex items-center gap-1.5 text-sm text-text-tertiary">
                       <Calendar size={13} />
                       {audit.date}
                     </div>
-                    <div className="flex items-center gap-1.5 text-[0.813rem] text-text-tertiary">
+                    <div className="flex items-center gap-1.5 text-sm text-text-tertiary">
                       <MapPin size={13} />
                       {audit.location}
                     </div>
@@ -144,7 +145,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, onAuditClick, onNewAudit 
       {/* FAB */}
       <button
         onClick={onNewAudit}
-        className="fixed bottom-8 right-8 w-14 h-14 rounded-lg bg-accent text-white border-none cursor-pointer flex items-center justify-center shadow-[0_8px_24px_rgba(240,81,62,0.4)] transition-transform duration-150 z-50 hover:scale-105"
+        className="fixed bottom-8 right-8 w-14 h-14 rounded-lg bg-accent text-black border-none cursor-pointer flex items-center justify-center shadow-[var(--shadow-glow-accent-lg)] transition-transform duration-[var(--transition-base)] z-50 hover:scale-105"
         title="New Audit"
       >
         <Plus size={24} />

@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { Plus, Trash2, ChevronDown, Wheat } from 'lucide-react';
+import { cn } from '../../../design-system';
 
 interface Step4Props {
   data: Record<string, unknown>;
@@ -50,7 +51,7 @@ function createEmptyCrop(): CropEntry {
   };
 }
 
-const inputClasses = "w-full py-2.5 px-3.5 bg-bg-input border border-border rounded-[10px] text-white text-sm font-inherit outline-none transition-colors duration-150";
+const inputClasses = "w-full py-2.5 px-3.5 bg-bg-input border border-border rounded-[10px] text-white text-sm font-inherit outline-none transition-colors duration-150 focus:border-accent";
 
 const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
   const crops: CropEntry[] = useMemo(() => {
@@ -87,19 +88,19 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
       </p>
 
       {errors.crops && (
-        <p className="text-[0.813rem] text-[#FCA5A5] mb-4">{errors.crops}</p>
+        <p className="text-[0.813rem] text-error-light mb-4">{errors.crops}</p>
       )}
 
       <div className="flex flex-col gap-4">
         {crops.map((crop, index) => (
           <div
             key={crop.id}
-            className="bg-bg-card border border-[rgba(255,255,255,0.06)] rounded-lg p-5"
+            className="bg-bg-card border border-border-glass rounded-lg p-5"
           >
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-sm bg-[rgba(34,197,94,0.1)] flex items-center justify-center text-[#22C55E]">
+                <div className="w-8 h-8 rounded-sm bg-success/10 flex items-center justify-center text-success">
                   <Wheat size={16} />
                 </div>
                 <span className="text-[0.938rem] font-semibold text-white">Crop {index + 1}</span>
@@ -108,7 +109,7 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
                 <button
                   type="button"
                   onClick={() => removeCrop(crop.id)}
-                  className="flex items-center gap-1.5 py-1.5 px-3 bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.2)] rounded-sm text-error text-xs font-medium cursor-pointer font-inherit"
+                  className="flex items-center gap-1.5 py-1.5 px-3 bg-error/10 border border-error/20 rounded-sm text-error text-xs font-medium cursor-pointer font-inherit"
                 >
                   <Trash2 size={13} />
                   Remove
@@ -131,7 +132,7 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
                   <ChevronDown size={16} className="text-text-tertiary" />
                 </button>
                 {openDropdowns[crop.id] && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-bg-input border border-[rgba(255,255,255,0.1)] rounded-[10px] z-50 max-h-[200px] overflow-y-auto shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-bg-input border border-border rounded-[10px] z-50 max-h-[200px] overflow-y-auto shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
                     {CROP_OPTIONS.map(opt => (
                       <button
                         key={opt.value}
@@ -140,11 +141,12 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
                           updateCropField(crop.id, 'crop_id', opt.value);
                           setOpenDropdowns(p => ({ ...p, [crop.id]: false }));
                         }}
-                        className="w-full py-2.5 px-3.5 border-none text-sm text-left cursor-pointer font-inherit"
-                        style={{
-                          background: crop.crop_id === opt.value ? 'rgba(240,81,62,0.15)' : 'transparent',
-                          color: crop.crop_id === opt.value ? '#F0513E' : '#FFFFFF',
-                        }}
+                        className={cn(
+                          "w-full py-2.5 px-3.5 border-none text-sm text-left cursor-pointer font-inherit",
+                          crop.crop_id === opt.value
+                            ? "bg-accent/[0.15] text-accent"
+                            : "bg-transparent text-white"
+                        )}
                       >
                         {opt.label}
                       </button>
@@ -205,7 +207,7 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
       <button
         type="button"
         onClick={addCrop}
-        className="flex items-center justify-center gap-2 w-full py-3.5 mt-4 bg-[rgba(240,81,62,0.08)] border border-dashed border-[rgba(240,81,62,0.3)] rounded-[14px] text-text-accent text-sm font-semibold cursor-pointer font-inherit transition-all duration-150"
+        className="flex items-center justify-center gap-2 w-full py-3.5 mt-4 bg-accent/[0.08] border border-dashed border-accent/30 rounded-[14px] text-text-accent text-sm font-semibold cursor-pointer font-inherit transition-all duration-150"
       >
         <Plus size={16} />
         Add Another Crop

@@ -7,6 +7,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import NuruAvatar from './NuruAvatar';
+import { cn } from '../design-system';
 
 interface NavItem {
   label: string;
@@ -36,12 +37,12 @@ const NuruSideNav: React.FC<NuruSideNavProps> = ({
 }) => {
   return (
     <aside
-      className="nuru-side-nav w-[260px] h-screen fixed left-0 top-0 bg-bg-card border-r border-[rgba(255,255,255,0.06)] flex flex-col font-[Inter,sans-serif] z-40"
+      className="nuru-side-nav w-[260px] h-screen fixed left-0 top-0 bg-bg-card border-r border-border-glass flex flex-col font-base z-40"
     >
       {/* Logo */}
-      <div className="py-6 px-5 border-b border-[rgba(255,255,255,0.06)]">
+      <div className="py-6 px-5 border-b border-border-glass">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-white font-extrabold text-sm">
+          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-black font-extrabold text-sm">
             N
           </div>
           <span className="text-white font-bold text-lg tracking-tight">
@@ -58,25 +59,12 @@ const NuruSideNav: React.FC<NuruSideNavProps> = ({
             <button
               key={item.path}
               onClick={() => onNavigate(item.path)}
-              className="flex items-center gap-3 w-full min-h-[44px] py-2.5 px-3.5 rounded-[10px] border-none cursor-pointer font-[Inter,sans-serif] text-sm transition-all duration-150 mb-1 text-left"
-              style={{
-                fontWeight: isActive ? 600 : 400,
-                color: isActive ? '#F0513E' : '#9CA3AF',
-                backgroundColor: isActive
-                  ? 'rgba(240,81,62,0.1)'
-                  : 'transparent',
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.backgroundColor =
-                    'rgba(255,255,255,0.04)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                }
-              }}
+              className={cn(
+                'flex items-center gap-3 w-full min-h-[44px] py-2.5 px-3.5 rounded-[10px] border-none cursor-pointer font-base text-sm transition-all duration-[var(--transition-base)] mb-1 text-left',
+                isActive
+                  ? 'font-semibold text-accent bg-accent/10'
+                  : 'font-normal text-text-secondary hover:bg-white/[0.04]',
+              )}
             >
               {item.icon}
               {item.label}
@@ -86,7 +74,7 @@ const NuruSideNav: React.FC<NuruSideNavProps> = ({
       </nav>
 
       {/* User Section */}
-      <div className="py-4 px-3.5 border-t border-[rgba(255,255,255,0.06)] flex items-center gap-3">
+      <div className="py-4 px-3.5 border-t border-border-glass flex items-center gap-3">
         <NuruAvatar name={user.name} size="sm" />
         <div className="flex-1 min-w-0">
           <div className="text-white text-[13px] font-semibold truncate">
@@ -99,9 +87,7 @@ const NuruSideNav: React.FC<NuruSideNavProps> = ({
         <button
           onClick={onLogout}
           title="Logout"
-          className="bg-transparent border-none text-text-tertiary cursor-pointer p-1.5 rounded-md flex items-center transition-colors duration-150 hover:text-[#EF4444]"
-          onMouseEnter={(e) => (e.currentTarget.style.color = '#EF4444')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = '#6B7280')}
+          className="bg-transparent border-none text-text-tertiary cursor-pointer p-1.5 rounded-md flex items-center transition-colors duration-[var(--transition-base)] hover:text-error"
         >
           <LogOut size={16} />
         </button>

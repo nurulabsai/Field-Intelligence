@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { User, Phone, CreditCard, Users, Home } from 'lucide-react';
+import { cn } from '../../../design-system';
 
 interface Step1Props {
   data: Record<string, unknown>;
@@ -62,21 +63,18 @@ const Step1_Identity: React.FC<Step1Props> = ({ data, onChange, errors }) => {
                   value={value}
                   onChange={e => handleChange(field.key, e.target.value)}
                   placeholder={field.placeholder}
-                  className="w-full py-3 pr-4 bg-bg-input rounded-xl text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150"
+                  className={cn(
+                    "w-full py-3 pr-4 bg-bg-input rounded-xl text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 border",
+                    error ? 'border-error' : 'border-border',
+                    'focus:border-accent',
+                  )}
                   style={{
                     paddingLeft: field.prefix ? '88px' : '44px',
-                    border: `1px solid ${error ? '#EF4444' : 'rgba(255,255,255,0.08)'}`,
-                  }}
-                  onFocus={e => {
-                    if (!error) e.currentTarget.style.borderColor = '#F0513E';
-                  }}
-                  onBlur={e => {
-                    if (!error) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
                   }}
                 />
               </div>
               {error && (
-                <p className="text-xs text-[#FCA5A5] mt-1">{error}</p>
+                <p className="text-xs text-error-light mt-1">{error}</p>
               )}
             </div>
           );

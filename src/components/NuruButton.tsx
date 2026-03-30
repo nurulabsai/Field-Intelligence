@@ -22,7 +22,7 @@ const SIZE_CLASSES: Record<string, string> = {
 };
 
 const VARIANT_CLASSES: Record<string, string> = {
-  primary: 'bg-accent text-white hover:bg-accent-dark active:scale-[0.97]',
+  primary: 'bg-accent text-black hover:bg-accent-dark active:scale-[0.97]',
   secondary: 'bg-bg-input text-white border border-border hover:border-border-dark hover:bg-[rgba(255,255,255,0.12)]',
   ghost: 'bg-transparent text-white hover:bg-[rgba(255,255,255,0.05)]',
   danger: 'bg-error text-white hover:bg-[#DC2626]',

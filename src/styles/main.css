@@ -22,6 +22,9 @@
   --color-accent-dark: var(--color-accent-dark);
   --color-accent-light: var(--color-accent-light);
   --color-secondary-lighter: var(--color-secondary-lighter);
+  --color-cyan: var(--color-cyan);
+  --color-cyan-dark: var(--color-cyan-dark);
+  --color-cyan-light: var(--color-cyan-light);
 
   /* Semantic colors */
   --color-success: var(--color-success);
@@ -77,23 +80,28 @@
 :root {
   /* === COLORS === */
 
-  /* Primary - Dark Charcoal */
-  --color-primary: #171717;
-  --color-primary-dark: #0D0D0D;
-  --color-primary-darker: #000000;
-  --color-primary-light: #1E1E1E;
-  --color-primary-lighter: #252525;
+  /* Primary - Navy */
+  --color-primary: #111622;
+  --color-primary-dark: #0B0F19;
+  --color-primary-darker: #070A12;
+  --color-primary-light: #1A2033;
+  --color-primary-lighter: #232A3F;
 
-  /* Secondary - Coral Red */
-  --color-secondary: #F0513E;
-  --color-secondary-dark: #D4402E;
-  --color-secondary-light: #F4705F;
-  --color-secondary-lighter: #2A1A17;
+  /* Secondary - Neon Lime */
+  --color-secondary: #BEF264;
+  --color-secondary-dark: #A8D84E;
+  --color-secondary-light: #D4F78E;
+  --color-secondary-lighter: #1A2A0D;
 
   /* Accent */
-  --color-accent: #F0513E;
-  --color-accent-dark: #D4402E;
-  --color-accent-light: #F4705F;
+  --color-accent: #BEF264;
+  --color-accent-dark: #A8D84E;
+  --color-accent-light: #D4F78E;
+
+  /* Cyan */
+  --color-cyan: #67E8F9;
+  --color-cyan-dark: #22D3EE;
+  --color-cyan-light: #A5F3FC;
 
   /* Semantic */
   --color-success: #22C55E;
@@ -114,8 +122,8 @@
 
   /* Neutrals */
   --color-white: #FFFFFF;
-  --color-gray-50: #1A1A1A;
-  --color-gray-100: #1E1E1E;
+  --color-gray-50: #0D1520;
+  --color-gray-100: #111622;
   --color-gray-200: rgba(255, 255, 255, 0.08);
   --color-gray-300: rgba(255, 255, 255, 0.12);
   --color-gray-400: #6B7280;
@@ -126,34 +134,34 @@
   --color-gray-900: #FFFFFF;
 
   /* Backgrounds */
-  --color-bg-primary: #0D0D0D;
-  --color-bg-secondary: #171717;
-  --color-bg-tertiary: #1E1E1E;
-  --color-bg-dark: #000000;
+  --color-bg-primary: #0B0F19;
+  --color-bg-secondary: #111622;
+  --color-bg-tertiary: #1A2033;
+  --color-bg-dark: #070A12;
   --color-bg-overlay: rgba(0, 0, 0, 0.7);
-  --color-bg-card: #1E1E1E;
-  --color-bg-input: #252525;
-  --color-bg-glass: rgba(30, 30, 30, 0.8);
+  --color-bg-card: #111622;
+  --color-bg-input: #0D1520;
+  --color-bg-glass: rgba(17, 22, 34, 0.8);
 
   /* Text */
   --color-text-primary: #FFFFFF;
   --color-text-secondary: #9CA3AF;
   --color-text-tertiary: #6B7280;
-  --color-text-inverse: #0D0D0D;
+  --color-text-inverse: #0B0F19;
   --color-text-on-primary: #FFFFFF;
-  --color-text-on-secondary: #FFFFFF;
-  --color-text-accent: #F0513E;
+  --color-text-on-secondary: #000000;
+  --color-text-accent: #BEF264;
 
   /* Border */
   --color-border: rgba(255, 255, 255, 0.08);
   --color-border-light: rgba(255, 255, 255, 0.04);
   --color-border-dark: rgba(255, 255, 255, 0.12);
-  --color-border-focus: #F0513E;
+  --color-border-focus: #BEF264;
   --color-border-glass: rgba(255, 255, 255, 0.06);
 
   /* === TYPOGRAPHY === */
-  --font-family-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --font-family-heading: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-base: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   --font-family-mono: 'IBM Plex Mono', 'Courier New', monospace;
 
   --font-size-xs: 0.75rem;
@@ -201,12 +209,12 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
   --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  --shadow-glow-coral: 0 0 20px rgba(240, 81, 62, 0.3);
-  --shadow-glow-coral-lg: 0 0 40px rgba(240, 81, 62, 0.4);
+  --shadow-glow-accent: 0 0 20px rgba(190, 242, 100, 0.15);
+  --shadow-glow-accent-lg: 0 0 40px rgba(190, 242, 100, 0.25);
   --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.4);
 
   /* === GLASSMORPHISM === */
-  --glass-bg: rgba(30, 30, 30, 0.8);
+  --glass-bg: rgba(17, 22, 34, 0.8);
   --glass-border: rgba(255, 255, 255, 0.06);
   --glass-blur: blur(16px);
   --glass-blur-lg: blur(24px);
@@ -270,12 +278,6 @@ h6 {
   font-family: var(--font-family-heading);
 }
 
-/* Focus-visible — keyboard users see a ring, mouse users don't */
-:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
@@ -292,4 +294,22 @@ h6 {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.25);
+}
+
+/* Focus visible */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

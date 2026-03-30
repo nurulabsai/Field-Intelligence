@@ -14,22 +14,27 @@
 export const tokens = {
   colors: {
     primary: {
-      DEFAULT: '#171717',
-      dark: '#0D0D0D',
-      darker: '#000000',
-      light: '#1E1E1E',
-      lighter: '#252525',
+      DEFAULT: '#111622',
+      dark: '#0B0F19',
+      darker: '#070A12',
+      light: '#1A2033',
+      lighter: '#232A3F',
     },
     secondary: {
-      DEFAULT: '#F0513E',
-      dark: '#D4402E',
-      light: '#F4705F',
-      lighter: '#2A1A17',
+      DEFAULT: '#BEF264',
+      dark: '#A8D84E',
+      light: '#D4F78E',
+      lighter: '#1A2A0D',
     },
     accent: {
-      DEFAULT: '#F0513E',
-      dark: '#D4402E',
-      light: '#F4705F',
+      DEFAULT: '#BEF264',
+      dark: '#A8D84E',
+      light: '#D4F78E',
+    },
+    cyan: {
+      DEFAULT: '#67E8F9',
+      dark: '#22D3EE',
+      light: '#A5F3FC',
     },
     success: {
       DEFAULT: '#22C55E',
@@ -53,8 +58,8 @@ export const tokens = {
     },
     white: '#FFFFFF',
     gray: {
-      50: '#1A1A1A',
-      100: '#1E1E1E',
+      50: '#0D1520',
+      100: '#111622',
       200: 'rgba(255,255,255,0.08)',
       300: 'rgba(255,255,255,0.12)',
       400: '#6B7280',
@@ -65,37 +70,37 @@ export const tokens = {
       900: '#FFFFFF',
     },
     bg: {
-      primary: '#0D0D0D',
-      secondary: '#171717',
-      tertiary: '#1E1E1E',
-      dark: '#000000',
+      primary: '#0B0F19',
+      secondary: '#111622',
+      tertiary: '#1A2033',
+      dark: '#070A12',
       overlay: 'rgba(0,0,0,0.7)',
-      card: '#1E1E1E',
-      input: '#252525',
-      glass: 'rgba(30,30,30,0.8)',
+      card: '#111622',
+      input: '#0D1520',
+      glass: 'rgba(17,22,34,0.8)',
     },
     text: {
       primary: '#FFFFFF',
       secondary: '#9CA3AF',
       tertiary: '#6B7280',
-      inverse: '#0D0D0D',
+      inverse: '#0B0F19',
       onPrimary: '#FFFFFF',
-      onSecondary: '#FFFFFF',
-      accent: '#F0513E',
+      onSecondary: '#000000',
+      accent: '#BEF264',
     },
     border: {
       DEFAULT: 'rgba(255,255,255,0.08)',
       light: 'rgba(255,255,255,0.04)',
       dark: 'rgba(255,255,255,0.12)',
-      focus: '#F0513E',
+      focus: '#BEF264',
       glass: 'rgba(255,255,255,0.06)',
     },
   },
 
   typography: {
     fontFamily: {
-      heading: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      base: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+      heading: "'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      base: "'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
       mono: "'IBM Plex Mono', 'Courier New', monospace",
     },
     fontSize: {
@@ -152,13 +157,13 @@ export const tokens = {
     lg: '0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -2px rgba(0,0,0,0.3)',
     xl: '0 20px 25px -5px rgba(0,0,0,0.4), 0 10px 10px -5px rgba(0,0,0,0.3)',
     '2xl': '0 25px 50px -12px rgba(0,0,0,0.5)',
-    glowCoral: '0 0 20px rgba(240,81,62,0.3)',
-    glowCoralLg: '0 0 40px rgba(240,81,62,0.4)',
+    glowAccent: '0 0 20px rgba(190,242,100,0.15)',
+    glowAccentLg: '0 0 40px rgba(190,242,100,0.25)',
     glass: '0 8px 32px rgba(0,0,0,0.4)',
   },
 
   glass: {
-    bg: 'rgba(30,30,30,0.8)',
+    bg: 'rgba(17,22,34,0.8)',
     border: 'rgba(255,255,255,0.06)',
     blur: 'blur(16px)',
     blurLg: 'blur(24px)',
@@ -318,8 +323,13 @@ export const cssVariables = `
   --shadow-lg: ${tokens.shadows.lg};
   --shadow-xl: ${tokens.shadows.xl};
   --shadow-2xl: ${tokens.shadows['2xl']};
-  --shadow-glow-coral: ${tokens.shadows.glowCoral};
-  --shadow-glow-coral-lg: ${tokens.shadows.glowCoralLg};
+  --shadow-glow-accent: ${tokens.shadows.glowAccent};
+  --shadow-glow-accent-lg: ${tokens.shadows.glowAccentLg};
+
+  /* Cyan */
+  --color-cyan: ${tokens.colors.cyan.DEFAULT};
+  --color-cyan-dark: ${tokens.colors.cyan.dark};
+  --color-cyan-light: ${tokens.colors.cyan.light};
   --shadow-glass: ${tokens.shadows.glass};
 
   /* Glass */

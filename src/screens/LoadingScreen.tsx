@@ -35,7 +35,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
   }, []);
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center bg-[linear-gradient(180deg,#171717_0%,#0D0D0D_100%)] z-[9999] font-base">
+    <div className="fixed inset-0 flex flex-col items-center justify-center bg-[linear-gradient(180deg,#111622_0%,#0B0F19_100%)] z-[9999] font-base">
       {/* Logo */}
       <div
         className="flex flex-col items-center gap-3 transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)]"

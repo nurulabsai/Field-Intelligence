@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../design-system';
 
 interface NuruBadgeProps {
   variant?: 'default' | 'success' | 'warning' | 'error' | 'info';
@@ -6,39 +7,35 @@ interface NuruBadgeProps {
   size?: 'sm' | 'md';
 }
 
+const VARIANT_CLASSES: Record<string, string> = {
+  default: 'bg-white/10 text-text-secondary',
+  success: 'bg-success/15 text-success',
+  warning: 'bg-warning/15 text-warning',
+  error: 'bg-error/15 text-error',
+  info: 'bg-info/15 text-info',
+};
+
+const SIZE_CLASSES: Record<string, string> = {
+  sm: 'text-xs px-2 py-0.5',
+  md: 'text-sm px-3 py-1',
+};
+
 const NuruBadge: React.FC<NuruBadgeProps> = ({
   variant = 'default',
   children,
   size = 'md',
 }) => {
-  const variantColors: Record<string, { bg: string; text: string }> = {
-    default: { bg: 'rgba(255,255,255,0.1)', text: '#9CA3AF' },
-    success: { bg: 'rgba(34,197,94,0.15)', text: '#22C55E' },
-    warning: { bg: 'rgba(245,158,11,0.15)', text: '#F59E0B' },
-    error: { bg: 'rgba(239,68,68,0.15)', text: '#EF4444' },
-    info: { bg: 'rgba(59,130,246,0.15)', text: '#3B82F6' },
-  };
-
-  const sizeStyles: Record<string, React.CSSProperties> = {
-    sm: { fontSize: '12px', padding: '2px 8px' },
-    md: { fontSize: '14px', padding: '4px 12px' },
-  };
-
-  const colors = variantColors[variant] ?? variantColors['default']!
-
-  const style: React.CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    borderRadius: '9999px',
-    fontWeight: 500,
-    fontFamily: 'Inter, sans-serif',
-    backgroundColor: colors.bg,
-    color: colors.text,
-    whiteSpace: 'nowrap',
-    ...sizeStyles[size],
-  };
-
-  return <span style={style}>{children}</span>;
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center rounded-full font-medium whitespace-nowrap',
+        VARIANT_CLASSES[variant],
+        SIZE_CLASSES[size],
+      )}
+    >
+      {children}
+    </span>
+  );
 };
 
 export default NuruBadge;

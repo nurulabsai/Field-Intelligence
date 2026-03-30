@@ -1,5 +1,6 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, Minus, Wheat } from 'lucide-react';
+import { cn } from '../../../design-system';
 
 interface CropPrice {
   id: string;
@@ -19,7 +20,7 @@ function formatTZS(amount: number): string {
 
 const CropPriceTable: React.FC<CropPriceTableProps> = ({ data }) => {
   return (
-    <div className="bg-bg-glass backdrop-blur-[16px] border border-border-glass rounded-xl overflow-hidden">
+    <div className="bg-bg-glass backdrop-blur-[var(--glass-blur)] border border-border-glass rounded-xl overflow-hidden">
       <div className="px-6 py-5 border-b border-border-glass">
         <h3 className="text-base font-semibold text-white">Crop Prices</h3>
       </div>
@@ -43,10 +44,10 @@ const CropPriceTable: React.FC<CropPriceTableProps> = ({ data }) => {
             {data.map((row, i) => (
               <tr
                 key={row.id}
-                className="transition-colors duration-150 hover:bg-white/[0.02]"
-                style={{
-                  borderBottom: i < data.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
-                }}
+                className={cn(
+                  'transition-colors duration-[var(--transition-base)] hover:bg-white/[0.02]',
+                  i < data.length - 1 && 'border-b border-border-light',
+                )}
               >
                 <td className="py-3.5 px-6">
                   <div className="flex items-center gap-2.5">
@@ -62,7 +63,10 @@ const CropPriceTable: React.FC<CropPriceTableProps> = ({ data }) => {
                 </td>
                 <td className="py-3.5 px-6">
                   <div
-                    className={`flex items-center gap-1 text-[0.813rem] font-semibold ${row.change > 0 ? 'text-success' : row.change < 0 ? 'text-error' : 'text-text-tertiary'}`}
+                    className={cn(
+                      'flex items-center gap-1 text-sm font-semibold',
+                      row.change > 0 ? 'text-success' : row.change < 0 ? 'text-error' : 'text-text-tertiary',
+                    )}
                   >
                     {row.change > 0 ? <TrendingUp size={14} /> : row.change < 0 ? <TrendingDown size={14} /> : <Minus size={14} />}
                     <span>{row.change > 0 ? '+' : ''}{row.change}%</span>
@@ -79,10 +83,10 @@ const CropPriceTable: React.FC<CropPriceTableProps> = ({ data }) => {
         {data.map((row, i) => (
           <div
             key={row.id}
-            className="py-4 px-6 flex justify-between items-center"
-            style={{
-              borderBottom: i < data.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
-            }}
+            className={cn(
+              'py-4 px-6 flex justify-between items-center',
+              i < data.length - 1 && 'border-b border-border-light',
+            )}
           >
             <div>
               <div className="flex items-center gap-2">
@@ -94,7 +98,10 @@ const CropPriceTable: React.FC<CropPriceTableProps> = ({ data }) => {
             <div className="text-right">
               <div className="text-sm font-semibold text-white">{formatTZS(row.pricePerKg)}</div>
               <div
-                className={`text-xs font-semibold mt-0.5 ${row.change > 0 ? 'text-success' : row.change < 0 ? 'text-error' : 'text-text-tertiary'}`}
+                className={cn(
+                  'text-xs font-semibold mt-0.5',
+                  row.change > 0 ? 'text-success' : row.change < 0 ? 'text-error' : 'text-text-tertiary',
+                )}
               >
                 {row.change > 0 ? '+' : ''}{row.change}%
               </div>

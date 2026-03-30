@@ -1,20 +1,25 @@
 import React from 'react';
-import { Home, ClipboardCheck, Calendar, Settings } from 'lucide-react';
+import { Home, ClipboardCheck, Calendar, Settings, Plus } from 'lucide-react';
+import { cn } from '../design-system';
 
 interface NavItem {
   label: string;
   path: string;
-  icon: React.FC<{ size: number; color: string }>;
+  icon: React.FC<{ size: number }>;
 }
 
 interface NuruBottomNavProps {
   currentPath: string;
   onNavigate: (path: string) => void;
+  onFabPress?: () => void;
 }
 
-const navItems: NavItem[] = [
+const leftItems: NavItem[] = [
   { label: 'Home', path: '/dashboard', icon: Home },
   { label: 'Audits', path: '/audits', icon: ClipboardCheck },
+];
+
+const rightItems: NavItem[] = [
   { label: 'Calendar', path: '/schedule', icon: Calendar },
   { label: 'Settings', path: '/settings', icon: Settings },
 ];
@@ -22,36 +27,54 @@ const navItems: NavItem[] = [
 const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
   currentPath,
   onNavigate,
+  onFabPress,
 }) => {
+  const renderItem = (item: NavItem) => {
+    const isActive = currentPath === item.path;
+    const Icon = item.icon;
+    return (
+      <button
+        key={item.path}
+        onClick={() => onNavigate(item.path)}
+        className={cn(
+          'flex-1 flex flex-col items-center justify-center gap-1 bg-transparent border-none cursor-pointer py-1.5 transition-colors duration-[var(--transition-base)]',
+          isActive ? 'text-accent' : 'text-gray-400',
+        )}
+      >
+        <Icon size={22} />
+        <span
+          className={cn(
+            'text-[10px] font-base',
+            isActive ? 'font-semibold text-accent' : 'font-normal text-gray-500',
+          )}
+        >
+          {item.label}
+        </span>
+      </button>
+    );
+  };
+
   return (
     <nav className="nuru-bottom-nav">
       <div
-        className="fixed bottom-0 left-0 right-0 h-16 bg-[rgba(13,13,13,0.85)] backdrop-blur-[16px] border-t border-[rgba(255,255,255,0.06)] flex items-center justify-around px-2 z-50 font-[Inter,sans-serif]"
+        className="fixed bottom-6 left-4 right-4 z-50 bg-black rounded-full p-2 shadow-2xl shadow-black/20 max-w-[420px] mx-auto"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0)' }}
       >
-        {navItems.map((item) => {
-          const isActive = currentPath === item.path;
-          const color = isActive ? '#F0513E' : '#6B7280';
-          const Icon = item.icon;
-          return (
+        <div className="flex items-center justify-between">
+          {leftItems.map(renderItem)}
+
+          {/* Center FAB */}
+          <div className="flex-1 flex justify-center">
             <button
-              key={item.path}
-              onClick={() => onNavigate(item.path)}
-              className="flex flex-col items-center justify-center gap-1 bg-transparent border-none cursor-pointer py-1.5 px-3 min-w-[60px] transition-colors duration-150"
+              onClick={onFabPress}
+              className="w-12 h-12 flex items-center justify-center rounded-full bg-accent shadow-[0_4px_20px_rgba(190,242,100,0.2)] border-none cursor-pointer active:scale-95 transition-transform"
             >
-              <Icon size={22} color={color} />
-              <span
-                className="text-[11px] font-[Inter,sans-serif]"
-                style={{
-                  fontWeight: isActive ? 600 : 400,
-                  color,
-                }}
-              >
-                {item.label}
-              </span>
+              <Plus size={24} className="text-black" strokeWidth={2.5} />
             </button>
-          );
-        })}
+          </div>
+
+          {rightItems.map(renderItem)}
+        </div>
       </div>
 
       <style>{`

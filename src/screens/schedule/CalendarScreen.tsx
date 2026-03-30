@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Plus, X, Clock, MapPin, Calendar } from 'lucide-react';
+import { cn } from '../../design-system';
 
 type EventType = 'audit' | 'training' | 'meeting' | 'deadline';
 
@@ -19,10 +20,10 @@ interface CalendarScreenProps {
 }
 
 const EVENT_COLORS: Record<EventType, string> = {
-  audit: '#3B82F6',
-  training: '#22C55E',
-  meeting: '#F59E0B',
-  deadline: '#EF4444',
+  audit: 'var(--color-info)',
+  training: 'var(--color-success)',
+  meeting: 'var(--color-warning)',
+  deadline: 'var(--color-error)',
 };
 
 const EVENT_LABELS: Record<EventType, string> = {
@@ -159,25 +160,25 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
 
       {/* Calendar Card */}
       <div
-        className="border border-[var(--glass-border,rgba(255,255,255,0.06))] rounded-xl p-6 mb-6"
+        className="border border-border-glass rounded-xl p-6 mb-6"
         style={{
-          backgroundColor: 'var(--glass-bg, rgba(30,30,30,0.8))',
-          backdropFilter: 'var(--glass-blur, blur(16px))',
-          WebkitBackdropFilter: 'var(--glass-blur, blur(16px))',
+          backgroundColor: 'var(--glass-bg)',
+          backdropFilter: 'var(--glass-blur)',
+          WebkitBackdropFilter: 'var(--glass-blur)',
         }}
       >
         {/* Month Navigation */}
         <div className="flex justify-between items-center mb-6">
           <button
             onClick={prevMonth}
-            className="w-9 h-9 rounded-[10px] bg-[rgba(255,255,255,0.06)] border-none text-white cursor-pointer flex items-center justify-center"
+            className="w-9 h-9 rounded-[10px] bg-border-glass border-none text-white cursor-pointer flex items-center justify-center"
           >
             <ChevronLeft size={18} />
           </button>
           <h2 className="text-lg font-semibold text-white">{monthName}</h2>
           <button
             onClick={nextMonth}
-            className="w-9 h-9 rounded-[10px] bg-[rgba(255,255,255,0.06)] border-none text-white cursor-pointer flex items-center justify-center"
+            className="w-9 h-9 rounded-[10px] bg-border-glass border-none text-white cursor-pointer flex items-center justify-center"
           >
             <ChevronRight size={18} />
           </button>
@@ -213,13 +214,11 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
               <button
                 key={day}
                 onClick={() => setSelectedDate(dateStr)}
-                className="aspect-square flex flex-col items-center justify-center gap-[3px] rounded-[10px] text-sm cursor-pointer font-inherit transition-all duration-100 p-1"
-                style={{
-                  border: isSelected ? '2px solid #F0513E' : '2px solid transparent',
-                  backgroundColor: isToday ? 'rgba(240,81,62,0.15)' : isSelected ? 'rgba(240,81,62,0.06)' : 'transparent',
-                  color: isToday ? '#F0513E' : '#FFFFFF',
-                  fontWeight: isToday ? 700 : 400,
-                }}
+                className={cn(
+                  "aspect-square flex flex-col items-center justify-center gap-[3px] rounded-[10px] text-sm cursor-pointer font-inherit transition-all duration-100 p-1 border-2",
+                  isSelected ? "border-accent" : "border-transparent",
+                  isToday ? "bg-accent/15 text-accent font-bold" : isSelected ? "bg-accent/[0.06] text-white" : "text-white font-normal"
+                )}
               >
                 <span>{day}</span>
                 {dayEvents.length > 0 && (
@@ -241,7 +240,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
 
       {/* Selected Day Events */}
       {selectedDate && (
-        <div className="bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)] p-5 mb-6">
+        <div className="bg-bg-card rounded-lg border border-border-glass p-5 mb-6">
           <h3 className="text-[0.938rem] font-semibold text-white mb-3.5">
             Events for {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </h3>
@@ -252,7 +251,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
               {selectedEvents.map(ev => (
                 <div
                   key={ev.id}
-                  className="py-3.5 px-4 bg-[rgba(255,255,255,0.03)] rounded-xl"
+                  className="py-3.5 px-4 bg-white/[0.03] rounded-xl"
                   style={{ borderLeft: `3px solid ${EVENT_COLORS[ev.type]}` }}
                 >
                   <div className="flex justify-between items-start mb-1.5">
@@ -285,7 +284,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
       )}
 
       {/* Upcoming Events */}
-      <div className="bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)] p-5 mb-20">
+      <div className="bg-bg-card rounded-lg border border-border-glass p-5 mb-20">
         <h3 className="text-[0.938rem] font-semibold text-white mb-3.5">
           Upcoming Events
         </h3>
@@ -296,7 +295,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
             {upcomingEvents.map(ev => (
               <div
                 key={ev.id}
-                className="flex items-center gap-3 p-3 rounded-[10px] bg-[rgba(255,255,255,0.02)]"
+                className="flex items-center gap-3 p-3 rounded-[10px] bg-white/[0.02]"
               >
                 <div
                   className="w-10 h-10 rounded-[10px] flex items-center justify-center shrink-0"
@@ -337,7 +336,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
           }));
           setShowModal(true);
         }}
-        className="fixed bottom-8 right-8 w-14 h-14 rounded-lg bg-accent text-white border-none cursor-pointer flex items-center justify-center shadow-[0_8px_24px_rgba(240,81,62,0.4)] transition-transform duration-150 z-50 hover:scale-105"
+        className="fixed bottom-8 right-8 w-14 h-14 rounded-lg bg-accent text-black border-none cursor-pointer flex items-center justify-center shadow-[var(--shadow-glow-accent-lg)] transition-transform duration-150 z-50 hover:scale-105"
         title="Add Event"
       >
         <Plus size={24} />
@@ -346,16 +345,16 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
       {/* Create Event Modal */}
       {showModal && (
         <div
-          className="fixed inset-0 bg-[rgba(0,0,0,0.7)] flex items-center justify-center z-[1000] p-6"
+          className="fixed inset-0 bg-overlay flex items-center justify-center z-[1000] p-6"
           onClick={e => { if (e.target === e.currentTarget) setShowModal(false); }}
         >
-          <div className="w-full max-w-[440px] bg-bg-tertiary rounded-xl border border-[rgba(255,255,255,0.1)] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
+          <div className="w-full max-w-[440px] bg-bg-tertiary rounded-xl border border-border overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
             {/* Modal Header */}
-            <div className="flex justify-between items-center px-6 py-5 border-b border-[rgba(255,255,255,0.06)]">
+            <div className="flex justify-between items-center px-6 py-5 border-b border-border-glass">
               <h3 className="text-lg font-semibold text-white">New Event</h3>
               <button
                 onClick={() => setShowModal(false)}
-                className="w-8 h-8 rounded-sm bg-[rgba(255,255,255,0.06)] border-none text-text-secondary cursor-pointer flex items-center justify-center"
+                className="w-8 h-8 rounded-sm bg-border-glass border-none text-text-secondary cursor-pointer flex items-center justify-center"
               >
                 <X size={16} />
               </button>
@@ -386,9 +385,9 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
                         onClick={() => setNewEvent(p => ({ ...p, type }))}
                         className="py-2 px-3.5 rounded-sm text-[0.813rem] font-medium cursor-pointer font-inherit"
                         style={{
-                          border: `2px solid ${selected ? EVENT_COLORS[type] : 'rgba(255,255,255,0.08)'}`,
+                          border: `2px solid ${selected ? EVENT_COLORS[type] : 'var(--color-border)'}`,
                           backgroundColor: selected ? `${EVENT_COLORS[type]}15` : 'transparent',
-                          color: selected ? EVENT_COLORS[type] : '#9CA3AF',
+                          color: selected ? EVENT_COLORS[type] : 'var(--color-text-secondary)',
                         }}
                       >
                         {EVENT_LABELS[type]}
@@ -445,12 +444,12 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
                 type="button"
                 onClick={handleCreateEvent}
                 disabled={!newEvent.title.trim()}
-                className="w-full py-3 border-none rounded-xl text-[0.938rem] font-semibold font-inherit mt-2"
-                style={{
-                  backgroundColor: newEvent.title.trim() ? '#F0513E' : 'rgba(240,81,62,0.3)',
-                  color: newEvent.title.trim() ? '#FFFFFF' : 'rgba(255,255,255,0.5)',
-                  cursor: newEvent.title.trim() ? 'pointer' : 'not-allowed',
-                }}
+                className={cn(
+                  "w-full py-3 border-none rounded-xl text-[0.938rem] font-semibold font-inherit mt-2",
+                  newEvent.title.trim()
+                    ? "bg-accent text-black cursor-pointer"
+                    : "bg-accent/30 text-black/50 cursor-not-allowed"
+                )}
               >
                 Create Event
               </button>

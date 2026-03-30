@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../design-system';
 
 interface NuruCardProps {
   children: React.ReactNode;
@@ -8,6 +9,12 @@ interface NuruCardProps {
   onClick?: () => void;
 }
 
+const PADDING_CLASSES: Record<string, string> = {
+  sm: 'p-3',
+  md: 'p-4',
+  lg: 'p-6',
+};
+
 const NuruCard: React.FC<NuruCardProps> = ({
   children,
   className = '',
@@ -15,41 +22,16 @@ const NuruCard: React.FC<NuruCardProps> = ({
   hoverable = false,
   onClick,
 }) => {
-  const [isHovered, setIsHovered] = React.useState(false);
-
-  const paddingMap: Record<string, string> = {
-    sm: '12px',
-    md: '16px',
-    lg: '24px',
-  };
-
-  const style: React.CSSProperties = {
-    backgroundColor: 'var(--color-bg-card, #1E1E1E)',
-    border: `1px solid ${
-      isHovered && hoverable
-        ? 'rgba(255,255,255,0.12)'
-        : 'rgba(255,255,255,0.06)'
-    }`,
-    borderRadius: '16px',
-    padding: paddingMap[padding],
-    backdropFilter: 'blur(16px)',
-    WebkitBackdropFilter: 'blur(16px)',
-    transition: 'all 0.25s ease',
-    cursor: onClick ? 'pointer' : 'default',
-    transform: isHovered && hoverable ? 'translateY(-2px)' : 'translateY(0)',
-    boxShadow:
-      isHovered && hoverable
-        ? '0 8px 24px rgba(0,0,0,0.3)'
-        : '0 2px 8px rgba(0,0,0,0.1)',
-  };
-
   return (
     <div
-      className={className}
-      style={style}
+      className={cn(
+        'bg-bg-card border border-border-glass rounded-2xl backdrop-blur-[var(--glass-blur)] transition-all duration-[var(--transition-slow)] shadow-sm',
+        PADDING_CLASSES[padding],
+        hoverable && 'hover:border-border-dark hover:-translate-y-0.5 hover:shadow-lg',
+        onClick && 'cursor-pointer',
+        className,
+      )}
       onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {children}
     </div>

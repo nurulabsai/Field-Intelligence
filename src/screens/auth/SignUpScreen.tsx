@@ -26,9 +26,9 @@ function getPasswordStrength(password: string): { label: string; color: string; 
   if (/[0-9]/.test(password)) score++;
   if (/[^A-Za-z0-9]/.test(password)) score++;
 
-  if (score <= 2) return { label: 'Weak', color: '#EF4444', width: '33%' };
-  if (score <= 3) return { label: 'Medium', color: '#F59E0B', width: '66%' };
-  return { label: 'Strong', color: '#22C55E', width: '100%' };
+  if (score <= 2) return { label: 'Weak', color: 'var(--color-error)', width: '33%' };
+  if (score <= 3) return { label: 'Medium', color: 'var(--color-warning)', width: '66%' };
+  return { label: 'Strong', color: 'var(--color-success)', width: '100%' };
 }
 
 const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin }) => {
@@ -237,11 +237,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
       <button
         type="submit"
         disabled={loading}
-        className={`w-full py-3.5 border-none rounded-xl text-base font-semibold font-[inherit] transition-all duration-150 flex items-center justify-center gap-2 ${loading ? 'bg-accent/60 text-white cursor-not-allowed' : 'bg-accent text-white cursor-pointer'}`}
+        className={`w-full py-3.5 border-none rounded-xl text-base font-semibold font-[inherit] transition-all duration-150 flex items-center justify-center gap-2 ${loading ? 'bg-accent/60 text-black cursor-not-allowed' : 'bg-accent text-black cursor-pointer'}`}
       >
         {loading ? (
           <>
-            <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-[nuru-spin_0.6s_linear_infinite]" />
+            <span className="w-[18px] h-[18px] border-2 border-black/30 border-t-black rounded-full animate-[nuru-spin_0.6s_linear_infinite]" />
             Creating Account...
           </>
         ) : (
@@ -272,9 +272,9 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
     <div className="min-h-screen flex bg-bg-primary font-base">
       {/* Left Panel - Desktop Only */}
       <div
-        className="nuru-signup-left-panel basis-[45%] shrink-0 grow-0 bg-[linear-gradient(135deg,#171717_0%,#0D0D0D_50%,rgba(240,81,62,0.08)_100%)] flex flex-col items-center justify-center p-12 relative overflow-hidden"
+        className="nuru-signup-left-panel basis-[45%] shrink-0 grow-0 bg-[linear-gradient(135deg,#111622_0%,#0B0F19_50%,rgba(190,242,100,0.08)_100%)] flex flex-col items-center justify-center p-12 relative overflow-hidden"
       >
-        <div className="absolute w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(240,81,62,0.12)_0%,transparent_70%)] top-[20%] -left-[10%]" />
+        <div className="absolute w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(190,242,100,0.12)_0%,transparent_70%)] top-[20%] -left-[10%]" />
         <div className="relative z-[1] text-center">
           <div className="flex items-baseline justify-center gap-0.5 mb-3">
             <span className="text-[2.5rem] font-bold text-white tracking-[-0.03em]">NuruOS</span>
@@ -283,7 +283,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
           <p className="text-text-secondary text-lg leading-relaxed max-w-[340px]">
             Smarter Field Audits.<br />Powered by AI.
           </p>
-          <div className="mt-12 p-6 bg-[rgba(30,30,30,0.8)] backdrop-blur-[16px] rounded-2xl border border-[rgba(255,255,255,0.06)] max-w-[300px]">
+          <div className="mt-12 p-6 bg-bg-glass backdrop-blur-[var(--glass-blur)] rounded-2xl border border-border-glass max-w-[300px]">
             <p className="text-text-secondary text-sm italic leading-relaxed">
               "NuruOS transformed how we collect field data across Tanzania. The AI insights save us hours every week."
             </p>

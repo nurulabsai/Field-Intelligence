@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { Camera, MapPin, Navigation, Mic, MicOff, X } from 'lucide-react';
+import { cn } from '../../../design-system';
 
 interface Step6Props {
   data: Record<string, unknown>;
@@ -34,7 +35,7 @@ function formatTZS(amount: number): string {
   return `TZS ${amount.toLocaleString('en-TZ')}`;
 }
 
-const inputClasses = "w-full py-3 px-4 bg-bg-input border border-border rounded-xl text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150";
+const inputClasses = "w-full py-3 px-4 bg-bg-input border border-border rounded-xl text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 focus:border-accent";
 
 const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
   const [gpsLoading, setGpsLoading] = useState(false);
@@ -119,6 +120,12 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
 
   const enableVoice = typeof window !== 'undefined' && 'MediaRecorder' in window;
 
+  const lossColorClass = parseFloat(lossValue) > 30
+    ? 'text-error'
+    : parseFloat(lossValue) > 15
+      ? 'text-warning'
+      : 'text-success';
+
   return (
     <div>
       <h2 className="text-xl font-bold text-white mb-1">
@@ -130,7 +137,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
 
       <div className="flex flex-col gap-6">
         {/* Yield Inputs */}
-        <div className="p-5 bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)]">
+        <div className="p-5 bg-bg-card rounded-lg border border-border-glass">
           <h3 className="text-[0.938rem] font-semibold text-white mb-4">
             Yield Data
           </h3>
@@ -179,15 +186,14 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
                 value={lossValue}
                 onChange={e => handleChange('yield_loss', e.target.value)}
                 placeholder="Auto"
-                className={inputClasses}
-                style={{ color: parseFloat(lossValue) > 30 ? '#EF4444' : parseFloat(lossValue) > 15 ? '#F59E0B' : '#22C55E' }}
+                className={cn(inputClasses, lossColorClass)}
               />
             </div>
           </div>
         </div>
 
         {/* Market Channel */}
-        <div className="p-5 bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)]">
+        <div className="p-5 bg-bg-card rounded-lg border border-border-glass">
           <h3 className="text-[0.938rem] font-semibold text-white mb-4">
             Market Information
           </h3>
@@ -201,12 +207,12 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
                   key={ch.value}
                   type="button"
                   onClick={() => handleChange('market_channel', ch.value)}
-                  className="py-2.5 px-5 rounded-[10px] text-sm font-medium cursor-pointer font-inherit transition-all duration-150"
-                  style={{
-                    border: `2px solid ${selected ? '#F0513E' : 'rgba(255,255,255,0.08)'}`,
-                    backgroundColor: selected ? 'rgba(240,81,62,0.12)' : 'transparent',
-                    color: selected ? '#F0513E' : '#9CA3AF',
-                  }}
+                  className={cn(
+                    "py-2.5 px-5 rounded-[10px] text-sm font-medium cursor-pointer font-inherit transition-all duration-150 border-2",
+                    selected
+                      ? "border-accent bg-accent/[0.12] text-accent"
+                      : "border-border bg-transparent text-text-secondary"
+                  )}
                 >
                   {ch.label}
                 </button>
@@ -229,7 +235,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-text-secondary mb-1.5">Gross Revenue</label>
-              <div className="py-3 px-4 bg-[rgba(34,197,94,0.08)] border border-[rgba(34,197,94,0.2)] rounded-xl text-[0.938rem] font-bold text-[#22C55E]">
+              <div className="py-3 px-4 bg-success/[0.08] border border-success/20 rounded-xl text-[0.938rem] font-bold text-success">
                 {formatTZS(grossRevenue)}
               </div>
             </div>
@@ -237,7 +243,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
         </div>
 
         {/* Constraint Severity Grid */}
-        <div className="p-5 bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)]">
+        <div className="p-5 bg-bg-card rounded-lg border border-border-glass">
           <h3 className="text-[0.938rem] font-semibold text-white mb-4">
             Constraint Severity
           </h3>
@@ -277,7 +283,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
         </div>
 
         {/* Photo Upload */}
-        <div className="p-5 bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)]">
+        <div className="p-5 bg-bg-card rounded-lg border border-border-glass">
           <h3 className="text-[0.938rem] font-semibold text-white mb-1">
             Photos
           </h3>
@@ -300,7 +306,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
                 <button
                   type="button"
                   onClick={() => removePhoto(i)}
-                  className="absolute top-1 right-1 w-[22px] h-[22px] rounded-full bg-[rgba(0,0,0,0.7)] border-none text-white cursor-pointer flex items-center justify-center"
+                  className="absolute top-1 right-1 w-[22px] h-[22px] rounded-full bg-overlay border-none text-white cursor-pointer flex items-center justify-center"
                 >
                   <X size={12} />
                 </button>
@@ -312,7 +318,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center justify-center gap-2 w-full py-3.5 bg-[rgba(255,255,255,0.04)] border border-dashed border-[rgba(255,255,255,0.15)] rounded-xl text-text-secondary text-sm font-medium cursor-pointer font-inherit"
+              className="flex items-center justify-center gap-2 w-full py-3.5 bg-border-light border border-dashed border-white/[0.15] rounded-xl text-text-secondary text-sm font-medium cursor-pointer font-inherit"
             >
               <Camera size={16} />
               Upload Photo
@@ -334,13 +340,14 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
             type="button"
             onClick={captureGPS}
             disabled={gpsLoading}
-            className="flex items-center gap-2 py-3 px-5 rounded-xl text-sm font-semibold font-inherit flex-1 justify-center"
-            style={{
-              backgroundColor: yieldLat ? 'rgba(34,197,94,0.1)' : 'rgba(240,81,62,0.1)',
-              border: `1px solid ${yieldLat ? 'rgba(34,197,94,0.25)' : 'rgba(240,81,62,0.25)'}`,
-              color: yieldLat ? '#22C55E' : '#F0513E',
-              cursor: gpsLoading ? 'wait' : 'pointer',
-            }}
+            className={cn(
+              "flex items-center gap-2 py-3 px-5 rounded-xl text-sm font-semibold font-inherit flex-1 justify-center border",
+              gpsLoading && "cursor-wait",
+              !gpsLoading && "cursor-pointer",
+              yieldLat
+                ? "bg-success/10 border-success/25 text-success"
+                : "bg-accent/10 border-accent/25 text-accent"
+            )}
           >
             {gpsLoading ? (
               'Capturing...'
@@ -362,12 +369,12 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
             <button
               type="button"
               onClick={toggleVoice}
-              className="flex items-center gap-2 py-3 px-5 rounded-xl text-sm font-medium cursor-pointer font-inherit"
-              style={{
-                backgroundColor: recording ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.06)',
-                border: `1px solid ${recording ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.08)'}`,
-                color: recording ? '#EF4444' : '#9CA3AF',
-              }}
+              className={cn(
+                "flex items-center gap-2 py-3 px-5 rounded-xl text-sm font-medium cursor-pointer font-inherit border",
+                recording
+                  ? "bg-error/[0.15] border-error/30 text-error"
+                  : "bg-border-glass border-border text-text-secondary"
+              )}
             >
               {recording ? <MicOff size={16} /> : <Mic size={16} />}
               {recording ? 'Stop' : 'Voice Note'}
