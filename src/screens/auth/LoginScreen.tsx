@@ -60,7 +60,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
             value={email}
             onChange={e => { setEmail(e.target.value); setErrors(p => ({ ...p, email: undefined })); }}
             placeholder="you@example.com"
-            className={`w-full py-3.5 px-4 pl-11 bg-bg-input border rounded-xl text-white text-[0.938rem] font-[inherit] outline-none transition-colors duration-150 ${errors.email ? 'border-error' : 'border-border'}`}
+            className={`w-full min-h-[48px] py-3 px-4 pl-11 bg-bg-input border rounded-xl text-white text-[0.938rem] font-[inherit] outline-none transition-colors duration-150 ${errors.email ? 'border-error' : 'border-border'}`}
           />
         </div>
         {errors.email && <p className="text-xs text-error-light mt-1">{errors.email}</p>}
@@ -78,7 +78,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
             value={password}
             onChange={e => { setPassword(e.target.value); setErrors(p => ({ ...p, password: undefined })); }}
             placeholder="Enter your password"
-            className={`w-full py-3.5 px-4 pl-11 bg-bg-input border rounded-xl text-white text-[0.938rem] font-[inherit] outline-none transition-colors duration-150 ${errors.password ? 'border-error' : 'border-border'}`}
+            className={`w-full min-h-[48px] py-3 px-4 pl-11 bg-bg-input border rounded-xl text-white text-[0.938rem] font-[inherit] outline-none transition-colors duration-150 ${errors.password ? 'border-error' : 'border-border'}`}
           />
           <button
             type="button"
@@ -109,7 +109,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
         <button
           type="button"
           onClick={onForgotPassword}
-          className="bg-transparent border-none text-text-accent text-sm font-medium cursor-pointer font-[inherit]"
+          className="bg-transparent border-none text-text-accent text-sm font-medium cursor-pointer font-[inherit] min-h-[44px] flex items-center"
         >
           Forgot Password?
         </button>
@@ -119,7 +119,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
       <button
         type="submit"
         disabled={loading}
-        className={`w-full py-3.5 border-none rounded-xl text-base font-semibold font-[inherit] transition-colors duration-150 flex items-center justify-center gap-2 ${loading ? 'bg-accent/60 text-black cursor-not-allowed' : 'bg-accent text-black cursor-pointer'}`}
+        className={`w-full min-h-[48px] py-3 border-none rounded-xl text-base font-semibold font-[inherit] transition-colors duration-150 flex items-center justify-center gap-2 ${loading ? 'bg-accent/60 text-black cursor-not-allowed' : 'bg-accent text-black cursor-pointer'}`}
       >
         {loading ? (
           <>
@@ -136,7 +136,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
         <button
           type="button"
           onClick={onNavigateToSignUp}
-          className="bg-transparent border-none text-text-accent cursor-pointer font-semibold text-sm font-[inherit]"
+          className="bg-transparent border-none text-text-accent cursor-pointer font-semibold text-sm font-[inherit] min-h-[44px] inline-flex items-center"
         >
           Sign up
         </button>
