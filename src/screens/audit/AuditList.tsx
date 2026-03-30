@@ -142,10 +142,10 @@ const AuditList: React.FC<AuditListProps> = ({ audits, onAuditClick, onNewAudit 
         )}
       </div>
 
-      {/* FAB */}
+      {/* FAB — desktop only (mobile uses bottom nav pill center button) */}
       <button
         onClick={onNewAudit}
-        className="fixed bottom-8 right-8 w-14 h-14 rounded-lg bg-accent text-black border-none cursor-pointer flex items-center justify-center shadow-[var(--shadow-glow-accent-lg)] transition-transform duration-[var(--transition-base)] z-50 hover:scale-105"
+        className="hidden md:flex fixed bottom-8 right-8 w-14 h-14 rounded-full bg-accent text-black border-none cursor-pointer items-center justify-center shadow-[var(--shadow-glow-accent-lg)] transition-transform duration-[var(--transition-base)] z-50 hover:scale-105"
         title="New Audit"
       >
         <Plus size={24} />

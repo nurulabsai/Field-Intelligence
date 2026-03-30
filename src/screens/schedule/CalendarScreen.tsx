@@ -327,7 +327,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
         )}
       </div>
 
-      {/* FAB - Add Event */}
+      {/* FAB — desktop only (mobile uses bottom nav pill center button) */}
       <button
         onClick={() => {
           setNewEvent(prev => ({
@@ -336,7 +336,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
           }));
           setShowModal(true);
         }}
-        className="fixed bottom-8 right-8 w-14 h-14 rounded-lg bg-accent text-black border-none cursor-pointer flex items-center justify-center shadow-[var(--shadow-glow-accent-lg)] transition-transform duration-150 z-50 hover:scale-105"
+        className="hidden md:flex fixed bottom-8 right-8 w-14 h-14 rounded-full bg-accent text-black border-none cursor-pointer items-center justify-center shadow-[var(--shadow-glow-accent-lg)] transition-transform duration-150 z-50 hover:scale-105"
         title="Add Event"
       >
         <Plus size={24} />
