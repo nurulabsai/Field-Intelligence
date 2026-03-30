@@ -251,8 +251,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({ events: propEvents, onA
               {selectedEvents.map(ev => (
                 <div
                   key={ev.id}
-                  className="py-3.5 px-4 bg-white/[0.03] rounded-xl"
-                  style={{ borderLeft: `3px solid ${EVENT_COLORS[ev.type]}` }}
+                  className="py-3.5 px-4 bg-white/[0.03] rounded-xl border border-border-glass"
                 >
                   <div className="flex justify-between items-start mb-1.5">
                     <span className="text-[0.938rem] font-medium text-white">{ev.title}</span>
