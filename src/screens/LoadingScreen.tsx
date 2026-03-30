@@ -35,44 +35,59 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
   }, []);
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center z-[9999] font-base nuru-screen overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(190,242,100,0.08),transparent_64%)] pointer-events-none" />
-      {/* Logo */}
+    <div className="fixed inset-0 flex flex-col items-center justify-center z-[9999] bg-[#0E111A] font-base nuru-screen overflow-hidden">
+      
+      {/* Absolute dark background to override any theme bleed */}
+      <div className="absolute inset-0 bg-[#0B0E16]" />
+
+      {/* Main Content Wrapper */}
       <div
-        className="flex flex-col items-center gap-3 transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] relative z-10"
+        className="relative z-10 flex flex-col items-center w-full max-w-[320px] transition-all duration-1000 ease-out"
         style={{
           opacity: logoVisible ? 1 : 0,
-          transform: logoVisible ? 'scale(1)' : 'scale(0.8)',
+          transform: logoVisible ? 'translateY(0)' : 'translateY(10px)',
         }}
       >
-        <div className="w-[124px] h-[124px] rounded-full border border-accent/30 nuru-neon-ring flex items-center justify-center bg-bg-primary mb-8">
-          <span className="text-[2.2rem] font-heading font-semibold tracking-tight text-white">
-            N
-          </span>
+        
+        {/* Logo Container with precise diffuse glow */}
+        <div className="relative mb-[120px]">
+          {/* Inner tight aura glow */}
+          <div className="absolute inset-0 bg-accent rounded-full blur-[45px] opacity-[0.25] transform scale-125" />
+          
+          {/* The Logo Circle */}
+          <div className="relative w-[140px] h-[140px] rounded-full bg-[#121623] border border-white flex items-center justify-center shadow-lg">
+            {/* Safe fallback since we don't have the actual logo SVG asset exported */}
+            <span className="text-white text-[64px] font-black tracking-tighter">
+              N
+            </span>
+          </div>
         </div>
-        <div className="flex items-baseline gap-0.5">
-          <span className="text-[2.1rem] font-heading font-light text-white tracking-tight">Initializing Intelligence...</span>
+
+        {/* Loading Text */}
+        <p className="text-white font-light text-[19px] tracking-wide mb-5 text-center">
+          Initializing Intelligence...
+        </p>
+
+        {/* Progress Bar Container */}
+        <div className="w-full h-[6px] bg-[#1E2534] rounded-full overflow-hidden shadow-inner">
+          <div
+            className="h-full bg-accent rounded-full transition-all duration-[50ms] ease-linear shadow-[0_0_12px_rgba(190,242,100,0.5)]"
+            style={{ width: `${progress}%` }}
+          />
         </div>
+
       </div>
 
-      {/* Progress bar */}
-      <div
-        className="w-[260px] h-[6px] bg-bg-tertiary rounded-full overflow-hidden mt-10 transition-opacity duration-500 delay-300 relative z-10"
+      {/* Absolute Bottom Tagline */}
+      <div 
+        className="absolute bottom-10 w-full text-center transition-opacity duration-1000 delay-500"
         style={{ opacity: logoVisible ? 1 : 0 }}
       >
-        <div
-          className="h-full bg-accent rounded-full transition-[width] duration-[50ms] linear shadow-[0_0_12px_rgba(190,242,100,0.45)]"
-          style={{ width: `${progress}%` }}
-        />
+        <p className="text-white/40 text-[10px] font-bold tracking-[0.25em] uppercase">
+          NuruOS Field Intelligence by Nuru Labs
+        </p>
       </div>
 
-      {/* Tagline */}
-      <p
-        className="mt-16 text-xs text-text-tertiary font-medium tracking-[0.2em] uppercase text-center px-6 transition-opacity duration-[600ms] delay-500 relative z-10"
-        style={{ opacity: logoVisible ? 1 : 0 }}
-      >
-        NuruOS Field Intelligence
-      </p>
     </div>
   );
 };

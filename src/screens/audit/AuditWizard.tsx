@@ -1,261 +1,220 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Save } from 'lucide-react';
+import React, { useState } from 'react';
+import { Flag, AlertTriangle, ChevronUp, Check, MousePointer2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../../design-system';
-import Step1_Identity from './steps/Step1_Identity';
-import Step2_Location from './steps/Step2_Location';
-import Step3_FarmChar from './steps/Step3_FarmChar';
-import Step4_Crops from './steps/Step4_Crops';
-import Step5_Inputs from './steps/Step5_Inputs';
-import Step6_Yield from './steps/Step6_Yield';
-
-const STEPS = [
-  { label: 'Identity', component: Step1_Identity },
-  { label: 'Location', component: Step2_Location },
-  { label: 'Farm', component: Step3_FarmChar },
-  { label: 'Crops', component: Step4_Crops },
-  { label: 'Inputs', component: Step5_Inputs },
-  { label: 'Yield', component: Step6_Yield },
-];
 
 interface AuditWizardProps {
   auditId?: string;
-  onComplete?: (data: Record<string, unknown>) => void;
+  onComplete?: (data: any) => void;
 }
 
-const DB_NAME = 'nuruos_audits';
-const STORE_NAME = 'wizard_state';
-
-function openDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 1);
-    req.onupgradeneeded = () => {
-      const db = req.result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME);
-      }
-    };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
-}
-
-async function saveState(key: string, data: unknown): Promise<void> {
-  const db = await openDB();
-  const tx = db.transaction(STORE_NAME, 'readwrite');
-  tx.objectStore(STORE_NAME).put(data, key);
-  return new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
-}
-
-async function loadState(key: string): Promise<unknown> {
-  const db = await openDB();
-  const tx = db.transaction(STORE_NAME, 'readonly');
-  const req = tx.objectStore(STORE_NAME).get(key);
-  return new Promise((resolve, reject) => {
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
-}
-
-const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
-  const stateKey = auditId || 'new_audit';
-  const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<Record<string, unknown>>({});
-  const [stepErrors, setStepErrors] = useState<Record<string, string>>({});
-  const [saving, setSaving] = useState(false);
-  const [isDirty, setIsDirty] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-
-  // Load persisted state
-  useEffect(() => {
-    loadState(stateKey).then(stored => {
-      if (stored && typeof stored === 'object') {
-        const data = stored as { step?: number; formData?: Record<string, unknown> };
-        if (data.step !== undefined) setCurrentStep(data.step);
-        if (data.formData) setFormData(data.formData);
-      }
-    }).catch(() => { /* no saved state */ });
-  }, [stateKey]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (isDirty) {
-      sessionStorage.setItem('nuru_audit_dirty', 'true');
-    } else {
-      sessionStorage.removeItem('nuru_audit_dirty');
-    }
-    return () => {
-      sessionStorage.removeItem('nuru_audit_dirty');
-    };
-  }, [isDirty]);
-
-  useEffect(() => {
-    const beforeUnload = (e: BeforeUnloadEvent) => {
-      if (!isDirty) return;
-      e.preventDefault();
-      e.returnValue = '';
-    };
-    window.addEventListener('beforeunload', beforeUnload);
-    return () => window.removeEventListener('beforeunload', beforeUnload);
-  }, [isDirty]);
-
-  // Debounced auto-save
-  const persistState = useCallback((step: number, data: Record<string, unknown>) => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(async () => {
-      setSaving(true);
-      try {
-        await saveState(stateKey, { step, formData: data });
-      } catch {
-        // silently fail
-      }
-      setSaving(false);
-    }, 500);
-  }, [stateKey]);
-
-  const handleStepData = useCallback((data: Record<string, unknown>) => {
-    setFormData(prev => {
-      const next = { ...prev, ...data };
-      persistState(currentStep, next);
-      return next;
-    });
-    setIsDirty(true);
-    setStepErrors({});
-  }, [currentStep, persistState]);
-
-  const handleNext = useCallback(() => {
-    if (currentStep < STEPS.length - 1) {
-      const nextStep = currentStep + 1;
-      setCurrentStep(nextStep);
-      persistState(nextStep, formData);
-    }
-  }, [currentStep, formData, persistState]);
-
-  const handleBack = useCallback(() => {
-    if (currentStep > 0) {
-      const prevStep = currentStep - 1;
-      setCurrentStep(prevStep);
-      persistState(prevStep, formData);
-    }
-  }, [currentStep, formData, persistState]);
-
-  const handleComplete = useCallback(() => {
-    setIsDirty(false);
-    onComplete?.(formData);
-  }, [formData, onComplete]);
-
-  const StepComponent = STEPS[currentStep]!.component;
+const AuditWizard: React.FC<AuditWizardProps> = () => {
+  const [, setPrimaryDestination] = useState('Melbourne, VIC');
+  const [purpose] = useState('Tourism');
+  const [hasInvitation] = useState('Yes');
 
   return (
-    <div className="min-h-screen nuru-screen font-base">
-      {/* Step Indicator */}
-      <div
-        className="sticky top-0 z-40 border-b border-border-glass px-6 py-4 bg-bg-primary/80 backdrop-blur-[18px]"
-      >
-        <div className="max-w-[800px] mx-auto">
-          {/* Progress bar */}
-          <div className="flex items-center gap-1 mb-3">
-            {STEPS.map((step, i) => (
-              <div key={step.label} className="flex-1 flex items-center gap-1">
-                <div
-                  className={cn(
-                    'flex-1 h-[3px] rounded transition-colors duration-[var(--transition-slow)]',
-                    i <= currentStep ? 'bg-accent' : 'bg-border',
-                  )}
-                />
+    <div className="min-h-screen bg-[#0B0F19] flex flex-col p-5 pb-8 font-base overflow-x-hidden relative">
+      
+      {/* Top Header Section */}
+      <div className="flex items-center justify-between mb-8 mt-2">
+        <div className="flex items-center gap-4">
+          <div className="w-[52px] h-[52px] rounded-[16px] bg-[#151924] flex items-center justify-center shrink-0 border border-white/5">
+            <Flag size={20} className="text-[#67E8F9]" />
+          </div>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-3">
+              <h1 className="text-[28px] font-bold text-white font-heading tracking-tight leading-none m-0">Australia</h1>
+              <div className="px-2.5 py-1 rounded-[6px] bg-accent text-black text-[9px] font-bold tracking-widest uppercase flex items-center gap-1.5 shrink-0">
+                <div className="w-1.5 h-1.5 rounded-full bg-black/50" />
+                In Progress
               </div>
-            ))}
-          </div>
-
-          {/* Step labels */}
-          <div className="flex justify-between">
-            {STEPS.map((step, i) => (
-              <button
-                key={step.label}
-                onClick={() => {
-                  if (i <= currentStep) {
-                    setCurrentStep(i);
-                    persistState(i, formData);
-                  }
-                }}
-                className={cn(
-                  'bg-transparent border-none text-[0.688rem] uppercase tracking-widest px-1.5 py-1.5 font-inherit rounded-full',
-                  i === currentStep && 'font-semibold text-accent cursor-pointer',
-                  i < currentStep && 'font-normal text-text-secondary cursor-pointer',
-                  i > currentStep && 'font-normal text-text-tertiary cursor-default',
-                )}
-              >
-                {step.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Save indicator */}
-          {saving && (
-            <div className="flex items-center gap-1.5 mt-2">
-              <Save size={12} className="text-text-tertiary" />
-              <span className="text-[0.688rem] text-text-tertiary">Saving...</span>
             </div>
-          )}
+            <p className="text-white/40 text-[11px] mt-1.5 leading-tight">
+              06.12.2025 →<br />24.01.2026
+            </p>
+          </div>
+        </div>
+
+        {/* 85% Circular Progress */}
+        <div className="relative w-[46px] h-[46px] shrink-0 flex items-center justify-center">
+          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(190, 242, 100, 0.15)" strokeWidth="3" />
+            <circle 
+              cx="18" cy="18" r="16" fill="none" 
+              stroke="#BEF264" strokeWidth="3" 
+              strokeDasharray="100 100" strokeDashoffset="15" 
+              strokeLinecap="round" 
+            />
+          </svg>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-[10px] font-bold text-accent">85%</span>
+          </div>
         </div>
       </div>
 
-      {/* Step Content */}
-      <div className="max-w-[800px] mx-auto py-8 px-6">
-        <div className="mb-5">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
-            Travel Details
+      {/* Progress Node Bar */}
+      <div className="flex items-center justify-between gap-1 mb-8 overflow-hidden">
+        {/* Checked Nodes */}
+        {[1, 2, 3, 4, 5].map((i) => (
+          <React.Fragment key={i}>
+            <div className="w-[16px] h-[16px] rounded-full bg-accent flex items-center justify-center shrink-0">
+              <Check size={10} strokeWidth={4} className="text-black" />
+            </div>
+            <div className="h-0.5 flex-1 bg-accent min-w-[12px]" />
+          </React.Fragment>
+        ))}
+        {/* Active Node */}
+        <div className="w-[20px] h-[20px] rounded-full border-[2px] border-accent flex items-center justify-center shrink-0 p-1 bg-[#0B0F19]">
+          <div className="w-full h-full rounded-full bg-accent" />
+        </div>
+        <div className="h-0.5 flex-1 bg-white/10 min-w-[12px]" />
+        {/* Inactive Node */}
+        <div className="w-[16px] h-[16px] rounded-full bg-white/10 shrink-0" />
+      </div>
+
+      {/* Section Title */}
+      <div className="mb-4 pl-1">
+        <h3 className="text-[10px] font-bold text-white/45 tracking-[0.15em] uppercase mb-1">Travel Details</h3>
+        <h2 className="text-[10px] font-bold text-accent tracking-[0.15em] uppercase mb-4">Step 6 - Primary Destination</h2>
+      </div>
+
+      {/* Main Form Card */}
+      <div className="bg-[#121623] rounded-[28px] p-5 pt-7 pb-8 border border-white/[0.03] shadow-lg flex-1 mb-[100px]">
+        
+        {/* Form Title & Required Tag */}
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-[26px] font-bold text-white font-heading tracking-tight">Purpose of Visit</h2>
+          <div className="flex items-center gap-1.5 text-[#EAB308]">
+            <span className="text-[10px] font-bold tracking-[0.1em] uppercase">Required</span>
+            <AlertTriangle size={14} strokeWidth={2.5} />
+          </div>
+        </div>
+
+        {/* Primary Destination Section */}
+        <div className="mb-8">
+          <h3 className="text-[10px] font-bold text-white/40 tracking-[0.1em] uppercase mb-3 pl-1">Primary Destination</h3>
+          
+          <div className="flex flex-col gap-2">
+            {/* Active Select Input (Cyan Glowing outline) */}
+            <div className="w-full bg-[#0B0F19] border border-[#67E8F9] rounded-[16px] px-5 py-4 flex items-center justify-between shadow-[0_0_15px_rgba(103,232,249,0.1)] relative">
+              <span className="text-white/90 text-[14px]">Select your primary destination</span>
+              <ChevronUp size={20} className="text-[#67E8F9]" />
+            </div>
+            
+            {/* Detached Options Dropdown List */}
+            <div className="w-full bg-[#0B0F19] border border-white/5 rounded-[16px] flex flex-col overflow-hidden">
+              <div 
+                onClick={() => setPrimaryDestination('Sydney, NSW')}
+                className="px-5 py-[18px] text-white/40 text-[14px] hover:bg-white/5 cursor-pointer border-b border-white/[0.03] transition-colors"
+              >
+                Sydney, NSW
+              </div>
+              
+              <div 
+                onClick={() => setPrimaryDestination('Melbourne, VIC')}
+                className="px-5 py-[18px] bg-[#16202A] text-white text-[14px] font-medium flex items-center justify-between cursor-pointer border-b border-white/[0.03] transition-colors"
+              >
+                Melbourne, VIC
+                <div className="w-6 h-6 rounded bg-black/50 flex items-center justify-center">
+                  <MousePointer2 size={12} className="text-white/60 fill-white/20 transform -rotate-12" />
+                </div>
+              </div>
+              
+              <div 
+                onClick={() => setPrimaryDestination('Brisbane, QLD')}
+                className="px-5 py-[18px] text-white/40 text-[14px] hover:bg-white/5 cursor-pointer transition-colors"
+              >
+                Brisbane, QLD
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Purpose Squircle Radio Group */}
+        <div className="flex flex-col gap-[22px] px-1 mb-8">
+          {[
+            'Conference',
+            'Visiting relatives',
+            'Tourism',
+            'Study'
+          ].map(opt => {
+            const isSelected = purpose === opt;
+            return (
+              <label key={opt} className="flex items-center gap-4 cursor-pointer group">
+                <div className={cn(
+                  "w-[22px] h-[22px] rounded-[6px] flex items-center justify-center border transition-colors shrink-0",
+                  isSelected ? "bg-accent border-accent shadow-[0_0_12px_rgba(190,242,100,0.3)]" : "border-white/10 bg-transparent group-hover:border-white/20"
+                )}>
+                  {isSelected && <Check size={14} strokeWidth={3.5} className="text-[#121623]" />}
+                </div>
+                <span className={cn(
+                  "text-[15px] transition-colors",
+                  isSelected ? "text-accent font-medium mt-0.5" : "text-white/60 mt-0.5"
+                )}>
+                  {opt}
+                </span>
+              </label>
+            )
+          })}
+        </div>
+
+        {/* Faded Dashed Separator */}
+        <div className="border-t border-dashed border-white/5 mx-1 mb-7" />
+
+        {/* Invitation Letter Question */}
+        <div className="px-1 mb-8">
+          <p className="text-white/90 text-[14px] leading-relaxed mb-5 pr-8">
+            Do you have an invitation letter from a company or organization?
           </p>
-          <p className="text-[11px] text-accent font-semibold uppercase tracking-[0.12em] mt-1">
-            Step {currentStep + 1} - {STEPS[currentStep]!.label}
-          </p>
+          <div className="flex items-center gap-6">
+            {['Yes', 'No'].map(opt => {
+              const isSelected = hasInvitation === opt;
+              return (
+                <label key={opt} className="flex items-center gap-3 cursor-pointer group">
+                  <div className={cn(
+                    "w-5 h-5 rounded-full flex items-center justify-center border-[2px] transition-all p-1 box-border",
+                    isSelected ? "border-accent" : "border-white/10 group-hover:border-white/20"
+                  )}>
+                    {isSelected && <div className="w-full h-full rounded-full bg-accent" />}
+                  </div>
+                  <span className={cn(
+                    "text-[14px] transition-colors font-medium",
+                    isSelected ? "text-white" : "text-white/40"
+                  )}>
+                    {opt}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
         </div>
-        <StepComponent
-          data={formData}
-          onChange={handleStepData}
-          errors={stepErrors}
-        />
+
+        {/* Additional Notes Textarea */}
+        <div className="px-1 flex flex-col">
+          <h3 className="text-[10px] font-bold text-white/40 tracking-[0.1em] uppercase mb-3">Any Additional Notes (Optional)</h3>
+          <textarea
+            className="w-full min-h-[120px] bg-[#0B0F19] border border-white/[0.03] rounded-[16px] p-5 text-white/60 text-[14px] outline-none focus:border-white/10 transition-colors resize-none placeholder:text-white/20 placeholder:italic font-light leading-relaxed"
+            placeholder="Provide any details that may support your application..."
+          />
+        </div>
+
       </div>
 
-      {/* Navigation */}
-      <div
-        className="sticky bottom-0 border-t border-border-glass px-6 py-4 bg-bg-primary/80 backdrop-blur-[18px]"
-      >
-        <div className="max-w-[800px] mx-auto flex justify-between gap-3">
-          <button
-            onClick={handleBack}
-            disabled={currentStep === 0}
-            className={cn(
-              'flex items-center gap-2 py-3 px-6 border border-border rounded-full text-sm font-medium font-inherit transition-all duration-[var(--transition-base)]',
-              currentStep === 0
-                ? 'bg-white/[0.03] text-text-tertiary cursor-not-allowed'
-                : 'bg-border-glass text-white cursor-pointer',
-            )}
-          >
-            <ChevronLeft size={16} />
-            Back
-          </button>
+      {/* Floating Action Buttons Area */}
+      <div className="fixed bottom-0 left-0 w-full px-5 pb-8 pt-10 flex items-center justify-between bg-gradient-to-t from-[#0B0F19] via-[#0B0F19]/90 to-transparent pointer-events-none z-50 max-w-[800px] mx-auto right-0">
+        
+        <button className="text-white/40 text-[12px] font-bold tracking-widest uppercase flex items-center gap-1.5 hover:text-white transition-colors pointer-events-auto bg-transparent border-none cursor-pointer p-2">
+          <ChevronLeft size={16} strokeWidth={2.5} />
+          Back
+        </button>
+        
+        <button className="h-[52px] px-8 rounded-full bg-accent text-black text-[13px] font-bold tracking-[0.1em] uppercase flex items-center gap-1.5 cursor-pointer shadow-[0_0_20px_rgba(190,242,100,0.3)] transition-transform hover:scale-105 active:scale-95 pointer-events-auto border-none">
+          Next
+          <ChevronRight size={18} strokeWidth={3} className="ml-1" />
+        </button>
 
-          {currentStep < STEPS.length - 1 ? (
-            <button
-              onClick={handleNext}
-              className="flex items-center gap-2 py-3 px-8 bg-accent text-black border-none rounded-full text-sm font-semibold cursor-pointer font-inherit transition-colors duration-[var(--transition-base)] shadow-[0_10px_28px_-12px_rgba(190,242,100,0.5)]"
-            >
-              Next
-              <ChevronRight size={16} />
-            </button>
-          ) : (
-            <button
-              onClick={handleComplete}
-              className="flex items-center gap-2 py-3 px-8 bg-success text-white border-none rounded-full text-sm font-semibold cursor-pointer font-inherit transition-colors duration-[var(--transition-base)]"
-            >
-              Submit Audit
-            </button>
-          )}
-        </div>
       </div>
+
     </div>
   );
 };

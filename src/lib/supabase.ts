@@ -461,6 +461,160 @@ export const schedule = {
 };
 
 // ---------------------------------------------------------------------------
+// Farm Boundaries
+// ---------------------------------------------------------------------------
+
+export interface FarmBoundaryRow {
+  id: string;
+  farm_id: string;
+  capture_method: string;
+  boundary_geojson: unknown;
+  boundary_points: unknown[];
+  status: string;
+  confidence: string;
+  gps_accuracy_summary: unknown;
+  area_ha: number | null;
+  captured_at: string | null;
+  captured_by: string | null;
+  notes: string | null;
+  skip_reason: string | null;
+  created_at: string;
+}
+
+export const farmBoundaries = {
+  async create(boundary: Omit<FarmBoundaryRow, 'id' | 'created_at'>): Promise<FarmBoundaryRow> {
+    const { data, error } = await supabase
+      .from('farm_boundaries')
+      .insert(boundary)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async getByFarm(farmId: string): Promise<FarmBoundaryRow[]> {
+    const { data, error } = await supabase
+      .from('farm_boundaries')
+      .select('*')
+      .eq('farm_id', farmId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Plots
+// ---------------------------------------------------------------------------
+
+export interface PlotRow {
+  id: string;
+  farm_id: string;
+  name: string;
+  area_ha: number | null;
+  status: string;
+  current_crop: string | null;
+  variety: string | null;
+  growth_stage: string | null;
+  irrigation_status: string | null;
+  center_point: unknown | null;
+  center_lat: number | null;
+  center_lon: number | null;
+  center_gps_accuracy: number | null;
+  planting_season: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const plots = {
+  async create(plot: Omit<PlotRow, 'id' | 'created_at' | 'updated_at'>): Promise<PlotRow> {
+    const { data, error } = await supabase
+      .from('plots')
+      .insert(plot)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async createMany(plotList: Omit<PlotRow, 'id' | 'created_at' | 'updated_at'>[]): Promise<PlotRow[]> {
+    const { data, error } = await supabase
+      .from('plots')
+      .insert(plotList)
+      .select();
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async listByFarm(farmId: string): Promise<PlotRow[]> {
+    const { data, error } = await supabase
+      .from('plots')
+      .select('*')
+      .eq('farm_id', farmId)
+      .order('name', { ascending: true });
+    if (error) throw error;
+    return data ?? [];
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Plot Observations
+// ---------------------------------------------------------------------------
+
+export interface PlotObservationRow {
+  id: string;
+  plot_id: string;
+  audit_id: string | null;
+  crop_condition: string;
+  pest_present: boolean;
+  disease_present: boolean;
+  pest_type: string | null;
+  pest_severity: string | null;
+  disease_type: string | null;
+  disease_severity: string | null;
+  stress_level: string | null;
+  plant_vigor: string | null;
+  soil_moisture: string | null;
+  weed_pressure: string | null;
+  yield_outlook: string | null;
+  notes: string | null;
+  observed_at: string;
+  created_at: string;
+}
+
+export const plotObservations = {
+  async create(obs: Omit<PlotObservationRow, 'id' | 'created_at'>): Promise<PlotObservationRow> {
+    const { data, error } = await supabase
+      .from('plot_observations')
+      .insert(obs)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async createMany(obsList: Omit<PlotObservationRow, 'id' | 'created_at'>[]): Promise<PlotObservationRow[]> {
+    const { data, error } = await supabase
+      .from('plot_observations')
+      .insert(obsList)
+      .select();
+    if (error) throw error;
+    return data ?? [];
+  },
+
+  async listByPlot(plotId: string): Promise<PlotObservationRow[]> {
+    const { data, error } = await supabase
+      .from('plot_observations')
+      .select('*')
+      .eq('plot_id', plotId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  },
+};
+
+// ---------------------------------------------------------------------------
 // Realtime notifications
 // ---------------------------------------------------------------------------
 

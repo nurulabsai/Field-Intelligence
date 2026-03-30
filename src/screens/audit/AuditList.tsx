@@ -1,162 +1,172 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { Search, Plus, MapPin, Calendar, FileText, Filter } from 'lucide-react';
-import { cn } from '../../design-system';
+import React from 'react';
+import { Settings, Download, Calendar, Folder, FileText, RotateCw } from 'lucide-react';
 
-type AuditStatus = 'draft' | 'submitted' | 'verified' | 'synced' | 'failed';
-
-interface AuditItem {
-  id: string;
-  farmName: string;
-  date: string;
-  status: AuditStatus;
-  location: string;
-}
-
+// Maintaining the props signature so App.tsx does not crash
 interface AuditListProps {
-  audits: AuditItem[];
+  audits?: any[];
   isLoading?: boolean;
   onAuditClick?: (id: string) => void;
   onNewAudit?: () => void;
 }
 
-const STATUS_CLASSES: Record<AuditStatus, { label: string; className: string }> = {
-  draft: { label: 'Draft', className: 'bg-gray-400/15 text-text-secondary' },
-  submitted: { label: 'Submitted', className: 'bg-info/15 text-info' },
-  verified: { label: 'Verified', className: 'bg-success/15 text-success' },
-  synced: { label: 'Synced', className: 'bg-[rgba(20,184,166,0.15)] text-[#14B8A6]' },
-  failed: { label: 'Failed', className: 'bg-error/15 text-error' },
-};
-
-const FILTERS: { label: string; value: string }[] = [
-  { label: 'All', value: 'all' },
-  { label: 'Draft', value: 'draft' },
-  { label: 'Submitted', value: 'submitted' },
-  { label: 'Verified', value: 'verified' },
-];
-
-const AuditList: React.FC<AuditListProps> = ({ audits, isLoading = false, onAuditClick, onNewAudit }) => {
-  const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState('all');
-
-  const filtered = useMemo(() => {
-    return audits.filter(a => {
-      const matchesSearch = !search || a.farmName.toLowerCase().includes(search.toLowerCase()) || a.location.toLowerCase().includes(search.toLowerCase());
-      const matchesFilter = filter === 'all' || a.status === filter;
-      return matchesSearch && matchesFilter;
-    });
-  }, [audits, search, filter]);
-
-  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-  }, []);
-
+const AuditList: React.FC<AuditListProps> = () => {
   return (
-    <div className="min-h-screen nuru-screen font-base relative">
+    <div className="min-h-screen bg-[#0B0F19] font-base p-6 pb-[120px] max-w-[800px] mx-auto">
+      
       {/* Header */}
-      <div className="pt-6 px-6 max-w-[800px] mx-auto">
-        <h1 className="text-3xl font-light text-white mb-5 font-heading tracking-tight">
-          All Audits
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-[1.75rem] font-light text-white font-heading tracking-tight">
+          System Tracking & Sync
         </h1>
-
-        {/* Search */}
-        <div className="relative mb-4">
-          <Search
-            size={18}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"
-          />
-          <input
-            type="text"
-            value={search}
-            onChange={handleSearch}
-            placeholder="Search audits..."
-            className="w-full py-3 pr-4 pl-11 nuru-glass-card border border-border rounded-full text-white text-sm font-inherit outline-none"
-          />
-        </div>
-
-        {/* Filter chips */}
-        <div className="flex gap-2 mb-6 flex-wrap">
-          {FILTERS.map(f => (
-            <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={cn(
-                'px-4 py-2 rounded-full text-sm font-medium border-none cursor-pointer font-inherit transition-all duration-[var(--transition-base)]',
-                filter === f.value
-                  ? 'bg-accent/15 text-accent'
-                  : 'bg-border-glass text-text-secondary',
-              )}
-            >
-              <span className="flex items-center gap-1.5">
-                {f.value !== 'all' && <Filter size={12} />}
-                {f.label}
-              </span>
-            </button>
-          ))}
-        </div>
+        <button className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center cursor-pointer border-none transition-colors hover:bg-white/10">
+          <Settings size={20} className="text-white/70" />
+        </button>
       </div>
 
-      {/* Audit cards */}
-      <div className="px-6 pb-[120px] max-w-[800px] mx-auto">
-        {isLoading ? (
-          <div className="flex flex-col gap-3">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="w-full h-[104px] nuru-glass-card rounded-[20px] border border-border-glass animate-pulse" />
-            ))}
+      {/* Action Buttons */}
+      <div className="flex gap-4 mb-10">
+        <button className="flex-1 py-3 px-5 rounded-full bg-accent text-black font-semibold text-[15px] flex items-center justify-center gap-2 border-none cursor-pointer">
+          <Download size={18} strokeWidth={2.5} />
+          Export CSV
+        </button>
+        <button className="flex-1 py-3 px-5 rounded-full bg-transparent border border-white/10 text-white font-medium text-[15px] flex items-center justify-center gap-2 cursor-pointer">
+          <Calendar size={18} className="text-white/70" />
+          Filter Dates
+        </button>
+      </div>
+
+      {/* Active Sync Section */}
+      <div className="mb-10">
+        <h2 className="text-xl font-semibold text-white mb-4">Active Sync</h2>
+        <div className="flex flex-col gap-4">
+          
+          {/* Sync Card 1 - Uploading */}
+          <div className="w-full p-5 bg-[#121623] border border-white/5 rounded-[24px] flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-[14px] bg-[#1E2538] flex items-center justify-center shrink-0">
+                  <Folder size={24} className="text-[#67E8F9]" fill="#67E8F9" />
+                </div>
+                <div>
+                  <h4 className="text-white font-semibold text-[15px] mb-0.5 tracking-wide">Site_Photos_A.zip</h4>
+                  <p className="text-white/40 text-[13px] font-medium">34MB • Uploading...</p>
+                </div>
+              </div>
+              <div className="px-3 py-1.5 rounded-full bg-[#67E8F9]/10 border border-[#67E8F9]/20 text-[#67E8F9] text-[11px] font-bold tracking-wider uppercase">
+                Syncing
+              </div>
+            </div>
+            {/* Progress Bar Container */}
+            <div className="w-full h-1.5 bg-white/5 rounded-full relative mt-1 overflow-hidden pointer-events-none">
+              <div className="absolute left-0 top-0 h-full bg-[#67E8F9] rounded-full w-[60%] shadow-[0_0_10px_rgba(103,232,249,0.5)]" />
+            </div>
           </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-16 px-6 nuru-glass-card rounded-[24px] border border-border-glass">
-            <FileText size={48} className="text-text-tertiary mx-auto mb-4" />
-            <p className="text-text-secondary text-base font-medium">No audits found</p>
-            <p className="text-text-tertiary text-sm mt-1">
-              {search ? 'Try a different search term' : 'Start a new audit to get going'}
-            </p>
+
+          {/* Sync Card 2 - Completed */}
+          <div className="w-full p-5 bg-[#121623] border border-white/5 rounded-[24px]">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-[14px] bg-[#1E2538] flex items-center justify-center shrink-0">
+                  <FileText size={24} className="text-accent" fill="#BEF264" />
+                </div>
+                <div>
+                  <h4 className="text-white font-semibold text-[15px] mb-0.5 tracking-wide">Audit_Report_v2.pdf</h4>
+                  <p className="text-white/40 text-[13px] font-medium">2MB • 2 mins ago</p>
+                </div>
+              </div>
+              <div className="px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-[11px] font-bold tracking-wider uppercase">
+                Completed
+              </div>
+            </div>
           </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {filtered.map(audit => {
-              const status = STATUS_CLASSES[audit.status];
-              return (
-                <button
-                  key={audit.id}
-                  onClick={() => onAuditClick?.(audit.id)}
-                  className="w-full p-5 nuru-glass-card border border-border-glass rounded-[20px] cursor-pointer font-inherit text-left transition-all duration-[var(--transition-base)] flex flex-col gap-3 hover:border-border-dark hover:-translate-y-px"
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="text-base font-semibold text-white">{audit.farmName}</div>
-                    <span
-                      className={cn(
-                        'px-2.5 py-1 rounded-[20px] text-[0.688rem] font-semibold uppercase tracking-wide shrink-0',
-                        status.className,
-                      )}
-                    >
-                      {status.label}
-                    </span>
-                  </div>
-                  <div className="flex gap-4 flex-wrap">
-                    <div className="flex items-center gap-1.5 text-sm text-text-tertiary">
-                      <Calendar size={13} />
-                      {audit.date}
-                    </div>
-                    <div className="flex items-center gap-1.5 text-sm text-text-tertiary">
-                      <MapPin size={13} />
-                      {audit.location}
-                    </div>
-                  </div>
+
+          {/* Sync Card 3 - Failed */}
+          <div className="w-full p-5 bg-[#121623] border border-white/5 rounded-[24px]">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-[14px] bg-[#2A1C24] flex items-center justify-center shrink-0">
+                  <FileText size={24} className="text-[#F87171]" fill="#F87171" />
+                </div>
+                <div>
+                  <h4 className="text-white font-semibold text-[15px] mb-0.5 tracking-wide">Soil_Data.csv</h4>
+                  <p className="text-white/40 text-[13px] font-medium">12MB • Failed</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="px-3 py-1.5 rounded-full bg-[#EF4444]/10 border border-[#EF4444]/20 text-[#F87171] text-[11px] font-bold tracking-wider uppercase">
+                  Failed
+                </div>
+                <button className="w-10 h-10 rounded-full bg-[#1A2033] border border-white/5 flex items-center justify-center cursor-pointer text-white/50 transition-colors hover:bg-white/10 hover:text-white">
+                  <RotateCw size={18} />
                 </button>
-              );
-            })}
+              </div>
+            </div>
           </div>
-        )}
+
+        </div>
       </div>
 
-      {/* FAB — desktop only (mobile uses bottom nav pill center button) */}
-      <button
-        onClick={onNewAudit}
-        className="hidden md:flex fixed bottom-8 right-8 w-14 h-14 rounded-full bg-accent text-black border-none cursor-pointer items-center justify-center shadow-[var(--shadow-glow-accent-lg)] transition-transform duration-[var(--transition-base)] z-50 hover:scale-105"
-        title="New Audit"
-      >
-        <Plus size={24} />
-      </button>
+      {/* Activity Tracking Section */}
+      <div>
+        <h2 className="text-xl font-semibold text-white mb-4">Activity Tracking</h2>
+        <div className="bg-[#121623] rounded-[24px] border border-white/5 overflow-hidden pb-6">
+          
+          {/* Table Header */}
+          <div className="grid grid-cols-[1.5fr_1.5fr_1fr] px-6 py-5 border-b border-white/5">
+            <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Activity ID</div>
+            <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest">User</div>
+            <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Action Type</div>
+          </div>
+
+          {/* Rows */}
+          <div className="flex flex-col">
+            <div className="grid grid-cols-[1.5fr_1.5fr_1fr] px-6 py-5 items-center border-b border-white/5">
+              <div className="text-[14px] text-white/50 font-medium">#NR-9821</div>
+              <div className="text-[14px] text-white font-semibold">John Doe</div>
+              <div className="text-[14px] text-white/80">Site Visit</div>
+            </div>
+
+            <div className="grid grid-cols-[1.5fr_1.5fr_1fr] px-6 py-5 items-center border-b border-white/5">
+              <div className="text-[14px] text-white/50 font-medium">#NR-9819</div>
+              <div className="text-[14px] text-white font-semibold">Sarah M.</div>
+              <div className="text-[14px] text-white/80">Data Entry</div>
+            </div>
+
+            <div className="grid grid-cols-[1.5fr_1.5fr_1fr] px-6 py-5 items-center border-b border-white/5">
+              <div className="text-[14px] text-white/50 font-medium">#NR-9815</div>
+              <div className="text-[14px] text-white font-semibold">Mike R.</div>
+              <div className="text-[14px] text-white/80">Export</div>
+            </div>
+
+            <div className="grid grid-cols-[1.5fr_1.5fr_1fr] px-6 py-5 items-center border-b border-white/5">
+              <div className="text-[14px] text-white/50 font-medium">#NR-9804</div>
+              <div className="text-[14px] text-white font-semibold flex flex-col gap-0.5">
+                <span>John Doe</span>
+              </div>
+              <div className="text-[14px] text-white/80">Audit Final</div>
+            </div>
+          </div>
+
+          {/* Pagination */}
+          <div className="px-6 pt-6 flex justify-between items-center gap-2">
+            <button className="h-10 px-4 rounded-full bg-[#1A2033] text-[11px] font-bold tracking-widest uppercase text-white/50 border-none cursor-pointer">PREV</button>
+            <div className="flex items-center gap-1">
+              <button className="w-10 h-10 rounded-full bg-accent text-black font-bold text-sm flex items-center justify-center border-none shadow-[0_0_15px_rgba(190,242,100,0.4)] cursor-pointer">
+                1
+              </button>
+              <button className="w-10 h-10 rounded-full bg-[#1A2033] text-white/50 font-medium text-sm flex items-center justify-center border-none cursor-pointer hover:bg-white/10 hover:text-white transition-colors">
+                2
+              </button>
+              <button className="w-10 h-10 rounded-full bg-[#1A2033] text-white/50 font-medium text-sm flex items-center justify-center border-none cursor-pointer hover:bg-white/10 hover:text-white transition-colors">
+                3
+              </button>
+            </div>
+            <button className="h-10 px-4 rounded-full bg-[#1A2033] text-[11px] font-bold tracking-widest uppercase text-white/50 border-none cursor-pointer">NEXT</button>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   );
 };

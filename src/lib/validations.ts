@@ -284,11 +284,161 @@ export const step6YieldSchema = z.object({
 export type Step6Yield = z.infer<typeof step6YieldSchema>;
 
 // ---------------------------------------------------------------------------
-// Full wizard schema (all steps combined)
+// Step 2b — Farm Profile (new)
+// ---------------------------------------------------------------------------
+
+export const stepFarmProfileSchema = z.object({
+  farm_profile: z.object({
+    id: z.string().min(1),
+    farm_name: z.string().min(1, 'Farm name is required').max(200),
+    farmer_name: z.string().min(2, 'Farmer name must be at least 2 characters').max(120),
+    farmer_phone: z.string().min(1, 'Farmer phone is required'),
+    village: z.string().min(1, 'Village is required'),
+    ward: z.string().min(1, 'Ward is required'),
+    district: z.string().min(1, 'District is required'),
+    region: z.string().min(1, 'Region is required'),
+    total_area_ha: z.union([
+      z.number().positive('Farm area must be greater than 0').max(10_000),
+      z.string().min(1, 'Farm area is required').transform(Number).pipe(
+        z.number().positive('Farm area must be greater than 0').max(10_000),
+      ),
+    ]),
+    tenure_type: z.enum(['owned', 'leased', 'communal', 'government', 'borrowed', 'other'], {
+      required_error: 'Tenure type is required',
+    }),
+    farming_system: z.enum(['rainfed', 'irrigated', 'mixed'], {
+      required_error: 'Farming system is required',
+    }),
+    contact_number: z.string().optional().default(''),
+    water_source: z.string().optional().default(''),
+    notes: z.string().max(2000).optional().default(''),
+  }),
+});
+
+export type StepFarmProfile = z.infer<typeof stepFarmProfileSchema>;
+
+// ---------------------------------------------------------------------------
+// Step 2c — Farm Boundary (new)
+// ---------------------------------------------------------------------------
+
+const gpsBoundaryPointSchema = z.object({
+  lat: z.number(),
+  lon: z.number(),
+  accuracy: z.number(),
+  timestamp: z.string(),
+  sequence: z.number(),
+});
+
+export const stepFarmBoundarySchema = z.object({
+  farm_boundary: z.object({
+    id: z.string().min(1),
+    farm_id: z.string().min(1),
+    capture_method: z.string().default(''),
+    points: z.array(gpsBoundaryPointSchema).default([]),
+    status: z.enum(['draft', 'complete', 'skipped']),
+    confidence: z.string().default(''),
+    captured_at: z.string().default(''),
+    captured_by: z.string().default(''),
+    gps_accuracy_summary: z.any().nullable(),
+    area_ha: z.number().nullable(),
+    notes: z.string().max(2000).optional().default(''),
+    skip_reason: z.string().optional().default(''),
+  }).refine(
+    d => d.status === 'skipped' || d.status === 'complete',
+    { message: 'Please capture the farm boundary or provide a reason for skipping' },
+  ),
+});
+
+export type StepFarmBoundary = z.infer<typeof stepFarmBoundarySchema>;
+
+// ---------------------------------------------------------------------------
+// Step 2d — Plot Structure (new)
+// ---------------------------------------------------------------------------
+
+const plotGpsSchema = z.object({
+  lat: z.number(),
+  lon: z.number(),
+  accuracy: z.number(),
+  timestamp: z.string(),
+}).nullable();
+
+const plotSchema = z.object({
+  id: z.string().min(1),
+  farm_id: z.string().min(1),
+  name: z.string().min(1, 'Plot name is required'),
+  area_ha: z.union([
+    z.number().positive('Plot area must be greater than 0'),
+    z.string().min(1, 'Plot area is required').transform(Number).pipe(
+      z.number().positive('Plot area must be greater than 0'),
+    ),
+  ]),
+  status: z.enum(['active', 'fallow', 'prepared', 'abandoned'], {
+    required_error: 'Plot status is required',
+  }),
+  current_crop: z.string().min(1, 'Current crop is required'),
+  variety: z.string().optional().default(''),
+  growth_stage: z.enum([
+    'germination', 'vegetative', 'flowering', 'fruiting',
+    'maturity', 'harvest', 'post_harvest',
+  ], { required_error: 'Growth stage is required' }),
+  irrigation_status: z.enum(['irrigated', 'rainfed', 'supplemental'], {
+    required_error: 'Irrigation status is required',
+  }),
+  center_gps: plotGpsSchema,
+  planting_season: z.string().optional().default(''),
+  photo: z.string().optional().default(''),
+  notes: z.string().max(2000).optional().default(''),
+});
+
+export const stepPlotStructureSchema = z.object({
+  plots: z.array(plotSchema).min(1, 'At least one plot is required').max(50),
+});
+
+export type StepPlotStructure = z.infer<typeof stepPlotStructureSchema>;
+
+// ---------------------------------------------------------------------------
+// Step 2e — Plot Observations (new)
+// ---------------------------------------------------------------------------
+
+const plotObservationSchema = z.object({
+  id: z.string().min(1),
+  plot_id: z.string().min(1, 'Observation must be linked to a plot'),
+  plot_name: z.string().default(''),
+  crop_condition: z.enum(['excellent', 'good', 'fair', 'poor', 'failed'], {
+    required_error: 'Crop condition is required',
+  }),
+  pest_present: z.boolean({ required_error: 'Indicate if pests are present' }),
+  disease_present: z.boolean({ required_error: 'Indicate if disease is present' }),
+  pest_type: z.string().optional().default(''),
+  pest_severity: z.string().optional().default(''),
+  disease_type: z.string().optional().default(''),
+  disease_severity: z.string().optional().default(''),
+  stress_level: z.string().optional().default(''),
+  plant_vigor: z.string().optional().default(''),
+  soil_moisture: z.string().optional().default(''),
+  weed_pressure: z.string().optional().default(''),
+  yield_outlook: z.string().optional().default(''),
+  notes: z.string().max(2000).optional().default(''),
+  photo: z.string().optional().default(''),
+  voice_note: z.string().optional().default(''),
+});
+
+export const stepPlotObservationsSchema = z.object({
+  plot_observations: z.array(plotObservationSchema).min(1, 'At least one plot observation is required'),
+});
+
+export type StepPlotObservations = z.infer<typeof stepPlotObservationsSchema>;
+
+// ---------------------------------------------------------------------------
+// Full wizard schema (all steps combined) — 10-step form
 // ---------------------------------------------------------------------------
 
 export const fullAuditSchema = step1IdentitySchema
   .merge(step2LocationSchema)
+  .merge(stepFarmProfileSchema)
+  .merge(stepFarmBoundarySchema)
+  .merge(stepPlotStructureSchema)
+  .merge(stepPlotObservationsSchema)
   .merge(
     z.object({
       total_area_ha: z.number().positive().max(10_000),
@@ -306,16 +456,28 @@ export const fullAuditSchema = step1IdentitySchema
 export type FullAuditData = z.infer<typeof fullAuditSchema>;
 
 // ---------------------------------------------------------------------------
-// Step-indexed schema map (useful for per-step validation in the wizard)
+// Step-indexed schema map — 10 steps
 // ---------------------------------------------------------------------------
 
+/**
+ * Lenient passthrough schema used for new steps where validation is
+ * advisory rather than blocking (the step components handle their own
+ * inline validation). Using z.any() lets the wizard advance freely
+ * while the step components show inline warnings.
+ */
+const passthroughSchema = z.record(z.any());
+
 export const stepSchemas = [
-  step1IdentitySchema,
-  step2LocationSchema,
-  step3FarmSchema,
-  step4CropsSchema,
-  step5InputsSchema,
-  step6YieldSchema,
+  step1IdentitySchema,       // 0 - Identity
+  step2LocationSchema,       // 1 - Location
+  passthroughSchema,         // 2 - Farm Profile (inline validation)
+  passthroughSchema,         // 3 - Farm Boundary (inline validation)
+  passthroughSchema,         // 4 - Plot Structure (inline validation)
+  passthroughSchema,         // 5 - Plot Observations (inline validation)
+  step3FarmSchema,           // 6 - Farm Characteristics
+  step4CropsSchema,          // 7 - Crops
+  step5InputsSchema,         // 8 - Inputs
+  step6YieldSchema,          // 9 - Yield
 ] as const;
 
 export const TOTAL_STEPS = stepSchemas.length;

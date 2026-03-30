@@ -14,10 +14,14 @@ import LoadingSkeleton from './components/LoadingSkeleton';
 // Lazy-loaded screens
 const SignUpScreen = lazy(() => import('./screens/auth/SignUpScreen'));
 const LoginScreen = lazy(() => import('./screens/auth/LoginScreen'));
+const WelcomeScreen = lazy(() => import('./screens/auth/WelcomeScreen'));
 const DashboardHome = lazy(() => import('./screens/dashboard/DashboardHome'));
 const AuditList = lazy(() => import('./screens/audit/AuditList'));
 const AuditWizard = lazy(() => import('./screens/audit/AuditWizard'));
 const CalendarScreen = lazy(() => import('./screens/schedule/CalendarScreen'));
+const CameraScanner = lazy(() => import('./screens/audit/CameraScanner'));
+const TypeSelectionScreen = lazy(() => import('./screens/audit/TypeSelectionScreen'));
+const BusinessWizard = lazy(() => import('./screens/audit/BusinessWizard'));
 
 // ─── Auth Guard ──────────────────────────────────────────────────────────────
 const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -100,7 +104,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <NuruBottomNav
         currentPath={location.pathname}
         onNavigate={handleNavigate}
-        onFabPress={() => navigate('/audit/new')}
+        onFabPress={() => handleNavigate('/audit/new')}
       />
     </div>
   );
@@ -136,6 +140,14 @@ const App: React.FC = () => {
           <Route path="/" element={<SplashRedirect />} />
 
           {/* Public auth routes */}
+          <Route
+            path="/auth/welcome"
+            element={
+              <PublicOnly>
+                <WelcomeWrapper />
+              </PublicOnly>
+            }
+          />
           <Route
             path="/auth/signup"
             element={
@@ -179,7 +191,27 @@ const App: React.FC = () => {
             element={
               <RequireAuth>
                 <AppShell>
+                  <TypeSelectionScreen />
+                </AppShell>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/audit/wizard/farm"
+            element={
+              <RequireAuth>
+                <AppShell>
                   <AuditWizardWrapper />
+                </AppShell>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/audit/wizard/business"
+            element={
+              <RequireAuth>
+                <AppShell>
+                  <BusinessWizard />
                 </AppShell>
               </RequireAuth>
             }
@@ -215,6 +247,16 @@ const App: React.FC = () => {
             }
           />
 
+          {/* Fullscreen Camera Route (No AppShell Navigation) */}
+          <Route
+            path="/scanner"
+            element={
+              <RequireAuth>
+                <CameraScanner />
+              </RequireAuth>
+            }
+          />
+
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
@@ -224,6 +266,16 @@ const App: React.FC = () => {
 };
 
 // ─── Auth Screen Wrappers ───────────────────────────────────────────────────
+const WelcomeWrapper: React.FC = () => {
+  const navigate = useNavigate();
+  return (
+    <WelcomeScreen
+      onNavigateToLogin={() => navigate('/auth/login')}
+      onNavigateToSignUp={() => navigate('/auth/signup')}
+    />
+  );
+};
+
 const LoginWrapper: React.FC = () => {
   const navigate = useNavigate();
   const signIn = useAuthStore((s) => s.signIn);
@@ -263,8 +315,8 @@ const DashboardWrapper: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [stats, setStats] = useState<{ totalAudits: number; submittedToday: number; pendingSync: number; verified: number }>();
-  const [audits, setAudits] = useState<Array<{ id: string; farmName: string; auditType: string; date: string; status: 'draft' | 'submitted' | 'verified' | 'synced' | 'failed' }>>([]);
-  const [prices, setPrices] = useState<Array<{ id: string; crop: string; region: string; pricePerKg: number; change: number }>>([]);
+  const [audits, setAudits] = useState<Array<{ id: string; farmName: string; auditType: string; date: string; status: 'draft' | 'submitted' | 'verified' | 'synced' | 'failed' }> | undefined>(undefined);
+  const [prices, setPrices] = useState<Array<{ id: string; crop: string; region: string; pricePerKg: number; change: number }> | undefined>(undefined);
   const [stressAlert, setStressAlert] = useState<string | null>(null);
 
   useEffect(() => {
@@ -314,6 +366,9 @@ const DashboardWrapper: React.FC = () => {
       })
       .catch(() => {
         setStressAlert('Live dashboard data is currently unavailable. Showing fallback content.');
+        setAudits(undefined);
+        setPrices(undefined);
+        setStats(undefined);
         addToast({ type: 'warning', message: 'Failed to load live dashboard data.' });
       })
       .finally(() => setIsLoading(false));
@@ -393,13 +448,48 @@ const AuditWizardWrapper: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const addToast = useUIStore((s) => s.addToast);
+  const user = useAuthStore((s) => s.user);
+  const createAudit = useAuditStore((s) => s.createAudit);
+  const submitAudit = useAuditStore((s) => s.submitAudit);
 
   return (
     <AuditWizard
       auditId={id}
-      onComplete={() => {
-        addToast({ type: 'success', message: 'Audit saved successfully.' });
-        navigate('/audits');
+      onComplete={async (data) => {
+        const location =
+          typeof data.latitude === 'number' && typeof data.longitude === 'number'
+            ? { latitude: data.latitude, longitude: data.longitude }
+            : null;
+        const gpsAccuracy =
+          typeof data.gps_accuracy === 'number'
+            ? data.gps_accuracy
+            : typeof data.yield_gps_accuracy === 'number'
+              ? data.yield_gps_accuracy
+              : null;
+
+        try {
+          if (id) {
+            await submitAudit(id);
+          } else {
+            const created = await createAudit({
+              campaign_id: null,
+              farm_id: (typeof data.farm_id === 'string' && data.farm_id) || crypto.randomUUID(),
+              assigned_to: user?.id ?? null,
+              status: 'submitted',
+              audit_location: location,
+              gps_accuracy_m: gpsAccuracy,
+              started_at: new Date().toISOString(),
+              completed_at: new Date().toISOString(),
+            });
+            await submitAudit(created.id);
+          }
+
+          addToast({ type: 'success', message: 'Audit submitted successfully.' });
+          navigate('/audits');
+        } catch {
+          addToast({ type: 'error', message: 'Failed to submit audit. Please try again.' });
+          throw new Error('Submit failed');
+        }
       }}
     />
   );
@@ -498,7 +588,7 @@ const SplashRedirect: React.FC = () => {
     );
   }
 
-  return user ? <Navigate to="/dashboard" replace /> : <Navigate to="/auth/login" replace />;
+  return user ? <Navigate to="/dashboard" replace /> : <Navigate to="/auth/welcome" replace />;
 };
 
 // ─── Settings Screen (basic) ────────────────────────────────────────────────
