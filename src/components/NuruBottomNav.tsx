@@ -57,7 +57,7 @@ const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
   return (
     <nav className="nuru-bottom-nav">
       <div
-        className="fixed bottom-6 left-4 right-4 z-50 bg-black rounded-full p-2 shadow-2xl shadow-black/20 max-w-[420px] mx-auto"
+        className="fixed bottom-6 left-4 right-4 z-50 bg-black rounded-full p-2 shadow-2xl shadow-black/20 max-w-[400px] mx-auto"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0)' }}
       >
         <div className="flex items-center justify-between">
