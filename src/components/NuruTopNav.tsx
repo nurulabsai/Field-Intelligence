@@ -18,7 +18,7 @@ const NuruTopNav: React.FC<NuruTopNavProps> = ({
 }) => {
   return (
     <nav
-      className="fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-4 bg-bg-primary/80 backdrop-blur-[var(--glass-blur)] border-b border-border-glass z-50 font-base"
+      className="fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-4 bg-bg-primary/80 backdrop-blur-[18px] border-b border-border-glass z-50 font-base"
     >
       {/* Left */}
       <div className="w-12 flex items-center">
@@ -33,7 +33,7 @@ const NuruTopNav: React.FC<NuruTopNavProps> = ({
       </div>
 
       {/* Center */}
-      <h1 className="text-base font-semibold text-white m-0 truncate flex-1 text-center">
+      <h1 className="text-base font-light font-heading tracking-tight text-white m-0 truncate flex-1 text-center">
         {title}
       </h1>
 

@@ -65,6 +65,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
   const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [stepErrors, setStepErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Load persisted state
@@ -77,6 +78,28 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
       }
     }).catch(() => { /* no saved state */ });
   }, [stateKey]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (isDirty) {
+      sessionStorage.setItem('nuru_audit_dirty', 'true');
+    } else {
+      sessionStorage.removeItem('nuru_audit_dirty');
+    }
+    return () => {
+      sessionStorage.removeItem('nuru_audit_dirty');
+    };
+  }, [isDirty]);
+
+  useEffect(() => {
+    const beforeUnload = (e: BeforeUnloadEvent) => {
+      if (!isDirty) return;
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', beforeUnload);
+    return () => window.removeEventListener('beforeunload', beforeUnload);
+  }, [isDirty]);
 
   // Debounced auto-save
   const persistState = useCallback((step: number, data: Record<string, unknown>) => {
@@ -98,6 +121,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
       persistState(currentStep, next);
       return next;
     });
+    setIsDirty(true);
     setStepErrors({});
   }, [currentStep, persistState]);
 
@@ -118,16 +142,17 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
   }, [currentStep, formData, persistState]);
 
   const handleComplete = useCallback(() => {
+    setIsDirty(false);
     onComplete?.(formData);
   }, [formData, onComplete]);
 
   const StepComponent = STEPS[currentStep]!.component;
 
   return (
-    <div className="min-h-screen bg-bg-primary font-base">
+    <div className="min-h-screen nuru-screen font-base">
       {/* Step Indicator */}
       <div
-        className="sticky top-0 z-40 border-b border-border-glass px-6 py-4 bg-bg-primary/95 backdrop-blur-[12px]"
+        className="sticky top-0 z-40 border-b border-border-glass px-6 py-4 bg-bg-primary/80 backdrop-blur-[18px]"
       >
         <div className="max-w-[800px] mx-auto">
           {/* Progress bar */}
@@ -156,7 +181,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
                   }
                 }}
                 className={cn(
-                  'bg-transparent border-none text-[0.688rem] uppercase tracking-widest px-0.5 py-1 font-inherit',
+                  'bg-transparent border-none text-[0.688rem] uppercase tracking-widest px-1.5 py-1.5 font-inherit rounded-full',
                   i === currentStep && 'font-semibold text-accent cursor-pointer',
                   i < currentStep && 'font-normal text-text-secondary cursor-pointer',
                   i > currentStep && 'font-normal text-text-tertiary cursor-default',
@@ -179,6 +204,14 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
 
       {/* Step Content */}
       <div className="max-w-[800px] mx-auto py-8 px-6">
+        <div className="mb-5">
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+            Travel Details
+          </p>
+          <p className="text-[11px] text-accent font-semibold uppercase tracking-[0.12em] mt-1">
+            Step {currentStep + 1} - {STEPS[currentStep]!.label}
+          </p>
+        </div>
         <StepComponent
           data={formData}
           onChange={handleStepData}
@@ -188,14 +221,14 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
 
       {/* Navigation */}
       <div
-        className="sticky bottom-0 border-t border-border-glass px-6 py-4 bg-bg-primary/95 backdrop-blur-[12px]"
+        className="sticky bottom-0 border-t border-border-glass px-6 py-4 bg-bg-primary/80 backdrop-blur-[18px]"
       >
         <div className="max-w-[800px] mx-auto flex justify-between gap-3">
           <button
             onClick={handleBack}
             disabled={currentStep === 0}
             className={cn(
-              'flex items-center gap-2 py-3 px-6 border border-border rounded-xl text-sm font-medium font-inherit transition-all duration-[var(--transition-base)]',
+              'flex items-center gap-2 py-3 px-6 border border-border rounded-full text-sm font-medium font-inherit transition-all duration-[var(--transition-base)]',
               currentStep === 0
                 ? 'bg-white/[0.03] text-text-tertiary cursor-not-allowed'
                 : 'bg-border-glass text-white cursor-pointer',
@@ -208,7 +241,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
           {currentStep < STEPS.length - 1 ? (
             <button
               onClick={handleNext}
-              className="flex items-center gap-2 py-3 px-8 bg-accent text-black border-none rounded-xl text-sm font-semibold cursor-pointer font-inherit transition-colors duration-[var(--transition-base)]"
+              className="flex items-center gap-2 py-3 px-8 bg-accent text-black border-none rounded-full text-sm font-semibold cursor-pointer font-inherit transition-colors duration-[var(--transition-base)] shadow-[0_10px_28px_-12px_rgba(190,242,100,0.5)]"
             >
               Next
               <ChevronRight size={16} />
@@ -216,7 +249,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
           ) : (
             <button
               onClick={handleComplete}
-              className="flex items-center gap-2 py-3 px-8 bg-success text-white border-none rounded-xl text-sm font-semibold cursor-pointer font-inherit transition-colors duration-[var(--transition-base)]"
+              className="flex items-center gap-2 py-3 px-8 bg-success text-white border-none rounded-full text-sm font-semibold cursor-pointer font-inherit transition-colors duration-[var(--transition-base)]"
             >
               Submit Audit
             </button>

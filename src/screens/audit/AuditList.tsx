@@ -14,6 +14,7 @@ interface AuditItem {
 
 interface AuditListProps {
   audits: AuditItem[];
+  isLoading?: boolean;
   onAuditClick?: (id: string) => void;
   onNewAudit?: () => void;
 }
@@ -33,7 +34,7 @@ const FILTERS: { label: string; value: string }[] = [
   { label: 'Verified', value: 'verified' },
 ];
 
-const AuditList: React.FC<AuditListProps> = ({ audits, onAuditClick, onNewAudit }) => {
+const AuditList: React.FC<AuditListProps> = ({ audits, isLoading = false, onAuditClick, onNewAudit }) => {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
 
@@ -50,10 +51,10 @@ const AuditList: React.FC<AuditListProps> = ({ audits, onAuditClick, onNewAudit 
   }, []);
 
   return (
-    <div className="min-h-screen bg-bg-primary font-base relative">
+    <div className="min-h-screen nuru-screen font-base relative">
       {/* Header */}
       <div className="pt-6 px-6 max-w-[800px] mx-auto">
-        <h1 className="text-2xl font-bold text-white mb-5">
+        <h1 className="text-3xl font-light text-white mb-5 font-heading tracking-tight">
           All Audits
         </h1>
 
@@ -68,7 +69,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, onAuditClick, onNewAudit 
             value={search}
             onChange={handleSearch}
             placeholder="Search audits..."
-            className="w-full py-3 pr-4 pl-11 bg-bg-input border border-border rounded-xl text-white text-sm font-inherit outline-none"
+            className="w-full py-3 pr-4 pl-11 nuru-glass-card border border-border rounded-full text-white text-sm font-inherit outline-none"
           />
         </div>
 
@@ -79,7 +80,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, onAuditClick, onNewAudit 
               key={f.value}
               onClick={() => setFilter(f.value)}
               className={cn(
-                'px-4 py-2 rounded-[20px] text-sm font-medium border-none cursor-pointer font-inherit transition-all duration-[var(--transition-base)]',
+                'px-4 py-2 rounded-full text-sm font-medium border-none cursor-pointer font-inherit transition-all duration-[var(--transition-base)]',
                 filter === f.value
                   ? 'bg-accent/15 text-accent'
                   : 'bg-border-glass text-text-secondary',
@@ -96,8 +97,14 @@ const AuditList: React.FC<AuditListProps> = ({ audits, onAuditClick, onNewAudit 
 
       {/* Audit cards */}
       <div className="px-6 pb-[120px] max-w-[800px] mx-auto">
-        {filtered.length === 0 ? (
-          <div className="text-center py-16 px-6 bg-bg-card rounded-xl border border-border-glass">
+        {isLoading ? (
+          <div className="flex flex-col gap-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="w-full h-[104px] nuru-glass-card rounded-[20px] border border-border-glass animate-pulse" />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16 px-6 nuru-glass-card rounded-[24px] border border-border-glass">
             <FileText size={48} className="text-text-tertiary mx-auto mb-4" />
             <p className="text-text-secondary text-base font-medium">No audits found</p>
             <p className="text-text-tertiary text-sm mt-1">
@@ -112,7 +119,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, onAuditClick, onNewAudit 
                 <button
                   key={audit.id}
                   onClick={() => onAuditClick?.(audit.id)}
-                  className="w-full p-5 bg-bg-card border border-border-glass rounded-lg cursor-pointer font-inherit text-left transition-all duration-[var(--transition-base)] flex flex-col gap-3 hover:border-border-dark hover:-translate-y-px"
+                  className="w-full p-5 nuru-glass-card border border-border-glass rounded-[20px] cursor-pointer font-inherit text-left transition-all duration-[var(--transition-base)] flex flex-col gap-3 hover:border-border-dark hover:-translate-y-px"
                 >
                   <div className="flex justify-between items-start">
                     <div className="text-base font-semibold text-white">{audit.farmName}</div>

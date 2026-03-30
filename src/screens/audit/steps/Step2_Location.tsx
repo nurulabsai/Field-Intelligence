@@ -56,21 +56,21 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
   const region = (data.region as string) || '';
 
-  const inputBaseClasses = "w-full py-3 px-4 bg-bg-input rounded-xl text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150";
+  const inputBaseClasses = "w-full py-3 px-4 nuru-glass-card rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150";
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-white mb-1">
+      <h2 className="text-2xl font-light font-heading tracking-tight text-white mb-1">
         Location Details
       </h2>
       <p className="text-sm text-text-tertiary mb-7">
         Capture farm location and administrative details
       </p>
 
-      <div className="flex flex-col gap-5">
+      <div className="nuru-glass-card rounded-[28px] p-6 flex flex-col gap-5">
         {/* Region Dropdown */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-1.5">
+          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
             Region <span className="text-text-accent">*</span>
           </label>
           <div className="relative">
@@ -89,7 +89,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
               <ChevronDown size={18} className="text-text-tertiary" />
             </button>
             {regionOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-bg-tertiary border border-border-dark rounded-xl z-50 max-h-60 overflow-y-auto shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
+              <div className="absolute top-full left-0 right-0 mt-1 nuru-glass-card border border-border-dark rounded-[18px] z-50 max-h-60 overflow-y-auto shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
                 {TANZANIA_REGIONS.map(r => (
                   <button
                     key={r}
@@ -111,7 +111,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
         {/* District */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-1.5">
+          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
             District <span className="text-text-accent">*</span>
           </label>
           <input
@@ -131,7 +131,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
         {/* Ward */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-1.5">Ward</label>
+          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">Ward</label>
           <input
             type="text"
             value={(data.ward as string) || ''}
@@ -143,7 +143,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
         {/* Village */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-1.5">Village</label>
+          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">Village</label>
           <input
             type="text"
             value={(data.village as string) || ''}
@@ -155,13 +155,13 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
         {/* GPS Capture */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-1.5">GPS Coordinates</label>
+          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">GPS Coordinates</label>
           <button
             type="button"
             onClick={captureGPS}
             disabled={gpsLoading}
             className={cn(
-              'flex items-center gap-2.5 py-3.5 px-5 rounded-xl text-sm font-semibold font-inherit w-full justify-center transition-all duration-150 border',
+              'flex items-center gap-2.5 py-3.5 px-5 rounded-full text-sm font-semibold tracking-[0.05em] font-inherit w-full justify-center transition-all duration-150 border',
               lat ? 'bg-success/10 border-success/25 text-success' : 'bg-accent/10 border-accent/25 text-accent',
               gpsLoading ? 'cursor-wait' : 'cursor-pointer',
             )}
@@ -186,7 +186,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
           {/* GPS Data Display */}
           {lat !== undefined && lng !== undefined && (
-            <div className="mt-3 py-3.5 px-4 bg-bg-input rounded-xl border border-border-glass">
+            <div className="mt-3 py-3.5 px-4 nuru-glass-card rounded-[16px] border border-border-glass">
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <span className="text-[0.688rem] text-text-tertiary uppercase tracking-widest">Latitude</span>
@@ -229,7 +229,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
         </div>
 
         {/* Map Placeholder */}
-        <div className="w-full h-[200px] bg-bg-input rounded-lg border border-border-glass flex items-center justify-center text-text-tertiary">
+        <div className="w-full h-[200px] nuru-glass-card rounded-[18px] border border-border-glass flex items-center justify-center text-text-tertiary">
           <div className="text-center">
             <MapPin size={32} className="mx-auto mb-2 opacity-50" />
             <p className="text-[0.813rem]">

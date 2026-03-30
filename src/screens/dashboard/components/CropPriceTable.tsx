@@ -20,7 +20,7 @@ function formatTZS(amount: number): string {
 
 const CropPriceTable: React.FC<CropPriceTableProps> = ({ data }) => {
   return (
-    <div className="bg-bg-glass backdrop-blur-[var(--glass-blur)] border border-border-glass rounded-xl overflow-hidden">
+    <div className="nuru-glass-card border border-border-glass rounded-[24px] overflow-hidden">
       <div className="px-6 py-5 border-b border-border-glass">
         <h3 className="text-base font-semibold text-white">Crop Prices</h3>
       </div>

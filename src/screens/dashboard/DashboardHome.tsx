@@ -7,6 +7,15 @@ import CropPriceTable from './components/CropPriceTable';
 interface DashboardHomeProps {
   userName?: string;
   stressAlert?: string | null;
+  isLoading?: boolean;
+  stats?: {
+    totalAudits: number;
+    submittedToday: number;
+    pendingSync: number;
+    verified: number;
+  };
+  audits?: Array<{ id: string; farmName: string; auditType: string; date: string; status: 'draft' | 'submitted' | 'verified' | 'synced' | 'failed' }>;
+  prices?: Array<{ id: string; crop: string; region: string; pricePerKg: number; change: number }>;
   onAuditClick?: (id: string) => void;
   onViewAllAudits?: () => void;
 }
@@ -37,6 +46,10 @@ const MOCK_PRICES = [
 const DashboardHome: React.FC<DashboardHomeProps> = ({
   userName = 'Agent',
   stressAlert,
+  isLoading = false,
+  stats,
+  audits = MOCK_AUDITS,
+  prices = MOCK_PRICES,
   onAuditClick,
   onViewAllAudits,
 }) => {
@@ -44,7 +57,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
   const dateStr = now.toLocaleDateString('en-TZ', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
-    <div className="min-h-screen bg-bg-primary font-base p-6 max-w-[1280px] mx-auto">
+    <div className="min-h-screen nuru-screen font-base p-6 max-w-[1280px] mx-auto">
       {/* Stress Alert */}
       {stressAlert && (
         <div className="flex items-center gap-3 py-3.5 px-5 bg-warning/10 border border-warning/25 rounded-[14px] mb-6">
@@ -55,7 +68,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
 
       {/* Greeting */}
       <div className="mb-8">
-        <h1 className="text-[1.75rem] font-bold text-white mb-1">
+        <h1 className="text-[2.1rem] nuru-hero-title text-white mb-1">
           Hi {userName}! Welcome Back,
         </h1>
         <p className="text-sm text-text-tertiary">{dateStr}</p>
@@ -63,43 +76,51 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
 
       {/* KPI Row */}
       <div className="nuru-kpi-grid grid grid-cols-4 gap-4 mb-8">
-        <MetricWidget
-          icon={<ClipboardList size={20} />}
-          value="128"
-          label="Total Audits"
-          trend={12}
-          variant="default"
-        />
-        <MetricWidget
-          icon={<Send size={20} />}
-          value="7"
-          label="Submitted Today"
-          trend={25}
-          variant="success"
-        />
-        <MetricWidget
-          icon={<WifiOff size={20} />}
-          value="3"
-          label="Pending Sync"
-          variant="warning"
-        />
-        <MetricWidget
-          icon={<CheckCircle2 size={20} />}
-          value="112"
-          label="Verified"
-          trend={8}
-          variant="success"
-        />
+        {isLoading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="nuru-glass-card rounded-[24px] h-[156px] border border-border-glass animate-pulse" />
+          ))
+        ) : (
+          <>
+            <MetricWidget
+              icon={<ClipboardList size={20} />}
+              value={stats?.totalAudits ?? 128}
+              label="Total Audits"
+              trend={12}
+              variant="default"
+            />
+            <MetricWidget
+              icon={<Send size={20} />}
+              value={stats?.submittedToday ?? 7}
+              label="Submitted Today"
+              trend={25}
+              variant="success"
+            />
+            <MetricWidget
+              icon={<WifiOff size={20} />}
+              value={stats?.pendingSync ?? 3}
+              label="Pending Sync"
+              variant="warning"
+            />
+            <MetricWidget
+              icon={<CheckCircle2 size={20} />}
+              value={stats?.verified ?? 112}
+              label="Verified"
+              trend={8}
+              variant="success"
+            />
+          </>
+        )}
       </div>
 
       {/* Content Grid */}
       <div className="nuru-dashboard-content grid grid-cols-2 gap-6">
         <AuditFeed
-          items={MOCK_AUDITS}
+          items={audits}
           onItemClick={onAuditClick}
           onViewAll={onViewAllAudits}
         />
-        <CropPriceTable data={MOCK_PRICES} />
+        <CropPriceTable data={prices} />
       </div>
 
       <style>{`

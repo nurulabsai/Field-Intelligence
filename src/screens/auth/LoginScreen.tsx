@@ -13,6 +13,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const validate = useCallback((): boolean => {
@@ -27,11 +28,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+    setSubmitError(null);
     setLoading(true);
     try {
       await onLogin?.({ email, password, rememberMe });
-    } catch {
-      // handle error
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unable to sign in. Please try again.';
+      setSubmitError(msg);
     } finally {
       setLoading(false);
     }
@@ -40,7 +43,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
   const formContent = (
     <form onSubmit={handleSubmit} className="w-full max-w-[420px]">
       <div className="mb-8">
-        <h2 className="text-[1.75rem] font-bold text-white mb-2">
+        <h2 className="text-[2rem] font-light text-white mb-2 font-heading tracking-tight">
           Welcome Back
         </h2>
         <p className="text-text-tertiary text-[0.938rem]">
@@ -60,7 +63,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
             value={email}
             onChange={e => { setEmail(e.target.value); setErrors(p => ({ ...p, email: undefined })); }}
             placeholder="you@example.com"
-            className={`w-full min-h-[48px] py-3 px-4 pl-11 bg-bg-input border rounded-xl text-white text-[0.938rem] font-[inherit] outline-none transition-colors duration-150 ${errors.email ? 'border-error' : 'border-border'}`}
+            className={`w-full min-h-[48px] py-3 px-4 pl-11 nuru-glass-card border rounded-full text-white text-[0.938rem] font-[inherit] outline-none transition-colors duration-150 ${errors.email ? 'border-error' : 'border-border'}`}
           />
         </div>
         {errors.email && <p className="text-xs text-error-light mt-1">{errors.email}</p>}
@@ -78,7 +81,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
             value={password}
             onChange={e => { setPassword(e.target.value); setErrors(p => ({ ...p, password: undefined })); }}
             placeholder="Enter your password"
-            className={`w-full min-h-[48px] py-3 px-4 pl-11 bg-bg-input border rounded-xl text-white text-[0.938rem] font-[inherit] outline-none transition-colors duration-150 ${errors.password ? 'border-error' : 'border-border'}`}
+            className={`w-full min-h-[48px] py-3 px-4 pl-11 nuru-glass-card border rounded-full text-white text-[0.938rem] font-[inherit] outline-none transition-colors duration-150 ${errors.password ? 'border-error' : 'border-border'}`}
           />
           <button
             type="button"
@@ -116,10 +119,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
       </div>
 
       {/* Submit */}
+      {submitError && (
+        <div className="mb-3 rounded-[14px] border border-error/30 bg-error/10 px-3.5 py-2.5 text-sm text-error-light">
+          {submitError}
+        </div>
+      )}
       <button
         type="submit"
         disabled={loading}
-        className={`w-full min-h-[48px] py-3 border-none rounded-xl text-base font-semibold font-[inherit] transition-colors duration-150 flex items-center justify-center gap-2 ${loading ? 'bg-accent/60 text-black cursor-not-allowed' : 'bg-accent text-black cursor-pointer'}`}
+        className={`w-full min-h-[56px] py-3 border-none rounded-full text-base font-semibold tracking-[0.06em] font-[inherit] transition-colors duration-150 flex items-center justify-center gap-2 ${loading ? 'bg-accent/60 text-black cursor-not-allowed' : 'bg-accent text-black cursor-pointer shadow-[0_10px_28px_-12px_rgba(190,242,100,0.5)]'}`}
       >
         {loading ? (
           <>
@@ -151,10 +159,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
   );
 
   return (
-    <div className="min-h-screen flex bg-bg-primary font-base">
+    <div className="min-h-screen flex nuru-screen font-base">
       {/* Left Panel - Desktop Only */}
       <div
-        className="nuru-login-left-panel basis-[45%] shrink-0 grow-0 bg-[linear-gradient(135deg,#111622_0%,#0B0F19_50%,rgba(190,242,100,0.08)_100%)] flex flex-col items-center justify-center p-12 relative overflow-hidden"
+        className="nuru-login-left-panel basis-[45%] shrink-0 grow-0 bg-[linear-gradient(135deg,#111622_0%,#0B0F19_50%,rgba(190,242,100,0.08)_100%)] flex flex-col items-center justify-center p-12 relative overflow-hidden border-r border-border-glass"
       >
         <div className="absolute w-[350px] h-[350px] rounded-full bg-[radial-gradient(circle,rgba(190,242,100,0.1)_0%,transparent_70%)] bottom-[10%] -right-[5%]" />
         <div className="relative z-[1] text-center">
@@ -174,7 +182,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
             ].map(stat => (
               <div
                 key={stat.label}
-                className="p-4 bg-bg-glass backdrop-blur-[var(--glass-blur)] rounded-xl border border-border-glass text-center"
+                className="p-4 nuru-glass-card rounded-[18px] border border-border-glass text-center"
               >
                 <div className="text-xl font-bold text-text-accent">{stat.value}</div>
                 <div className="text-xs text-text-tertiary mt-1">{stat.label}</div>

@@ -44,7 +44,7 @@ const SEED_SOURCES: DropdownOption[] = [
   { value: 'company', label: 'Company' },
 ];
 
-const inputClasses = "w-full py-3 px-4 bg-bg-input border border-border rounded-xl text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 focus:border-accent";
+const inputClasses = "w-full py-3 px-4 nuru-glass-card border border-border rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 focus:border-accent";
 
 const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -76,7 +76,7 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
             <ChevronDown size={18} className={cn("text-text-tertiary transition-transform duration-150", isOpen && "rotate-180")} />
           </button>
           {isOpen && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-bg-tertiary border border-border rounded-xl z-50 overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
+            <div className="absolute top-full left-0 right-0 mt-1 nuru-glass-card border border-border rounded-[16px] z-50 overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
               {options.map(opt => (
                 <button
                   key={opt.value}
@@ -102,16 +102,16 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-white mb-1">
+      <h2 className="text-2xl font-light font-heading tracking-tight text-white mb-1">
         Agricultural Inputs
       </h2>
       <p className="text-sm text-text-tertiary mb-7">
         Record fertilizers, pesticides and seed information
       </p>
 
-      <div className="flex flex-col gap-5">
+      <div className="nuru-glass-card rounded-[28px] p-6 flex flex-col gap-5">
         {/* Fertilizer Section */}
-        <div className="p-5 bg-bg-card rounded-lg border border-border-glass">
+        <div className="p-5 nuru-glass-card rounded-[20px] border border-border-glass">
           <h3 className="text-[0.938rem] font-semibold text-white mb-4">
             Fertilizer
           </h3>
@@ -135,7 +135,7 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
         </div>
 
         {/* Pesticide Section */}
-        <div className="p-5 bg-bg-card rounded-lg border border-border-glass">
+        <div className="p-5 nuru-glass-card rounded-[20px] border border-border-glass">
           <h3 className="text-[0.938rem] font-semibold text-white mb-4">
             Pesticide
           </h3>
@@ -159,7 +159,7 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
         </div>
 
         {/* Seed Section */}
-        <div className="p-5 bg-bg-card rounded-lg border border-border-glass">
+        <div className="p-5 nuru-glass-card rounded-[20px] border border-border-glass">
           <h3 className="text-[0.938rem] font-semibold text-white mb-4">
             Seeds
           </h3>

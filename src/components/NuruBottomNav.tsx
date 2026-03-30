@@ -57,7 +57,7 @@ const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
   return (
     <nav className="nuru-bottom-nav">
       <div
-        className="fixed bottom-6 left-4 right-4 z-50 bg-black rounded-full p-2 shadow-2xl shadow-black/20 max-w-[400px] mx-auto"
+        className="fixed bottom-6 left-4 right-4 z-50 bg-black/90 border border-white/10 rounded-full p-2 shadow-2xl shadow-black/30 max-w-[420px] mx-auto backdrop-blur-xl"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0)' }}
       >
         <div className="flex items-center justify-between">
@@ -67,7 +67,7 @@ const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
           <div className="flex-1 flex justify-center">
             <button
               onClick={onFabPress}
-              className="w-12 h-12 flex items-center justify-center rounded-full bg-accent shadow-[0_4px_20px_rgba(190,242,100,0.2)] border-none cursor-pointer active:scale-95 transition-transform"
+              className="w-12 h-12 flex items-center justify-center rounded-full bg-accent shadow-[0_6px_24px_rgba(190,242,100,0.35)] border-none cursor-pointer active:scale-95 transition-transform"
             >
               <Plus size={24} className="text-black" strokeWidth={2.5} />
             </button>

@@ -1,7 +1,9 @@
 import React, { useEffect, useState, lazy, Suspense } from 'react';
-import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useAuthStore } from './store/index';
 import { useUIStore } from './store/index';
+import { useAuditStore } from './store/index';
+import { schedule, dashboard } from './lib/supabase';
 import LoadingScreen from './screens/LoadingScreen';
 import OfflineBanner from './components/OfflineBanner';
 import NuruSideNav from './components/NuruSideNav';
@@ -58,17 +60,29 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
 
   const handleNavigate = (path: string) => {
+    const leavingAudit = location.pathname.startsWith('/audit') && !path.startsWith('/audit');
+    const hasUnsavedAudit = typeof window !== 'undefined' && sessionStorage.getItem('nuru_audit_dirty') === 'true';
+    if (leavingAudit && hasUnsavedAudit) {
+      const ok = window.confirm('You have unsaved audit changes. Leave this screen?');
+      if (!ok) return;
+    }
     navigate(path);
   };
 
   return (
-    <div className="flex min-h-screen bg-bg-primary">
+    <div className="flex min-h-screen nuru-screen">
       {/* Desktop Sidebar */}
       <NuruSideNav
         currentPath={location.pathname}
         onNavigate={handleNavigate}
         user={{ name: user?.fullName ?? 'User', role: user?.role ?? 'Agent' }}
         onLogout={async () => {
+          const leavingAudit = location.pathname.startsWith('/audit');
+          const hasUnsavedAudit = typeof window !== 'undefined' && sessionStorage.getItem('nuru_audit_dirty') === 'true';
+          if (leavingAudit && hasUnsavedAudit) {
+            const ok = window.confirm('You have unsaved audit changes. Sign out anyway?');
+            if (!ok) return;
+          }
           await signOut();
           navigate('/auth/login');
         }}
@@ -86,6 +100,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <NuruBottomNav
         currentPath={location.pathname}
         onNavigate={handleNavigate}
+        onFabPress={() => navigate('/audit/new')}
       />
     </div>
   );
@@ -164,7 +179,7 @@ const App: React.FC = () => {
             element={
               <RequireAuth>
                 <AppShell>
-                  <AuditWizard />
+                  <AuditWizardWrapper />
                 </AppShell>
               </RequireAuth>
             }
@@ -174,7 +189,7 @@ const App: React.FC = () => {
             element={
               <RequireAuth>
                 <AppShell>
-                  <AuditWizard />
+                  <AuditWizardWrapper />
                 </AppShell>
               </RequireAuth>
             }
@@ -184,7 +199,7 @@ const App: React.FC = () => {
             element={
               <RequireAuth>
                 <AppShell>
-                  <CalendarScreen />
+                  <CalendarWrapper />
                 </AppShell>
               </RequireAuth>
             }
@@ -243,11 +258,79 @@ const SignUpWrapper: React.FC = () => {
 // ─── Dashboard Wrapper ──────────────────────────────────────────────────────
 const DashboardWrapper: React.FC = () => {
   const user = useAuthStore((s) => s.user);
+  const pendingSync = useUIStore((s) => s.pendingSyncCount);
+  const addToast = useUIStore((s) => s.addToast);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [stats, setStats] = useState<{ totalAudits: number; submittedToday: number; pendingSync: number; verified: number }>();
+  const [audits, setAudits] = useState<Array<{ id: string; farmName: string; auditType: string; date: string; status: 'draft' | 'submitted' | 'verified' | 'synced' | 'failed' }>>([]);
+  const [prices, setPrices] = useState<Array<{ id: string; crop: string; region: string; pricePerKg: number; change: number }>>([]);
+  const [stressAlert, setStressAlert] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    setIsLoading(true);
+    Promise.all([
+      dashboard.getStats(user.id),
+      dashboard.getRecentAudits(user.id, 10),
+      dashboard.getCropPrices(undefined, 12),
+    ])
+      .then(([s, recent, market]) => {
+        const submittedToday = recent.filter((a) => {
+          const date = new Date(a.updated_at || a.created_at).toDateString();
+          return date === new Date().toDateString() && a.status === 'submitted';
+        }).length;
+        const verified = recent.filter((a) => a.status === 'approved').length;
+        setStats({
+          totalAudits: s.totalAudits,
+          submittedToday,
+          pendingSync,
+          verified,
+        });
+
+        const statusMap: Record<string, 'draft' | 'submitted' | 'verified' | 'synced' | 'failed'> = {
+          draft: 'draft',
+          in_progress: 'draft',
+          submitted: 'submitted',
+          approved: 'verified',
+          rejected: 'failed',
+        };
+
+        setAudits(recent.map((a) => ({
+          id: a.id,
+          farmName: `Farm ${a.farm_id.slice(0, 8)}`,
+          auditType: 'Farm Audit',
+          date: new Date(a.updated_at || a.created_at).toLocaleDateString('en-TZ', { month: 'short', day: 'numeric', year: 'numeric' }),
+          status: statusMap[a.status] ?? 'draft',
+        })));
+
+        setPrices(market.slice(0, 7).map((m) => ({
+          id: m.id,
+          crop: `Crop ${m.crop_id.slice(0, 6)}`,
+          region: m.region_id ? `Region ${m.region_id.slice(0, 5)}` : 'Region N/A',
+          pricePerKg: m.price_per_kg,
+          change: 0,
+        })));
+      })
+      .catch(() => {
+        setStressAlert('Live dashboard data is currently unavailable. Showing fallback content.');
+        addToast({ type: 'warning', message: 'Failed to load live dashboard data.' });
+      })
+      .finally(() => setIsLoading(false));
+  }, [user?.id, addToast]);
+
+  useEffect(() => {
+    setStats((prev) => (prev ? { ...prev, pendingSync } : prev));
+  }, [pendingSync]);
 
   return (
     <DashboardHome
       userName={user?.fullName}
+      isLoading={isLoading}
+      stats={stats}
+      audits={audits}
+      prices={prices}
+      stressAlert={stressAlert}
       onAuditClick={(id) => navigate(`/audit/${id}`)}
       onViewAllAudits={() => navigate('/audits')}
     />
@@ -257,11 +340,147 @@ const DashboardWrapper: React.FC = () => {
 // ─── Audit Wrappers ─────────────────────────────────────────────────────────
 const AuditListWrapper: React.FC = () => {
   const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
+  const audits = useAuditStore((s) => s.audits);
+  const loadAudits = useAuditStore((s) => s.loadAudits);
+  const isLoading = useAuditStore((s) => s.isLoading);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    loadAudits(user.id).catch(() => {
+      // Keep UI usable even when backend fetch fails.
+    });
+  }, [user?.id, loadAudits]);
+
+  const mappedAudits = audits.map((a) => {
+    const location =
+      typeof a.audit_location === 'object' && a.audit_location
+        ? 'GPS Tagged'
+        : 'Location pending';
+
+    const statusMap: Record<string, 'draft' | 'submitted' | 'verified' | 'synced' | 'failed'> = {
+      draft: 'draft',
+      in_progress: 'draft',
+      submitted: 'submitted',
+      approved: 'verified',
+      rejected: 'failed',
+    };
+
+    return {
+      id: a.id,
+      farmName: `Farm ${a.farm_id.slice(0, 8)}`,
+      date: new Date(a.updated_at || a.created_at).toLocaleDateString('en-TZ', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      }),
+      status: statusMap[a.status] ?? 'draft',
+      location,
+    };
+  });
+
   return (
     <AuditList
-      audits={[]}
+      audits={mappedAudits}
+      isLoading={isLoading}
       onAuditClick={(id) => navigate(`/audit/${id}`)}
       onNewAudit={() => navigate('/audit/new')}
+    />
+  );
+};
+
+const AuditWizardWrapper: React.FC = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const addToast = useUIStore((s) => s.addToast);
+
+  return (
+    <AuditWizard
+      auditId={id}
+      onComplete={() => {
+        addToast({ type: 'success', message: 'Audit saved successfully.' });
+        navigate('/audits');
+      }}
+    />
+  );
+};
+
+const CalendarWrapper: React.FC = () => {
+  const user = useAuthStore((s) => s.user);
+  const addToast = useUIStore((s) => s.addToast);
+  const [events, setEvents] = useState<Array<{
+    id: string;
+    title: string;
+    type: 'audit' | 'training' | 'meeting' | 'deadline';
+    date: string;
+    time: string;
+    location: string;
+    notes?: string;
+  }>>([]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    schedule
+      .getEvents(user.id)
+      .then((rows) => {
+        const mapped = rows.map((r) => {
+          const start = new Date(r.start_time || r.created_at);
+          const typeMap: Record<string, 'audit' | 'training' | 'meeting' | 'deadline'> = {
+            audit: 'audit',
+            training: 'training',
+            meeting: 'meeting',
+            deadline: 'deadline',
+          };
+          return {
+            id: r.id,
+            title: r.title,
+            type: typeMap[r.event_type ?? ''] ?? 'meeting',
+            date: start.toISOString().slice(0, 10),
+            time: start.toTimeString().slice(0, 5),
+            location: r.description ?? '',
+            notes: r.description ?? '',
+          };
+        });
+        setEvents(mapped);
+      })
+      .catch(() => {
+        addToast({ type: 'warning', message: 'Could not load schedule from server.' });
+      });
+  }, [user?.id, addToast]);
+
+  return (
+    <CalendarScreen
+      events={events}
+      onAddEvent={async (event) => {
+        try {
+          const isoStart = new Date(`${event.date}T${event.time}:00`).toISOString();
+          const created = await schedule.createEvent({
+            title: event.title,
+            description: event.notes || event.location || null,
+            start_time: isoStart,
+            end_time: null,
+            assigned_to: user?.id ?? null,
+            event_type: event.type,
+            status: 'pending',
+          });
+
+          setEvents((prev) => [
+            ...prev,
+            {
+              id: created.id,
+              title: event.title,
+              type: event.type,
+              date: event.date,
+              time: event.time,
+              location: event.location,
+              notes: event.notes,
+            },
+          ]);
+          addToast({ type: 'success', message: 'Event created.' });
+        } catch {
+          addToast({ type: 'error', message: 'Failed to create event.' });
+        }
+      }}
     />
   );
 };
@@ -289,12 +508,12 @@ const SettingsPlaceholder: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="p-6 max-w-[600px] mx-auto">
-      <h1 className="text-2xl font-bold text-text-primary font-heading mb-6">
+    <div className="p-6 max-w-[760px] mx-auto nuru-screen">
+      <h1 className="text-3xl font-light text-text-primary font-heading tracking-tight mb-6">
         Settings
       </h1>
 
-      <div className="bg-bg-card rounded-lg border border-[rgba(255,255,255,0.06)] p-6 mb-4">
+      <div className="nuru-glass-card rounded-[24px] p-6 mb-4">
         <div className="mb-4">
           <div className="text-xs text-text-tertiary mb-1">Name</div>
           <div className="text-base text-text-primary">{user?.fullName || 'N/A'}</div>
@@ -314,7 +533,7 @@ const SettingsPlaceholder: React.FC = () => {
           await signOut();
           navigate('/auth/login');
         }}
-        className="w-full py-3.5 px-6 bg-[rgba(239,68,68,0.1)] text-[#EF4444] border border-[rgba(239,68,68,0.2)] rounded-xl text-base font-semibold cursor-pointer font-base"
+        className="w-full py-3.5 px-6 bg-[rgba(239,68,68,0.1)] text-[#EF4444] border border-[rgba(239,68,68,0.2)] rounded-full text-base font-semibold cursor-pointer font-base"
       >
         Sign Out
       </button>

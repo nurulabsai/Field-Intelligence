@@ -29,7 +29,7 @@ const STATUS_CLASSES: Record<AuditStatus, { label: string; className: string }> 
 const AuditFeed: React.FC<AuditFeedProps> = ({ items, onItemClick, onViewAll }) => {
   if (items.length === 0) {
     return (
-      <div className="bg-bg-glass backdrop-blur-[var(--glass-blur)] border border-border-glass rounded-xl py-12 px-6 text-center">
+      <div className="nuru-glass-card border border-border-glass rounded-[24px] py-12 px-6 text-center">
         <FileText size={48} className="text-text-tertiary mx-auto mb-4" />
         <p className="text-text-secondary text-base font-medium">No audits yet</p>
         <p className="text-text-tertiary text-sm mt-1">
@@ -40,7 +40,7 @@ const AuditFeed: React.FC<AuditFeedProps> = ({ items, onItemClick, onViewAll }) 
   }
 
   return (
-    <div className="bg-bg-glass backdrop-blur-[var(--glass-blur)] border border-border-glass rounded-xl overflow-hidden">
+    <div className="nuru-glass-card border border-border-glass rounded-[24px] overflow-hidden">
       {/* Header */}
       <div className="flex justify-between items-center px-6 py-5 border-b border-border-glass">
         <h3 className="text-base font-semibold text-white">Recent Audits</h3>

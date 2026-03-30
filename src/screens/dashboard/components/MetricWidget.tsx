@@ -31,7 +31,7 @@ const MetricWidget: React.FC<MetricWidgetProps> = ({
 
   return (
     <div
-      className="bg-bg-glass backdrop-blur-[var(--glass-blur)] border border-border-glass rounded-xl p-6 flex flex-col gap-4 transition-all duration-[var(--transition-slow)] cursor-default hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)]"
+      className="nuru-glass-card border border-border-glass rounded-[24px] p-6 flex flex-col gap-4 transition-all duration-[var(--transition-slow)] cursor-default hover:-translate-y-0.5 hover:shadow-[0_18px_38px_-18px_rgba(190,242,100,0.4)]"
     >
       {/* Icon */}
       <div

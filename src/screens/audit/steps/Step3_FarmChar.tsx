@@ -96,7 +96,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
     });
   }, [data, onChange]);
 
-  const inputBaseClasses = "w-full py-3 px-4 bg-bg-input rounded-xl text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150";
+  const inputBaseClasses = "w-full py-3 px-4 nuru-glass-card rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150";
 
   const renderDropdown = (
     key: string,
@@ -111,7 +111,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
 
     return (
       <div key={key}>
-        <label className="block text-sm font-medium text-text-secondary mb-1.5">
+        <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
           {label}
           {required && <span className="text-text-accent ml-1">*</span>}
         </label>
@@ -131,7 +131,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
             <ChevronDown size={18} className="text-text-tertiary transition-transform duration-150" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }} />
           </button>
           {isOpen && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-bg-tertiary border border-border-dark rounded-xl z-50 overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
+            <div className="absolute top-full left-0 right-0 mt-1 nuru-glass-card border border-border-dark rounded-[18px] z-50 overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
               {options.map(opt => (
                 <button
                   key={opt.value}
@@ -158,7 +158,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-white mb-1">
+      <h2 className="text-2xl font-light font-heading tracking-tight text-white mb-1">
         Farm Characteristics
       </h2>
       <p className="text-sm text-text-tertiary mb-7">
@@ -184,10 +184,10 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
         </div>
       )}
 
-      <div className="flex flex-col gap-5">
+      <div className="nuru-glass-card rounded-[28px] p-6 flex flex-col gap-5">
         {/* Total Area */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-1.5">
+          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
             Total Area (ha) <span className="text-text-accent">*</span>
           </label>
           <input
@@ -212,7 +212,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
 
         {/* Cultivated Area */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-1.5">
+          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
             Cultivated Area (ha) <span className="text-text-accent">*</span>
           </label>
           <input

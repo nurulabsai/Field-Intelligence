@@ -44,6 +44,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [roleOpen, setRoleOpen] = useState(false);
 
   const handleChange = useCallback((field: keyof SignUpFormData, value: string) => {
@@ -69,11 +70,13 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+    setSubmitError(null);
     setLoading(true);
     try {
       await onSignUp?.(form);
-    } catch {
-      // handle error
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unable to create account. Please try again.';
+      setSubmitError(msg);
     } finally {
       setLoading(false);
     }
@@ -82,12 +85,12 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
   const strength = getPasswordStrength(form.password);
 
   const inputClasses = (hasError: boolean) =>
-    `w-full py-3 px-4 pl-11 bg-bg-input border rounded-xl text-white text-[0.938rem] font-[inherit] outline-none transition-colors duration-150 ${hasError ? 'border-error' : 'border-border'}`;
+    `w-full py-3 px-4 pl-11 nuru-glass-card border rounded-full text-white text-[0.938rem] font-[inherit] outline-none transition-colors duration-150 ${hasError ? 'border-error' : 'border-border'}`;
 
   const formContent = (
     <form onSubmit={handleSubmit} className="w-full max-w-[420px]">
       <div className="mb-8">
-        <h2 className="text-[1.75rem] font-bold text-white mb-2">
+        <h2 className="text-[2rem] font-light text-white mb-2 font-heading tracking-tight">
           Create Account
         </h2>
         <p className="text-text-tertiary text-[0.938rem]">
@@ -200,7 +203,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
             <ChevronDown size={18} className="absolute right-3.5 text-text-tertiary" />
           </button>
           {roleOpen && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-bg-tertiary border border-white/10 rounded-xl z-50 overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
+            <div className="absolute top-full left-0 right-0 mt-1 nuru-glass-card border border-white/10 rounded-[20px] z-50 overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
               {ROLES.map(role => (
                 <button
                   key={role}
@@ -234,10 +237,15 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
       </div>
 
       {/* Submit */}
+      {submitError && (
+        <div className="mb-3 rounded-[14px] border border-error/30 bg-error/10 px-3.5 py-2.5 text-sm text-error-light">
+          {submitError}
+        </div>
+      )}
       <button
         type="submit"
         disabled={loading}
-        className={`w-full py-3.5 border-none rounded-xl text-base font-semibold font-[inherit] transition-all duration-150 flex items-center justify-center gap-2 ${loading ? 'bg-accent/60 text-black cursor-not-allowed' : 'bg-accent text-black cursor-pointer'}`}
+        className={`w-full py-3.5 border-none rounded-full text-base font-semibold tracking-[0.06em] font-[inherit] transition-all duration-150 flex items-center justify-center gap-2 ${loading ? 'bg-accent/60 text-black cursor-not-allowed' : 'bg-accent text-black cursor-pointer shadow-[0_10px_28px_-12px_rgba(190,242,100,0.5)]'}`}
       >
         {loading ? (
           <>
@@ -269,10 +277,10 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
   );
 
   return (
-    <div className="min-h-screen flex bg-bg-primary font-base">
+    <div className="min-h-screen flex nuru-screen font-base">
       {/* Left Panel - Desktop Only */}
       <div
-        className="nuru-signup-left-panel basis-[45%] shrink-0 grow-0 bg-[linear-gradient(135deg,#111622_0%,#0B0F19_50%,rgba(190,242,100,0.08)_100%)] flex flex-col items-center justify-center p-12 relative overflow-hidden"
+        className="nuru-signup-left-panel basis-[45%] shrink-0 grow-0 bg-[linear-gradient(135deg,#111622_0%,#0B0F19_50%,rgba(190,242,100,0.08)_100%)] flex flex-col items-center justify-center p-12 relative overflow-hidden border-r border-border-glass"
       >
         <div className="absolute w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(190,242,100,0.12)_0%,transparent_70%)] top-[20%] -left-[10%]" />
         <div className="relative z-[1] text-center">
@@ -283,7 +291,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
           <p className="text-text-secondary text-lg leading-relaxed max-w-[340px]">
             Smarter Field Audits.<br />Powered by AI.
           </p>
-          <div className="mt-12 p-6 bg-bg-glass backdrop-blur-[var(--glass-blur)] rounded-2xl border border-border-glass max-w-[300px]">
+          <div className="mt-12 p-6 nuru-glass-card rounded-2xl border border-border-glass max-w-[300px]">
             <p className="text-text-secondary text-sm italic leading-relaxed">
               "NuruOS transformed how we collect field data across Tanzania. The AI insights save us hours every week."
             </p>

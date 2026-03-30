@@ -31,21 +31,21 @@ const Step1_Identity: React.FC<Step1Props> = ({ data, onChange, errors }) => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-white mb-1">
+      <h2 className="text-2xl font-light font-heading tracking-tight text-white mb-1">
         Farmer Identity
       </h2>
       <p className="text-sm text-text-tertiary mb-7">
         Capture the farmer and farm identification details
       </p>
 
-      <div className="flex flex-col gap-5">
+      <div className="nuru-glass-card rounded-[28px] p-6 flex flex-col gap-5">
         {FIELDS.map(field => {
           const value = (data[field.key] as string) || '';
           const error = errors[field.key];
 
           return (
             <div key={field.key}>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">
+              <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
                 {field.label}
                 {field.required && <span className="text-text-accent ml-1">*</span>}
               </label>
@@ -64,7 +64,7 @@ const Step1_Identity: React.FC<Step1Props> = ({ data, onChange, errors }) => {
                   onChange={e => handleChange(field.key, e.target.value)}
                   placeholder={field.placeholder}
                   className={cn(
-                    "w-full py-3 pr-4 bg-bg-input rounded-xl text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 border",
+                    "w-full py-3 pr-4 nuru-glass-card rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 border",
                     error ? 'border-error' : 'border-border',
                     'focus:border-accent',
                   )}

@@ -25,9 +25,9 @@ const NuruCard: React.FC<NuruCardProps> = ({
   return (
     <div
       className={cn(
-        'bg-bg-card border border-border-glass rounded-2xl backdrop-blur-[var(--glass-blur)] transition-all duration-[var(--transition-slow)] shadow-sm',
+        'nuru-glass-card rounded-2xl transition-all duration-[var(--transition-slow)]',
         PADDING_CLASSES[padding],
-        hoverable && 'hover:border-border-dark hover:-translate-y-0.5 hover:shadow-lg',
+        hoverable && 'hover:border-border-dark hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-20px_rgba(190,242,100,0.35)]',
         onClick && 'cursor-pointer',
         className,
       )}

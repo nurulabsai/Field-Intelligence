@@ -35,7 +35,7 @@ function formatTZS(amount: number): string {
   return `TZS ${amount.toLocaleString('en-TZ')}`;
 }
 
-const inputClasses = "w-full py-3 px-4 bg-bg-input border border-border rounded-xl text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 focus:border-accent";
+const inputClasses = "w-full py-3 px-4 nuru-glass-card border border-border rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 focus:border-accent";
 
 const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
   const [gpsLoading, setGpsLoading] = useState(false);
@@ -128,7 +128,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-white mb-1">
+      <h2 className="text-2xl font-light font-heading tracking-tight text-white mb-1">
         Yield & Constraints
       </h2>
       <p className="text-sm text-text-tertiary mb-7">
@@ -137,7 +137,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
 
       <div className="flex flex-col gap-6">
         {/* Yield Inputs */}
-        <div className="p-5 bg-bg-card rounded-lg border border-border-glass">
+        <div className="p-5 nuru-glass-card rounded-[24px] border border-border-glass">
           <h3 className="text-[0.938rem] font-semibold text-white mb-4">
             Yield Data
           </h3>
@@ -193,7 +193,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
         </div>
 
         {/* Market Channel */}
-        <div className="p-5 bg-bg-card rounded-lg border border-border-glass">
+        <div className="p-5 nuru-glass-card rounded-[24px] border border-border-glass">
           <h3 className="text-[0.938rem] font-semibold text-white mb-4">
             Market Information
           </h3>
@@ -208,7 +208,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
                   type="button"
                   onClick={() => handleChange('market_channel', ch.value)}
                   className={cn(
-                    "py-2.5 px-5 rounded-[10px] text-sm font-medium cursor-pointer font-inherit transition-all duration-150 border-2",
+                    "py-2.5 px-5 rounded-full text-sm font-medium cursor-pointer font-inherit transition-all duration-150 border-2",
                     selected
                       ? "border-accent bg-accent/[0.12] text-accent"
                       : "border-border bg-transparent text-text-secondary"
@@ -235,7 +235,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-text-secondary mb-1.5">Gross Revenue</label>
-              <div className="py-3 px-4 bg-success/[0.08] border border-success/20 rounded-xl text-[0.938rem] font-bold text-success">
+              <div className="py-3 px-4 bg-success/[0.08] border border-success/20 rounded-[16px] text-[0.938rem] font-bold text-success">
                 {formatTZS(grossRevenue)}
               </div>
             </div>
@@ -243,7 +243,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
         </div>
 
         {/* Constraint Severity Grid */}
-        <div className="p-5 bg-bg-card rounded-lg border border-border-glass">
+        <div className="p-5 nuru-glass-card rounded-[24px] border border-border-glass">
           <h3 className="text-[0.938rem] font-semibold text-white mb-4">
             Constraint Severity
           </h3>
@@ -262,7 +262,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
                           key={level.value}
                           type="button"
                           onClick={() => handleChange(row.key, level.value)}
-                          className="py-2 px-3.5 rounded-sm text-xs font-semibold cursor-pointer font-inherit transition-all duration-150"
+                          className="py-2 px-3.5 rounded-full text-xs font-semibold cursor-pointer font-inherit transition-all duration-150"
                           style={{
                             border: `2px solid ${isSelected ? level.color : 'transparent'}`,
                             backgroundColor: isSelected ? `${level.color}20` : 'rgba(255,255,255,0.04)',
@@ -283,7 +283,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
         </div>
 
         {/* Photo Upload */}
-        <div className="p-5 bg-bg-card rounded-lg border border-border-glass">
+        <div className="p-5 nuru-glass-card rounded-[24px] border border-border-glass">
           <h3 className="text-[0.938rem] font-semibold text-white mb-1">
             Photos
           </h3>
@@ -318,7 +318,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center justify-center gap-2 w-full py-3.5 bg-border-light border border-dashed border-white/[0.15] rounded-xl text-text-secondary text-sm font-medium cursor-pointer font-inherit"
+              className="flex items-center justify-center gap-2 w-full py-3.5 bg-border-light border border-dashed border-white/[0.15] rounded-full text-text-secondary text-sm font-medium cursor-pointer font-inherit"
             >
               <Camera size={16} />
               Upload Photo
@@ -341,7 +341,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
             onClick={captureGPS}
             disabled={gpsLoading}
             className={cn(
-              "flex items-center gap-2 py-3 px-5 rounded-xl text-sm font-semibold font-inherit flex-1 justify-center border",
+              "flex items-center gap-2 py-3 px-5 rounded-full text-sm font-semibold tracking-[0.05em] font-inherit flex-1 justify-center border",
               gpsLoading && "cursor-wait",
               !gpsLoading && "cursor-pointer",
               yieldLat
@@ -370,7 +370,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
               type="button"
               onClick={toggleVoice}
               className={cn(
-                "flex items-center gap-2 py-3 px-5 rounded-xl text-sm font-medium cursor-pointer font-inherit border",
+                "flex items-center gap-2 py-3 px-5 rounded-full text-sm font-medium cursor-pointer font-inherit border",
                 recording
                   ? "bg-error/[0.15] border-error/30 text-error"
                   : "bg-border-glass border-border text-text-secondary"

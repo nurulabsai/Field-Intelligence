@@ -51,7 +51,7 @@ function createEmptyCrop(): CropEntry {
   };
 }
 
-const inputClasses = "w-full py-2.5 px-3.5 bg-bg-input border border-border rounded-[10px] text-white text-sm font-inherit outline-none transition-colors duration-150 focus:border-accent";
+const inputClasses = "w-full py-2.5 px-3.5 nuru-glass-card border border-border rounded-[14px] text-white text-sm font-inherit outline-none transition-colors duration-150 focus:border-accent";
 
 const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
   const crops: CropEntry[] = useMemo(() => {
@@ -80,7 +80,7 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-white mb-1">
+      <h2 className="text-2xl font-light font-heading tracking-tight text-white mb-1">
         Crops
       </h2>
       <p className="text-sm text-text-tertiary mb-6">
@@ -95,12 +95,12 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
         {crops.map((crop, index) => (
           <div
             key={crop.id}
-            className="bg-bg-card border border-border-glass rounded-lg p-5"
+            className="nuru-glass-card border border-border-glass rounded-[24px] p-5"
           >
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-sm bg-success/10 flex items-center justify-center text-success">
+                <div className="w-8 h-8 rounded-[10px] bg-success/10 flex items-center justify-center text-success">
                   <Wheat size={16} />
                 </div>
                 <span className="text-[0.938rem] font-semibold text-white">Crop {index + 1}</span>
@@ -109,7 +109,7 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
                 <button
                   type="button"
                   onClick={() => removeCrop(crop.id)}
-                  className="flex items-center gap-1.5 py-1.5 px-3 bg-error/10 border border-error/20 rounded-sm text-error text-xs font-medium cursor-pointer font-inherit"
+                  className="flex items-center gap-1.5 py-1.5 px-3 bg-error/10 border border-error/20 rounded-full text-error text-xs font-medium cursor-pointer font-inherit"
                 >
                   <Trash2 size={13} />
                   Remove
@@ -132,7 +132,7 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
                   <ChevronDown size={16} className="text-text-tertiary" />
                 </button>
                 {openDropdowns[crop.id] && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-bg-input border border-border rounded-[10px] z-50 max-h-[200px] overflow-y-auto shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
+                  <div className="absolute top-full left-0 right-0 mt-1 nuru-glass-card border border-border rounded-[14px] z-50 max-h-[200px] overflow-y-auto shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
                     {CROP_OPTIONS.map(opt => (
                       <button
                         key={opt.value}
