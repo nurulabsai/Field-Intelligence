@@ -71,7 +71,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
           <ChevronLeft size={18} strokeWidth={2.5} className="ml-[-1px]" />
         </button>
 
-        <h1 className="text-[34px] font-medium text-white font-heading tracking-tight mt-8 mb-2 leading-tight">
+        <h1 className="text-[36px] font-medium text-white font-heading tracking-tight mt-8 mb-2 leading-tight">
           Create an Account
         </h1>
         <p className="text-white/45 text-[15px] font-medium pr-10">
@@ -200,7 +200,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-[58px] rounded-[24px] bg-accent text-[#0B0F19] text-[13px] font-bold tracking-[0.1em] uppercase flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_30px_rgba(190,242,100,0.2)] transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 border-none mb-10"
+              className="w-full h-[58px] rounded-full bg-accent text-[#0B0F19] text-[13px] font-bold tracking-[0.1em] uppercase flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_30px_rgba(190,242,100,0.2)] transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 border-none mb-10"
             >
               {loading ? 'Creating...' : 'Register'}
               <ArrowRight size={18} strokeWidth={2.5} className="ml-0.5" />

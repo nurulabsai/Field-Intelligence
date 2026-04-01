@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ArrowRight, Mail, Lock, BarChart2 } from 'lucide-react';
+import { ArrowRight, Mail, Lock } from 'lucide-react';
+import NuruLogo from '../../components/NuruLogo';
 
 interface LoginScreenProps {
   onLogin?: (data: { email: string; password: string; rememberMe: boolean }) => Promise<void>;
@@ -37,18 +38,20 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
   };
 
   return (
-    <div className="min-h-screen bg-[#070A0F] flex flex-col font-base items-center overflow-y-auto w-full px-6 pt-16 pb-12 relative text-white">
+    <div className="min-h-screen bg-[#0B0F19] flex flex-col font-base items-center overflow-y-auto w-full px-6 pt-16 pb-12 relative text-white">
+      
+      {/* Ambient Gradient Orbs — Stitch spec */}
+      <div className="absolute top-[-40px] right-[-60px] w-[280px] h-[280px] bg-[#67E8F9] rounded-full blur-[140px] opacity-[0.06] pointer-events-none" />
+      <div className="absolute bottom-[-40px] left-[-60px] w-[260px] h-[260px] bg-[#BEF264] rounded-full blur-[140px] opacity-[0.05] pointer-events-none" />
       
       <div className="w-full max-w-[360px] flex flex-col relative z-10 w-full mb-8">
         {/* App Logo Icon */}
         <div className="w-[52px] h-[52px] rounded-[16px] bg-[#121623] border border-white/5 flex items-center justify-center mb-6 shadow-xl">
-          <div className="text-accent">
-            <BarChart2 size={24} strokeWidth={2.5} />
-          </div>
+          <NuruLogo size={24} />
         </div>
 
         {/* Welcome Headers */}
-        <h1 className="text-[34px] font-normal text-white font-heading tracking-tight mb-2 leading-tight">
+        <h1 className="text-[40px] font-normal text-white font-heading tracking-tight mb-2 leading-tight">
           Welcome Back
         </h1>
         <p className="text-white/45 text-[15px] pr-8 mb-8">
@@ -73,7 +76,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
         </div>
 
         {/* Main Login Card */}
-        <form onSubmit={handleSubmit} className="bg-[#121623] rounded-[32px] border border-white/[0.04] p-6 pt-8 pb-10 w-full flex flex-col shadow-2xl">
+        <form onSubmit={handleSubmit} className="bg-[#0F1420]/70 backdrop-blur-2xl rounded-[32px] border border-white/[0.06] p-6 pt-8 pb-10 w-full flex flex-col shadow-2xl">
           
           {/* Email Box */}
           <div className="mb-6 w-full">
@@ -86,7 +89,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="you@nurulabs.io"
-                className="w-full h-[54px] bg-[#0B0F19] border border-white/[0.04] rounded-[16px] pl-5 pr-12 text-white text-[15px] outline-none transition-colors focus:border-white/20 placeholder:text-white/20 font-light"
+                className="w-full h-[54px] bg-[#0B0F19] border border-white/[0.04] rounded-[16px] pl-5 pr-12 text-white text-[15px] outline-none transition-all focus:border-[#67E8F9]/50 focus:shadow-[0_0_12px_rgba(103,232,249,0.1)] placeholder:text-white/20 font-light"
               />
               <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none">
                 <Mail size={18} />
@@ -105,7 +108,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full h-[54px] bg-[#0B0F19] border border-white/[0.04] rounded-[16px] pl-5 pr-12 text-white text-[17px] outline-none transition-colors focus:border-white/20 placeholder:text-white/20 tracking-[0.2em]"
+                className="w-full h-[54px] bg-[#0B0F19] border border-white/[0.04] rounded-[16px] pl-5 pr-12 text-white text-[17px] outline-none transition-all focus:border-[#67E8F9]/50 focus:shadow-[0_0_12px_rgba(103,232,249,0.1)] placeholder:text-white/20 tracking-[0.2em]"
               />
               <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none">
                 <Lock size={18} />
@@ -149,17 +152,21 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
             <div className="flex-1 h-px bg-gradient-to-l from-transparent to-[#181F30]" />
           </div>
 
-          {/* Social Buttons */}
+          {/* Social Buttons — Stitch spec */}
           <div className="grid grid-cols-2 gap-4 w-full">
-            <button type="button" className="flex items-center justify-center gap-2.5 h-[50px] rounded-full border border-white/[0.04] bg-[#0B0F19] hover:bg-white/5 transition-colors cursor-pointer disabled:opacity-50">
-              <div className="w-4 h-4 bg-white rounded-sm flex items-center justify-center">
-                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-              </div>
-              <span className="text-white text-[13px] font-semibold pr-1">Google</span>
+            <button type="button" className="flex items-center justify-center gap-2.5 h-[50px] rounded-full bg-white/[0.03] backdrop-blur-xl border border-white/5 hover:bg-white/[0.08] transition-colors cursor-pointer">
+              <img 
+                alt="Google" 
+                className="w-5 h-5" 
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDh98-cJhfuYqtEkV62K3Uzw6oqB6hVeliRpkKayAW_N8rscM9hQ2BQX3pQSBhL5PoaiZrYD1rlaa39ULz8hTaVA6p6QhiJQ4tEVgdvCVWZvDHsjP-e1jvtwPV06KCfFXgN-HDjaSY3oVUCNgGmI_x-GbVRdm6jf9O0dBUe0oRBAG0ZHq6t429XyWY0K242ZKh5tYDLzgQ-Vb45OjD7buAyBbcOpE8e528lxzFJPJIPOW1dGKDJBob-T6vuvsI9DgwxR10n66glxEJ" 
+              />
+              <span className="text-white text-[13px] font-bold">Google</span>
             </button>
-            <button type="button" className="flex items-center justify-center gap-2.5 h-[50px] rounded-full border border-white/[0.04] bg-[#0B0F19] hover:bg-white/5 transition-colors cursor-pointer disabled:opacity-50">
-              <span className="font-bold text-white tracking-widest text-[14px]">iOS</span>
-              <span className="text-white text-[13px] font-semibold pr-1">Apple ID</span>
+            <button type="button" className="flex items-center justify-center gap-2.5 h-[50px] rounded-full bg-white/[0.03] backdrop-blur-xl border border-white/5 hover:bg-white/[0.08] transition-colors cursor-pointer">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+              </svg>
+              <span className="text-white text-[13px] font-bold">Apple ID</span>
             </button>
           </div>
 

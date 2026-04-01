@@ -19,7 +19,7 @@ const navItems: NavItem[] = [
   { id: 'calendar', path: '/schedule', icon: Calendar },
   { id: 'add', path: '/audit/new', icon: Plus },
   { id: 'analytics', path: '/audits', icon: BarChart2 },
-  { id: 'camera', path: '/camera', icon: Camera },
+  { id: 'camera', path: '/scanner', icon: Camera },
 ];
 
 const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
@@ -29,7 +29,7 @@ const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
   return (
     <nav className="nuru-bottom-nav">
       <div
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#070A12] rounded-full p-2.5 shadow-2xl w-[90%] max-w-[400px]"
+        className="fixed bottom-8 left-6 right-6 z-50 bg-black rounded-full p-2 shadow-2xl"
         style={{ paddingBottom: 'calc(10px + env(safe-area-inset-bottom, 0))' }}
       >
         <div className="flex items-center justify-between px-2">

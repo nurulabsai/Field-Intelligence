@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import NuruLogo from '../components/NuruLogo';
 
 interface LoadingScreenProps {
   onComplete: () => void;
@@ -35,10 +36,10 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
   }, []);
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center z-[9999] bg-[#0E111A] font-base nuru-screen overflow-hidden">
+    <div className="fixed inset-0 flex flex-col items-center justify-center z-[9999] bg-[#0B0F19] font-base nuru-screen overflow-hidden">
       
       {/* Absolute dark background to override any theme bleed */}
-      <div className="absolute inset-0 bg-[#0B0E16]" />
+      <div className="absolute inset-0 bg-[#0B0F19]" />
 
       {/* Main Content Wrapper */}
       <div
@@ -49,22 +50,19 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
         }}
       >
         
-        {/* Logo Container with precise diffuse glow */}
+        {/* Logo Container with Stitch-spec diffuse glow */}
         <div className="relative mb-[120px]">
-          {/* Inner tight aura glow */}
-          <div className="absolute inset-0 bg-accent rounded-full blur-[45px] opacity-[0.25] transform scale-125" />
+          {/* Outer diffuse glow */}
+          <div className="absolute inset-0 bg-accent rounded-full blur-[45px] opacity-[0.25] transform scale-[2.5]" />
           
-          {/* The Logo Circle */}
-          <div className="relative w-[140px] h-[140px] rounded-full bg-[#121623] border border-white flex items-center justify-center shadow-lg">
-            {/* Safe fallback since we don't have the actual logo SVG asset exported */}
-            <span className="text-white text-[64px] font-black tracking-tighter">
-              N
-            </span>
+          {/* The Logo Circle — matching Stitch: border lime/30, neon-glow-diffused */}
+          <div className="relative w-[124px] h-[124px] rounded-full bg-[#0B0F19] border border-[#BEF264]/30 flex items-center justify-center shadow-[0_0_40px_rgba(190,242,100,0.15)]">
+            <NuruLogo size={68} />
           </div>
         </div>
 
         {/* Loading Text */}
-        <p className="text-white font-light text-[19px] tracking-wide mb-5 text-center">
+        <p className="text-white font-light text-[19px] tracking-wide mb-5 text-center font-heading">
           Initializing Intelligence...
         </p>
 
