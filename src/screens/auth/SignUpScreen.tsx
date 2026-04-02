@@ -80,7 +80,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
       </div>
 
       {/* Main Form Card */}
-      <div className="bg-[#121623] rounded-t-[36px] flex-1 border-t border-white/[0.04] p-6 pt-8 pb-10 flex flex-col items-center">
+      <div className="bg-[#121623]/60 backdrop-blur-xl rounded-t-[36px] flex-1 border-t border-white/[0.04] p-6 pt-8 pb-10 flex flex-col items-center">
         
         {/* Animated Segmented Controller */}
         <div className="bg-[#070A0F] rounded-full flex items-center p-1.5 w-full max-w-[340px] mb-10 shadow-inner">

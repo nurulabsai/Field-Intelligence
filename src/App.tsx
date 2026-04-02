@@ -22,6 +22,7 @@ const CalendarScreen = lazy(() => import('./screens/schedule/CalendarScreen'));
 const CameraScanner = lazy(() => import('./screens/audit/CameraScanner'));
 const TypeSelectionScreen = lazy(() => import('./screens/audit/TypeSelectionScreen'));
 const BusinessWizard = lazy(() => import('./screens/audit/BusinessWizard'));
+const AuditErrorState = lazy(() => import('./screens/audit/AuditErrorState'));
 
 // ─── Auth Guard ──────────────────────────────────────────────────────────────
 const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -212,6 +213,16 @@ const App: React.FC = () => {
               <RequireAuth>
                 <AppShell>
                   <BusinessWizard />
+                </AppShell>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/audit/error"
+            element={
+              <RequireAuth>
+                <AppShell>
+                  <AuditErrorState />
                 </AppShell>
               </RequireAuth>
             }

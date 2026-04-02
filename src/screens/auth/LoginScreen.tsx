@@ -51,7 +51,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
           </div>
 
           {/* Welcome Headers — Stitch spec */}
-          <h1 className="text-4xl font-light tracking-tight font-heading text-white mb-2">
+          <h1 className="text-[40px] font-light tracking-tight font-heading text-white mb-2">
             Welcome Back
           </h1>
           <p className="text-base text-text-tertiary font-base">
