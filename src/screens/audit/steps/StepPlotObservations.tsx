@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, useRef } from 'react';
 import {
-  Bug, Leaf, Droplets, Sun, Camera, Mic, MicOff,
+  Bug, Leaf, Sun, Camera, Mic, MicOff,
   ChevronLeft, ChevronRight, X, Check, AlertCircle,
 } from 'lucide-react';
 import { cn } from '../../../design-system';

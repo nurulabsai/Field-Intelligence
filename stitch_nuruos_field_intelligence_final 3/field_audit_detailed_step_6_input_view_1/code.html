@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NuruOS Step 6 - Floating Pill Navigation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        neonLime: "#BEF264",
+                        neonCyan: "#67E8F9",
+                        deepNavy: "#0B0F19",
+                    },
+                    fontFamily: {
+                        sora: ["Sora", "sans-serif"],
+                        manrope: ["Manrope", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .neon-glow-lime {
+                box-shadow: 0 4px 20px rgba(190, 242, 100, 0.15);
+            }
+            .neon-glow-cyan {
+                box-shadow: 0 4px 20px rgba(103, 232, 249, 0.1);
+            }
+            .glassmorphism {
+                background: rgba(255, 255, 255, 0.03);
+                backdrop-filter: blur(24px);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            }
+            .progress-ring {
+                transform: rotate(-90deg);
+            }
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 0px;
+            }
+        }
+        body {
+            background-color: #0B0F19;
+            color: white;
+            font-family: 'Manrope', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100dvh;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-deepNavy min-h-screen flex flex-col items-center">
+<div class="flex-1 flex flex-col w-full max-w-[430px] mx-auto min-h-screen relative">
+<header class="px-8 pt-12 pb-6">
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center border border-white/5">
+<span class="material-symbols-outlined text-neonCyan text-2xl">flag</span>
+</div>
+<div>
+<h1 class="text-3xl font-light font-sora text-white tracking-tight">Australia</h1>
+<p class="text-[11px] text-gray-500 font-medium tracking-wide font-manrope mt-0.5">06.12.2025 → 24.01.2026</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-end">
+<span class="flex items-center gap-2 bg-neonLime text-black text-[10px] uppercase font-bold px-4 py-2 rounded-full neon-glow-lime">
+<span class="w-1.5 h-1.5 bg-black rounded-full"></span>
+                            IN PROGRESS
+                        </span>
+</div>
+<div class="relative flex items-center justify-center">
+<svg class="w-14 h-14 progress-ring">
+<circle class="text-white/5" cx="28" cy="28" fill="transparent" r="24" stroke="currentColor" stroke-width="3"></circle>
+<circle class="text-neonLime" cx="28" cy="28" fill="transparent" r="24" stroke="currentColor" stroke-dasharray="150.8" stroke-dashoffset="22.6" stroke-linecap="round" stroke-width="3"></circle>
+</svg>
+<span class="absolute text-sm font-light text-neonLime font-sora">85%</span>
+</div>
+</div>
+</div>
+<div class="mt-4 flex items-center justify-between gap-1.5 px-1">
+<div class="flex items-center gap-2 flex-1">
+<span class="material-symbols-outlined text-neonLime text-lg fill-1">check_circle</span>
+<div class="h-[2px] flex-1 bg-neonLime rounded-full"></div>
+<span class="material-symbols-outlined text-neonLime text-lg fill-1">check_circle</span>
+<div class="h-[2px] flex-1 bg-neonLime rounded-full"></div>
+<span class="material-symbols-outlined text-neonLime text-lg fill-1">check_circle</span>
+<div class="h-[2px] flex-1 bg-neonLime rounded-full"></div>
+<span class="material-symbols-outlined text-neonLime text-lg fill-1">check_circle</span>
+<div class="h-[2px] flex-1 bg-neonLime rounded-full"></div>
+<div class="w-6 h-6 rounded-full border border-neonLime flex items-center justify-center bg-neonLime/10">
+<div class="w-2 h-2 bg-neonLime rounded-full neon-glow-lime"></div>
+</div>
+<div class="h-[2px] flex-1 bg-white/10 rounded-full"></div>
+<div class="w-4 h-4 rounded-full bg-white/10"></div>
+</div>
+</div>
+<div class="mt-8">
+<h3 class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 font-manrope">Travel Details</h3>
+<p class="text-[10px] text-neonLime font-bold uppercase mt-1.5 font-manrope">Step 6 - Primary destination</p>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto px-4 pb-40 custom-scrollbar">
+<div class="glassmorphism rounded-[32px] p-8">
+<div class="flex justify-between items-center mb-8">
+<h2 class="font-light text-2xl font-sora text-white tracking-tight">Purpose of Visit</h2>
+<div class="flex items-center gap-1.5 text-[10px] text-orange-400/80 font-bold uppercase font-manrope tracking-wider">
+                        Required <span class="material-symbols-outlined text-sm">warning</span>
+</div>
+</div>
+<div class="mb-12">
+<label class="block text-[10px] font-bold text-gray-500 uppercase tracking-[0.15em] mb-4 font-manrope px-2">Primary destination</label>
+<div class="relative">
+<button class="w-full bg-white/5 border border-white/5 rounded-full px-6 py-4 text-left flex justify-between items-center text-sm font-manrope group focus:outline-none focus:border-neonCyan/30 transition-all">
+<span class="text-white/60 font-medium">Select your primary destination</span>
+<span class="material-symbols-outlined text-neonCyan transition-transform group-focus:rotate-180">expand_more</span>
+</button>
+<div class="absolute top-full left-0 right-0 mt-3 bg-[#161C2A] border border-white/5 rounded-[24px] shadow-2xl z-20 overflow-hidden font-manrope">
+<div class="px-6 py-4 text-sm text-gray-400 border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer">Sydney, NSW</div>
+<div class="px-6 py-4 text-sm text-white font-semibold bg-neonCyan/10 border-b border-white/5 relative flex items-center justify-between cursor-pointer">
+                                Melbourne, VIC
+                                <img alt="cursor" class="w-5 h-5 opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtXnqFIcvG0U9b0YGKjV5wCqixH-ukTgT2RzldyaJ5j6IbNwKNYavZN6sHevxdjQmm5tiyCEpgWAJDL_eN86v6oS4BA1iE0H01QyaBMYnpgMk3hzDs03uE0D958lC1-6edxkYUY9zFVYFJ2cGWAULdHx9UtCsFCx0QAlTiK44j05ZqJ7ZT37Jx2YE-Ry1jlxz-vh7jkL4pFBg1g1RRc5qYH9MyFSNmPVY2uD23f-YbbqxcHwI0BEFQmZiQTOjx4r9e-bxv6Twaw0-P" style="filter: invert(1);"/>
+</div>
+<div class="px-6 py-4 text-sm text-gray-400 hover:bg-white/5 transition-colors cursor-pointer">Brisbane, QLD</div>
+</div>
+</div>
+</div>
+<div class="space-y-6 pt-48 font-manrope">
+<label class="flex items-center gap-4 cursor-pointer group">
+<div class="w-6 h-6 rounded-full border border-white/10 bg-white/5 flex items-center justify-center transition-all group-hover:border-white/30"></div>
+<span class="text-sm font-medium text-gray-500 group-hover:text-white transition-colors">Conference</span>
+</label>
+<label class="flex items-center gap-4 cursor-pointer group">
+<div class="w-6 h-6 rounded-full border border-white/10 bg-white/5 flex items-center justify-center transition-all group-hover:border-white/30"></div>
+<span class="text-sm font-medium text-gray-500 group-hover:text-white transition-colors">Visiting relatives</span>
+</label>
+<label class="flex items-center gap-4 cursor-pointer group">
+<div class="w-6 h-6 rounded-full bg-neonLime flex items-center justify-center neon-glow-lime">
+<span class="material-symbols-outlined text-black text-lg font-bold">check</span>
+</div>
+<span class="text-sm font-bold text-neonLime">Tourism</span>
+</label>
+<label class="flex items-center gap-4 cursor-pointer group">
+<div class="w-6 h-6 rounded-full border border-white/10 bg-white/5 flex items-center justify-center transition-all group-hover:border-white/30"></div>
+<span class="text-sm font-medium text-gray-500 group-hover:text-white transition-colors">Study</span>
+</label>
+</div>
+<div class="my-10 border-t border-dashed border-white/5"></div>
+<div class="mb-10 font-manrope">
+<p class="text-sm font-medium text-white/70 mb-6 leading-relaxed">Do you have an invitation letter from a company or organization?</p>
+<div class="flex gap-10 px-1">
+<label class="flex items-center gap-3 cursor-pointer">
+<div class="w-6 h-6 rounded-full border border-neonLime flex items-center justify-center bg-neonLime/5">
+<div class="w-2.5 h-2.5 bg-neonLime rounded-full neon-glow-lime"></div>
+</div>
+<span class="text-sm font-bold text-white">Yes</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-6 h-6 rounded-full border border-white/10 flex items-center justify-center bg-white/5 group-hover:border-white/30 transition-all"></div>
+<span class="text-sm font-medium text-gray-500 group-hover:text-gray-300">No</span>
+</label>
+</div>
+</div>
+<div class="font-manrope">
+<label class="block text-[10px] font-bold text-gray-500 uppercase tracking-[0.15em] mb-4 px-2">Any additional notes (optional)</label>
+<div class="w-full bg-white/5 border border-white/5 rounded-[24px] p-6 text-sm text-gray-500 min-h-[120px] italic leading-relaxed">
+                        Provide any details that may support your application...
+                    </div>
+</div>
+<div class="flex items-center justify-between mt-12 mb-4">
+<button class="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-white transition-colors py-4 px-8 rounded-full border border-white/5 hover:bg-white/5">
+<span class="material-symbols-outlined text-lg">chevron_left</span>
+                        BACK
+                    </button>
+<button class="bg-neonLime text-black px-12 py-4 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 neon-glow-lime shadow-lg active:scale-95 transition-all">
+                        NEXT
+                        <span class="material-symbols-outlined text-lg font-bold">chevron_right</span>
+</button>
+</div>
+</div>
+</main>
+<nav class="fixed bottom-8 left-6 right-6 z-[100] bg-black rounded-full p-2 shadow-2xl shadow-black/20 max-w-[382px] mx-auto">
+<div class="flex items-center justify-between">
+<div class="flex-1 flex justify-center">
+<span class="material-symbols-outlined text-gray-400">home</span>
+</div>
+<div class="flex-1 flex justify-center">
+<span class="material-symbols-outlined text-gray-400">explore</span>
+</div>
+<div class="flex-1 flex justify-center">
+<div class="w-12 h-12 flex items-center justify-center rounded-full bg-[#BEF264] shadow-lg shadow-neonLime/20">
+<span class="material-symbols-outlined text-white text-3xl font-bold">add</span>
+</div>
+</div>
+<div class="flex-1 flex justify-center">
+<span class="material-symbols-outlined text-gray-400">description</span>
+</div>
+<div class="flex-1 flex justify-center">
+<span class="material-symbols-outlined text-gray-400">person</span>
+</div>
+</div>
+</nav>
+<div class="fixed bottom-0 left-0 right-0 h-6 flex justify-center items-end pb-2 pointer-events-none max-w-[430px] mx-auto z-[101]">
+<div class="w-32 h-1.5 bg-white/10 rounded-full"></div>
+</div>
+</div>
+
+</body></html>

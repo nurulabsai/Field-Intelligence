@@ -304,10 +304,10 @@ export const stepFarmProfileSchema = z.object({
       ),
     ]),
     tenure_type: z.enum(['owned', 'leased', 'communal', 'government', 'borrowed', 'other'], {
-      required_error: 'Tenure type is required',
+      error: 'Tenure type is required',
     }),
     farming_system: z.enum(['rainfed', 'irrigated', 'mixed'], {
-      required_error: 'Farming system is required',
+      error: 'Farming system is required',
     }),
     contact_number: z.string().optional().default(''),
     water_source: z.string().optional().default(''),
@@ -373,16 +373,16 @@ const plotSchema = z.object({
     ),
   ]),
   status: z.enum(['active', 'fallow', 'prepared', 'abandoned'], {
-    required_error: 'Plot status is required',
+    error: 'Plot status is required',
   }),
   current_crop: z.string().min(1, 'Current crop is required'),
   variety: z.string().optional().default(''),
   growth_stage: z.enum([
     'germination', 'vegetative', 'flowering', 'fruiting',
     'maturity', 'harvest', 'post_harvest',
-  ], { required_error: 'Growth stage is required' }),
+  ], { error: 'Growth stage is required' }),
   irrigation_status: z.enum(['irrigated', 'rainfed', 'supplemental'], {
-    required_error: 'Irrigation status is required',
+    error: 'Irrigation status is required',
   }),
   center_gps: plotGpsSchema,
   planting_season: z.string().optional().default(''),
@@ -405,10 +405,10 @@ const plotObservationSchema = z.object({
   plot_id: z.string().min(1, 'Observation must be linked to a plot'),
   plot_name: z.string().default(''),
   crop_condition: z.enum(['excellent', 'good', 'fair', 'poor', 'failed'], {
-    required_error: 'Crop condition is required',
+    error: 'Crop condition is required',
   }),
-  pest_present: z.boolean({ required_error: 'Indicate if pests are present' }),
-  disease_present: z.boolean({ required_error: 'Indicate if disease is present' }),
+  pest_present: z.boolean({ error: 'Indicate if pests are present' }),
+  disease_present: z.boolean({ error: 'Indicate if disease is present' }),
   pest_type: z.string().optional().default(''),
   pest_severity: z.string().optional().default(''),
   disease_type: z.string().optional().default(''),
@@ -465,7 +465,7 @@ export type FullAuditData = z.infer<typeof fullAuditSchema>;
  * inline validation). Using z.any() lets the wizard advance freely
  * while the step components show inline warnings.
  */
-const passthroughSchema = z.record(z.any());
+const passthroughSchema = z.record(z.string(), z.any());
 
 export const stepSchemas = [
   step1IdentitySchema,       // 0 - Identity

@@ -29,60 +29,37 @@ const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
   return (
     <nav className="nuru-bottom-nav">
       <div
-        className="fixed bottom-8 left-6 right-6 z-50 bg-black rounded-full p-2 shadow-2xl"
-        style={{ paddingBottom: 'calc(10px + env(safe-area-inset-bottom, 0))' }}
+        className="fixed bottom-8 left-6 right-6 z-[100] bg-black rounded-full p-2 shadow-2xl shadow-black/20 flex items-center justify-between"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0)' }}
       >
-        <div className="flex items-center justify-between px-2">
-          {navItems.map((item) => {
-            const isActive = currentPath === item.path;
-            const isAddButton = item.id === 'add';
-            const Icon = item.icon;
-            
-            // Special styling for the active state of the Center "+" Add button
-            if (isAddButton) {
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => onNavigate(item.path)}
-                  className={cn(
-                    "relative flex items-center justify-center border-none cursor-pointer p-0 transition-all duration-300 outline-none",
-                    isActive 
-                      ? "w-16 h-16 bg-accent rounded-full -translate-y-4 shadow-[0_0_30px_rgba(190,242,100,0.4)]" 
-                      : "w-12 h-12 bg-transparent rounded-full"
-                  )}
-                >
-                  <Icon
-                    size={isActive ? 32 : 24}
-                    strokeWidth={isActive ? 2.5 : 2}
-                    className={cn(
-                      "relative z-10 transition-colors duration-300",
-                      isActive ? "text-[#080B10]" : "text-gray-500"
-                    )}
-                  />
-                </button>
-              );
-            }
+        {navItems.map((item) => {
+          const isActive = currentPath === item.path;
+          const Icon = item.icon;
 
+          if (isActive) {
             return (
               <button
                 key={item.id}
                 onClick={() => onNavigate(item.path)}
-                className="relative flex items-center justify-center border-none bg-transparent cursor-pointer p-2 transition-all duration-300 outline-none w-12 h-12"
+                className="w-12 h-12 flex items-center justify-center bg-accent rounded-full text-white border-none cursor-pointer active:scale-95 transition-transform outline-none shadow-lg shadow-accent/20"
               >
-                {isActive && (
-                  <div className="absolute inset-0 bg-accent rounded-full scale-[1.15] opacity-20 transition-transform duration-300" />
-                )}
-                <Icon
-                  size={24}
-                  className={cn(
-                    "relative z-10 transition-colors duration-300",
-                    isActive ? "text-accent" : "text-gray-500"
-                  )}
-                />
+                <Icon size={24} strokeWidth={2} />
               </button>
             );
-          })}
-        </div>
+          }
+
+          return (
+            <button
+              key={item.id}
+              onClick={() => onNavigate(item.path)}
+              className={cn(
+                "flex-1 flex justify-center items-center py-2 text-gray-400 bg-transparent border-none cursor-pointer transition-colors outline-none"
+              )}
+            >
+              <Icon size={24} strokeWidth={1.5} />
+            </button>
+          );
+        })}
       </div>
 
       <style>{`

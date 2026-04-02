@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, User, ShieldCheck, Sprout, Briefcase, TabletSmartphone, LayoutDashboard } from 'lucide-react';
+import { Menu, User, ShieldCheck, Sprout, Briefcase, TabletSmartphone, LayoutDashboard, Loader2, AlertTriangle } from 'lucide-react';
 
 interface DashboardHomeProps {
   userName?: string;
@@ -15,126 +15,173 @@ interface DashboardHomeProps {
   prices?: Array<{ id: string; crop: string; region: string; pricePerKg: number; change: number }>;
   onAuditClick?: (id: string) => void;
   onViewAllAudits?: () => void;
+  onStartNewAudit?: () => void;
 }
 
+const PROGRESS_COLORS: string[] = ['#67E8F9', '#E9D5FF', '#BEF264', '#FBBF24', '#FB7185'];
+
 const DashboardHome: React.FC<DashboardHomeProps> = ({
+  userName,
+  stressAlert,
+  isLoading = false,
+  stats,
+  audits,
   onAuditClick,
   onViewAllAudits,
 }) => {
+  const highPriority = stats?.pendingSync ?? 0;
+  const farmChecks = stats?.totalAudits ?? 0;
+  const businessReports = stats?.verified ?? 0;
+
   return (
-    <div className="min-h-screen bg-[#0B0F19] font-base p-6 pb-24 md:pb-6 relative overflow-x-hidden">
-      
-      {/* Top Navigation */}
-      <div className="flex items-center justify-between mb-8">
-        <button className="w-11 h-11 rounded-full bg-[#1A2033] border-none flex items-center justify-center cursor-pointer text-white">
-          <Menu size={20} strokeWidth={2} />
-        </button>
-        <span className="text-xl font-light font-heading tracking-wide text-white">NuruOS</span>
-        <button className="w-11 h-11 rounded-full bg-[#1A2033] border-none flex items-center justify-center cursor-pointer text-white">
+    <div className="min-h-screen bg-bg-primary font-base overflow-x-hidden">
+
+      <header className="flex items-center justify-between px-6 pt-12 pb-6">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            aria-label="Menu"
+            className="w-10 h-10 rounded-full bg-white/5 border border-white/5 flex items-center justify-center cursor-pointer text-white/80 active:scale-95 transition-transform"
+          >
+            <Menu size={20} strokeWidth={2} />
+          </button>
+          <h1 className="font-heading font-light tracking-tight text-xl ml-2 text-white">NuruOS</h1>
+        </div>
+        <button
+          type="button"
+          aria-label="Profile"
+          className="w-10 h-10 rounded-full border border-white/5 bg-white/5 flex items-center justify-center cursor-pointer text-text-secondary active:scale-95 transition-transform"
+        >
           <User size={20} strokeWidth={2} />
         </button>
-      </div>
+      </header>
 
-      {/* Hero Title */}
-      <div className="mb-10 flex justify-center">
-        <h1 className="text-4xl text-center text-white leading-tight font-heading font-light">
-          Your Field<br />Audit Plan
-        </h1>
-      </div>
+      <main className="flex-1 px-6 flex flex-col gap-8 pb-40">
 
-      {/* 3-Card Asymmetric Grid */}
-      <div className="grid grid-cols-2 gap-4 mb-10">
-        
-        {/* Left Tall Card - Lime */}
-        <div className="row-span-2 rounded-[32px] bg-accent p-6 flex flex-col justify-between shadow-[0_15px_40px_-15px_rgba(190,242,100,0.4)]">
-          <div className="w-14 h-14 rounded-full bg-black flex items-center justify-center mb-8">
-            <ShieldCheck size={26} className="text-accent" />
+        {stressAlert && (
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-[20px] px-5 py-3.5 flex items-center gap-3" role="alert">
+            <AlertTriangle size={18} className="text-amber-400 shrink-0" />
+            <p className="text-amber-300 text-[13px] font-medium">{stressAlert}</p>
           </div>
-          <div>
-            <h2 className="text-[2.75rem] font-light leading-none text-black mb-1 font-heading">03</h2>
-            <h3 className="text-xl font-bold font-heading text-black leading-tight mb-3">High<br />Priority<br />Audits</h3>
-            <p className="text-[10px] uppercase font-bold tracking-widest text-black/40">Tasks Pending</p>
-          </div>
-        </div>
+        )}
 
-        {/* Top Right Card - Cyan */}
-        <div className="rounded-[32px] bg-[#67E8F9] p-5 shadow-[0_15px_40px_-15px_rgba(103,232,249,0.3)] min-h-[160px] flex flex-col justify-between">
-          <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center mb-2">
-            <Sprout size={22} className="text-black/80" />
+        {isLoading && (
+          <div className="flex items-center justify-center py-20" aria-label="Loading dashboard data">
+            <Loader2 size={36} className="text-accent animate-spin" />
           </div>
-          <div>
-            <h2 className="text-3xl font-light leading-none text-black mb-1 font-heading">12</h2>
-            <h3 className="text-sm font-bold font-heading text-black">Farm Checks</h3>
-          </div>
-        </div>
+        )}
 
-        {/* Bottom Right Card - Lavender */}
-        <div className="rounded-[32px] bg-[#E9D5FF] p-5 shadow-[0_15px_40px_-15px_rgba(233,213,255,0.3)] min-h-[160px] flex flex-col justify-between">
-          <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center mb-2">
-            <Briefcase size={22} className="text-black/80" />
-          </div>
-          <div>
-            <h2 className="text-3xl font-light leading-none text-black mb-1 font-heading">28</h2>
-            <h3 className="text-sm font-bold font-heading text-black leading-tight">Business<br />Reports</h3>
-          </div>
-        </div>
+        {!isLoading && (
+          <>
+            <section>
+              <h2 className="font-heading text-4xl font-light tracking-tight text-white text-center leading-tight">
+                {userName ? `${userName.split(' ')[0]}'s` : 'Your'} Field<br />Audit Plan
+              </h2>
+            </section>
 
-      </div>
+            <section className="grid grid-cols-2 gap-4" aria-label="Audit statistics">
+              <div className="row-span-2 bg-accent rounded-[32px] p-6 flex flex-col justify-between text-black nuru-soft-shadow relative active:scale-95 transition-transform border border-white/5 min-h-[320px]">
+                <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center self-start nuru-soft-shadow shrink-0">
+                  <ShieldCheck size={22} className="text-accent" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-4xl font-light tracking-tighter block mb-1 nuru-tabular-nums">
+                    {String(highPriority).padStart(2, '0')}
+                  </span>
+                  <h3 className="font-heading font-bold text-base leading-tight">High Priority<br />Audits</h3>
+                  <p className="text-[10px] uppercase tracking-wider font-bold mt-1.5 opacity-60">Tasks Pending</p>
+                </div>
+              </div>
 
-      {/* Ongoing Audits Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-light font-heading text-white">Ongoing Audits</h2>
-        <button 
-          onClick={onViewAllAudits}
-          className="text-xs font-semibold py-2 px-4 rounded-full bg-white/5 text-white/50 border border-white/5 uppercase tracking-wider cursor-pointer"
-        >
-          View All
-        </button>
-      </div>
+              <div className="flex flex-col gap-4">
+                <div className="bg-cyan rounded-[32px] p-6 flex-1 min-h-[140px] flex flex-col justify-between text-black nuru-soft-shadow active:scale-95 transition-transform border border-white/5">
+                  <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center shrink-0">
+                    <Sprout size={22} className="text-black/80" />
+                  </div>
+                  <div>
+                    <span className="text-2xl font-light tracking-tighter block nuru-tabular-nums">{farmChecks}</span>
+                    <h3 className="font-heading font-bold text-sm leading-tight">Farm Checks</h3>
+                  </div>
+                </div>
 
-      {/* Ongoing Audits List */}
-      <div className="flex flex-col gap-4">
-        
-        {/* Item 1 */}
-        <div 
-          className="bg-[#141A27] rounded-[28px] p-5 flex items-center cursor-pointer shadow-lg overflow-hidden relative"
-          onClick={() => onAuditClick?.('1')}
-        >
-          <div className="w-14 h-14 shrink-0 rounded-full bg-[#1E253A] flex items-center justify-center mr-4">
-            <TabletSmartphone size={24} className="text-[#67E8F9]" />
-          </div>
-          <div className="flex-1 w-full min-w-0 pr-4">
-            <h4 className="text-white font-semibold text-[15px] mb-1 truncate">Green Valley Farm</h4>
-            <p className="text-white/40 text-sm mb-3">Field Inspection</p>
-            {/* Progress Bar Container */}
-            <div className="w-full h-[6px] bg-white/5 rounded-full relative">
-              <div className="absolute left-0 top-0 h-full bg-[#67E8F9] rounded-full" style={{ width: '50%' }} />
-            </div>
-          </div>
-          <div className="text-[#67E8F9] text-base font-light">50%</div>
-        </div>
+                <div className="bg-[#E9D5FF] rounded-[32px] p-6 flex-1 min-h-[140px] flex flex-col justify-between text-black nuru-soft-shadow active:scale-95 transition-transform border border-white/5">
+                  <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center shrink-0">
+                    <Briefcase size={22} className="text-black/80" />
+                  </div>
+                  <div>
+                    <span className="text-2xl font-light tracking-tighter block nuru-tabular-nums">{businessReports}</span>
+                    <h3 className="font-heading font-bold text-sm leading-tight">Business<br />Reports</h3>
+                  </div>
+                </div>
+              </div>
+            </section>
 
-        {/* Item 2 */}
-        <div 
-          className="bg-[#141A27] rounded-[28px] p-5 flex items-center cursor-pointer shadow-lg overflow-hidden relative"
-          onClick={() => onAuditClick?.('2')}
-        >
-          <div className="w-14 h-14 shrink-0 rounded-full bg-[#1E253A] flex items-center justify-center mr-4">
-            <LayoutDashboard size={24} className="text-[#E9D5FF]" />
-          </div>
-          <div className="flex-1 w-full min-w-0 pr-4">
-            <h4 className="text-white font-semibold text-[15px] mb-1 truncate">Downtown Retail</h4>
-            <p className="text-white/40 text-sm mb-3">Compliance Check</p>
-            {/* Progress Bar Container */}
-            <div className="w-full h-[6px] bg-white/5 rounded-full relative">
-              <div className="absolute left-0 top-0 h-full bg-[#E9D5FF] rounded-full" style={{ width: '80%' }} />
-            </div>
-          </div>
-          <div className="text-[#E9D5FF] text-base font-light">80%</div>
-        </div>
+            <section className="mt-2">
+              <div className="flex justify-between items-center mb-6">
+                <h4 className="text-xl font-heading font-light tracking-tight text-white">Ongoing Audits</h4>
+                <button
+                  type="button"
+                  onClick={onViewAllAudits}
+                  className="bg-white/5 text-white/40 text-[10px] px-3 py-1 rounded-full uppercase tracking-widest border border-white/5 cursor-pointer"
+                >
+                  View All
+                </button>
+              </div>
 
-      </div>
+              <div className="flex flex-col gap-4" role="list" aria-label="Ongoing audits">
+                {(!audits || audits.length === 0) && !isLoading && (
+                  <div className="text-center py-12 nuru-glass-card rounded-[32px]">
+                    <p className="text-text-secondary text-[14px] mb-2">No audits yet</p>
+                    <p className="text-text-tertiary text-[12px]">Start a new audit to see it here</p>
+                  </div>
+                )}
 
+                {audits && audits.slice(0, 5).map((audit, index) => {
+                  const colorIdx = index % PROGRESS_COLORS.length;
+                  const color = PROGRESS_COLORS[colorIdx];
+                  const progress = audit.status === 'verified' ? 100
+                    : audit.status === 'submitted' ? 80
+                    : audit.status === 'synced' ? 100
+                    : audit.status === 'failed' ? 30
+                    : 50;
+
+                  const IconComp = index % 2 === 0 ? TabletSmartphone : LayoutDashboard;
+
+                  return (
+                    <div
+                      key={audit.id}
+                      role="listitem"
+                      className="nuru-glass-card rounded-[32px] p-6 flex items-center gap-4 cursor-pointer active:scale-[0.98] transition-transform"
+                      onClick={() => onAuditClick?.(audit.id)}
+                      onKeyDown={(e) => e.key === 'Enter' && onAuditClick?.(audit.id)}
+                      tabIndex={0}
+                    >
+                      <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
+                        <IconComp size={24} style={{ color }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-end mb-3">
+                          <div>
+                            <h5 className="font-bold text-sm text-white truncate">{audit.farmName}</h5>
+                            <p className="text-xs text-text-secondary">{audit.auditType}</p>
+                          </div>
+                          <span className="text-sm font-light tracking-tight nuru-tabular-nums" style={{ color }}>{progress}%</span>
+                        </div>
+                        <div className="w-full h-[6px] bg-white/[0.08] rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-700"
+                            style={{ width: `${progress}%`, backgroundColor: color }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          </>
+        )}
+      </main>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import {
   MapPin, Navigation, AlertTriangle, Play, Pause, Square, RotateCcw,
-  Crosshair, Footprints, Zap, Trash2, Check, ChevronDown, Undo2,
+  Crosshair, Footprints, Zap, Check, Undo2,
 } from 'lucide-react';
 import { cn } from '../../../design-system';
 import type {

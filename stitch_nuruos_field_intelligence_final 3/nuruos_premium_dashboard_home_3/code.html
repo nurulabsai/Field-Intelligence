@@ -1,0 +1,120 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>NuruOS AI Camera - Vital Aesthetic</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Sora:wght@300;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#BEF264", // Neon Lime
+                        "background-navy": "#0B0F19",
+                        "neon-cyan": "#67E8F9",
+                        "glass-bg": "rgba(11, 15, 25, 0.7)",
+                    },
+                    fontFamily: {
+                        "manrope": ["Manrope", "sans-serif"],
+                        "sora": ["Sora", "sans-serif"]
+                    },
+                    boxShadow: {
+                        'soft-diffused': '0 20px 50px -12px rgba(0, 0, 0, 0.5)',
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        .glass-pill {
+            @apply backdrop-blur-2xl bg-glass-bg border border-white/10 shadow-soft-diffused;
+        }
+        .viewfinder-bracket {
+            @apply absolute w-8 h-8 border-white/40;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        .animate-pulse-cyan {
+            animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        body {
+            background-color: #000;
+            overflow: hidden;
+        }
+        .shutter-outer {
+            @apply w-20 h-20 rounded-full border-4 border-white flex items-center justify-center transition-transform active:scale-90;
+        }
+        .shutter-inner {
+            @apply w-16 h-16 rounded-full bg-primary;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-manrope text-white min-h-screen relative">
+<div class="fixed inset-0 bg-[#0B0F19] z-0 overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60"></div>
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="relative w-64 h-64">
+<div class="viewfinder-bracket top-0 left-0 border-t-2 border-l-2 rounded-tl-lg"></div>
+<div class="viewfinder-bracket top-0 right-0 border-t-2 border-r-2 rounded-tr-lg"></div>
+<div class="viewfinder-bracket bottom-0 left-0 border-b-2 border-l-2 rounded-bl-lg"></div>
+<div class="viewfinder-bracket bottom-0 right-0 border-b-2 border-r-2 rounded-br-lg"></div>
+<div class="absolute -bottom-16 left-1/2 -translate-x-1/2">
+<div class="glass-pill rounded-full px-6 py-2 flex items-center gap-3 whitespace-nowrap">
+<div class="w-2 h-2 bg-neon-cyan rounded-full animate-pulse-cyan shadow-[0_0_8px_#67E8F9]"></div>
+<span class="text-[12px] font-sora font-light tracking-wide uppercase" style="">Detecting Crop Health...</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<header class="fixed top-0 left-0 right-0 z-50 p-8">
+<div class="max-w-md mx-auto flex items-center justify-between glass-pill rounded-full p-2 pr-4">
+<button class="w-10 h-10 flex items-center justify-center text-white/80 hover:text-white transition-colors" style="">
+<span class="material-symbols-outlined" style="">chevron_left</span>
+</button>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 bg-neon-cyan rounded-full animate-pulse-cyan"></div>
+<span class="font-sora font-light text-[11px] tracking-[0.2em] uppercase" style="">ai Scanning</span>
+</div>
+<div class="flex items-center gap-3">
+<button class="w-8 h-8 flex items-center justify-center text-white/60" style="">
+<span class="material-symbols-outlined text-[20px]" style="">flash_on</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-white/60" style="">
+<span class="material-symbols-outlined text-[20px]" style="">grid_on</span>
+</button>
+</div>
+</div>
+</header>
+<footer class="fixed bottom-0 left-0 right-0 z-50">
+<div class="glass-pill rounded-t-[40px] p-8 pb-12 flex flex-col items-center gap-8">
+<div class="flex items-center justify-between w-full max-w-[280px] bg-white/5 rounded-full p-1 border border-white/5">
+<button class="flex-1 py-2 text-[10px] font-sora font-semibold tracking-widest text-primary" style="">SCAN</button>
+<button class="flex-1 py-2 text-[10px] font-sora font-semibold tracking-widest text-white/40" style="">PHOTO</button>
+<button class="flex-1 py-2 text-[10px] font-sora font-semibold tracking-widest text-white/40" style="">VIDEO</button>
+</div>
+<div class="flex items-center justify-between w-full max-w-sm">
+<button class="w-10 h-10 rounded-[12px] overflow-hidden border border-white/20 bg-slate-800" style="">
+<div class="w-full h-full bg-gradient-to-tr from-indigo-900 to-slate-700"></div>
+</button>
+<button class="shutter-outer" style="">
+<div class="shutter-inner"></div>
+</button>
+<button class="w-10 h-10 rounded-full glass-pill flex items-center justify-center active:rotate-180 transition-transform duration-500" style="">
+<span class="material-symbols-outlined text-white/80" style="">cached</span>
+</button>
+</div>
+<div class="w-32 h-1 bg-white/20 rounded-full mt-4"></div>
+</div>
+</footer>
+
+</body></html>

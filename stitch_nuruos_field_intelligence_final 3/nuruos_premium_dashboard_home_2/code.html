@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NuruOS Premium Dashboard Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=Sora:wght@300;400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#d1fa7d",
+                        "neon-lime": "#BEF264",
+                        "secondary-cyan": "#4edaff",
+                        "secondary-purple": "#e0c6fd",
+                        "background-dark": "#0B0F19",
+                        "card-dark": "#1c2333",
+                        "card-glass": "rgba(28, 35, 51, 0.4)",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "header": ["Sora", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "3xl": "2.5rem",
+                        "vital": "32px",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        .glass-card {
+            background: theme('colors.card-glass');
+            @apply backdrop-blur-xl border border-white/5;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+        }
+        .soft-shadow {
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.25);
+        }
+        .progress-bar-bg {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-radius: 9999px;
+            height: 6px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .progress-bar-fill-cyan {
+            background-color: #4edaff;
+            height: 100%;
+            border-radius: 9999px;
+        }
+        .progress-bar-fill-purple {
+            background-color: #e0c6fd;
+            height: 100%;
+            border-radius: 9999px;
+        }
+        body {
+            min-height: max(884px, 100dvh);
+            background-color: #0B0F19;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display text-white min-h-screen flex flex-col">
+<header class="flex items-center justify-between px-6 pt-12 pb-6">
+<div class="flex items-center gap-3">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-white/80 border border-white/5 bg-white/5">
+<span class="material-symbols-outlined text-2xl">sort</span>
+</button>
+<h1 class="font-header font-light tracking-tight text-xl ml-2">NuruOS</h1>
+</div>
+<button class="w-10 h-10 rounded-full border border-white/5 bg-white/5 flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-slate-300">person</span>
+</button>
+</header>
+<main class="flex-1 px-6 flex flex-col gap-8 pb-40">
+<section>
+<h2 class="font-header text-4xl font-light tracking-tight text-white text-center leading-tight">
+                Your Field<br/>Audit Plan
+            </h2>
+</section>
+<section class="grid grid-cols-2 gap-4 h-80">
+<div class="bg-primary rounded-vital p-8 flex flex-col justify-between text-slate-900 soft-shadow relative overflow-hidden group active:scale-95 transition-transform border border-white/5">
+<div class="w-14 h-14 bg-black rounded-full flex items-center justify-center self-start soft-shadow">
+<span class="material-symbols-outlined text-primary text-2xl">verified_user</span>
+</div>
+<div>
+<span class="text-4xl font-light tracking-tighter block mb-1">03</span>
+<h3 class="font-header font-bold text-lg leading-tight">High Priority<br/>Audits</h3>
+<p class="text-[10px] uppercase tracking-wider font-bold mt-2 opacity-60">Tasks Pending</p>
+</div>
+</div>
+<div class="flex flex-col gap-4 h-full">
+<div class="bg-secondary-cyan rounded-vital p-6 flex-1 flex flex-col justify-between text-slate-900 soft-shadow active:scale-95 transition-transform border border-white/5">
+<div class="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-slate-900 text-xl">grass</span>
+</div>
+<div>
+<span class="text-2xl font-light tracking-tighter block">12</span>
+<h3 class="font-header font-bold text-sm leading-tight">Farm Checks</h3>
+</div>
+</div>
+<div class="bg-secondary-purple rounded-vital p-6 flex-1 flex flex-col justify-between text-slate-900 soft-shadow active:scale-95 transition-transform border border-white/5">
+<div class="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-slate-900 text-xl">business_center</span>
+</div>
+<div>
+<span class="text-2xl font-light tracking-tighter block">28</span>
+<h3 class="font-header font-bold text-sm leading-tight">Business Reports</h3>
+</div>
+</div>
+</div>
+</section>
+<section class="mt-2">
+<div class="flex justify-between items-center mb-6">
+<h4 class="text-xl font-header font-light tracking-tight text-white">Ongoing Audits</h4>
+<span class="bg-white/5 text-white/40 text-[10px] px-3 py-1 rounded-full uppercase tracking-widest border border-white/5">View All</span>
+</div>
+<div class="flex flex-col gap-4">
+<div class="glass-card rounded-vital p-6 flex items-center gap-4 active:scale-[0.98] transition-transform">
+<div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
+<span class="material-symbols-outlined text-secondary-cyan text-2xl">smartphone</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-end mb-3">
+<div>
+<h5 class="font-bold text-sm text-white truncate">Green Valley Farm</h5>
+<p class="text-xs text-slate-400">Field Inspection</p>
+</div>
+<span class="text-sm font-light tracking-tight text-secondary-cyan">50%</span>
+</div>
+<div class="progress-bar-bg">
+<div class="progress-bar-fill-cyan w-1/2"></div>
+</div>
+</div>
+</div>
+<div class="glass-card rounded-vital p-6 flex items-center gap-4 active:scale-[0.98] transition-transform">
+<div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
+<span class="material-symbols-outlined text-secondary-purple text-2xl">web</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-end mb-3">
+<div>
+<h5 class="font-bold text-sm text-white truncate">Downtown Retail</h5>
+<p class="text-xs text-slate-400">Compliance Check</p>
+</div>
+<span class="text-sm font-light tracking-tight text-secondary-purple">80%</span>
+</div>
+<div class="progress-bar-bg">
+<div class="progress-bar-fill-purple w-4/5"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-8 left-6 right-6 z-[100] bg-black rounded-full p-2 shadow-2xl shadow-black/20 flex items-center justify-between">
+<a class="w-12 h-12 flex items-center justify-center bg-neon-lime rounded-full text-white" href="#">
+<span class="material-symbols-outlined text-2xl">home</span>
+</a>
+<a class="flex-1 flex justify-center text-gray-400" href="#">
+<span class="material-symbols-outlined text-2xl">calendar_today</span>
+</a>
+<a class="flex-1 flex justify-center text-gray-400" href="#">
+<span class="material-symbols-outlined text-2xl">add</span>
+</a>
+<a class="flex-1 flex justify-center text-gray-400" href="#">
+<span class="material-symbols-outlined text-2xl">analytics</span>
+</a>
+<a class="flex-1 flex justify-center text-gray-400" href="#">
+<span class="material-symbols-outlined text-2xl">photo_camera</span>
+</a>
+</nav>
+
+</body></html>

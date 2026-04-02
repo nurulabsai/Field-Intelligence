@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NuruOS System Tracking &amp; Sync</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Sora:wght@300;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#BEF264", // Neon Lime
+                        "background-navy": "#0B0F19",
+                        "neon-cyan": "#67E8F9",
+                        "neon-red": "#FF4D4D",
+                        "glass-bg": "rgba(15, 23, 42, 0.4)", // Slate-900 at 40%
+                    },
+                    fontFamily: {
+                        "manrope": ["Manrope", "sans-serif"],
+                        "sora": ["Sora", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "3xl": "24px",
+                        "4xl": "32px",
+                    },
+                    boxShadow: {
+                        'soft-diffused': '0 10px 40px -10px rgba(0, 0, 0, 0.3)',
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        .glass-material {
+            background: theme('colors.glass-bg');
+            @apply backdrop-blur-xl border border-white/5 shadow-soft-diffused;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        @keyframes pulse-cyan {
+            0%, 100% { opacity: 1; filter: drop-shadow(0 0 2px #67E8F9); }
+            50% { opacity: 0.7; filter: drop-shadow(0 0 5px #67E8F9); }
+        }
+        .animate-pulse-cyan {
+            animation: pulse-cyan 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        body {
+            background-color: #0B0F19;
+            min-height: 100dvh;
+        }
+        .table-row-alt:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-manrope text-white min-h-screen flex flex-col">
+<div class="flex-1 pb-40">
+<header class="px-6 pt-12 pb-6 flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<h1 class="font-sora font-light text-[24px] tracking-tight leading-none">System Tracking &amp; Sync</h1>
+<button class="w-10 h-10 rounded-full border border-white/5 flex items-center justify-center bg-white/5">
+<span class="material-symbols-outlined text-slate-300">settings_suggest</span>
+</button>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex-1 bg-primary text-black font-bold py-3.5 px-6 rounded-full flex items-center justify-center gap-2 active:scale-95 transition-transform text-sm">
+<span class="material-symbols-outlined text-[20px]">download</span>
+                    Export CSV
+                </button>
+<button class="flex-1 glass-material text-white font-medium py-3.5 px-6 rounded-full flex items-center justify-center gap-2 active:scale-95 transition-transform text-sm">
+<span class="material-symbols-outlined text-[20px]">calendar_today</span>
+                    Filter Dates
+                </button>
+</div>
+</header>
+<main class="px-6 flex flex-col gap-8">
+<section>
+<h2 class="font-sora font-semibold text-[20px] text-white mb-4">Active Sync</h2>
+<div class="flex flex-col gap-3">
+<div class="glass-material rounded-[32px] p-8 flex flex-col gap-5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-neon-cyan/10 rounded-2xl flex items-center justify-center">
+<span class="material-symbols-outlined text-neon-cyan">folder_zip</span>
+</div>
+<div>
+<h3 class="font-bold text-sm">Site_Photos_A.zip</h3>
+<p class="text-[11px] text-slate-500 font-medium">34MB • Uploading...</p>
+</div>
+</div>
+<div class="px-4 py-1.5 bg-neon-cyan/10 text-neon-cyan text-[10px] font-bold rounded-full animate-pulse-cyan flex items-center gap-1 border border-neon-cyan/30">
+                                Syncing
+                            </div>
+</div>
+<div class="h-[6px] bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-neon-cyan w-[65%] rounded-full shadow-[0_0_8px_rgba(103,232,249,0.5)]"></div>
+</div>
+</div>
+<div class="glass-material rounded-[32px] p-8 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">picture_as_pdf</span>
+</div>
+<div>
+<h3 class="font-bold text-sm">Audit_Report_v2.pdf</h3>
+<p class="text-[11px] text-slate-500 font-medium">2MB • 2 mins ago</p>
+</div>
+</div>
+<div class="px-4 py-1.5 bg-primary/10 text-primary text-[10px] font-bold rounded-full border border-primary/30">
+                            Completed
+                        </div>
+</div>
+<div class="glass-material rounded-[32px] p-8 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-neon-red/10 rounded-2xl flex items-center justify-center">
+<span class="material-symbols-outlined text-neon-red">description</span>
+</div>
+<div>
+<h3 class="font-bold text-sm">Soil_Data.csv</h3>
+<p class="text-[11px] text-slate-500 font-medium">12MB • Failed</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="px-4 py-1.5 bg-neon-red/10 text-neon-red text-[10px] font-bold rounded-full border border-neon-red/30">
+                                Failed
+                            </div>
+<button class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 active:scale-90 border border-white/5">
+<span class="material-symbols-outlined text-lg">refresh</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<section class="flex-1 flex flex-col min-h-0">
+<h2 class="font-sora font-semibold text-[20px] text-white mb-4">Activity Tracking</h2>
+<div class="glass-material rounded-[32px] flex-1 flex flex-col overflow-hidden">
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left border-collapse min-w-[500px]">
+<thead class="sticky top-0 z-10 glass-material border-none">
+<tr class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+<th class="px-8 py-5">Activity ID</th>
+<th class="px-8 py-5">User</th>
+<th class="px-8 py-5">Action Type</th>
+<th class="px-8 py-5">Timestamp</th>
+<th class="px-8 py-5">Status</th>
+</tr>
+</thead>
+<tbody class="text-[13px]">
+<tr class="table-row-alt border-b border-white/5">
+<td class="px-8 py-6 font-mono text-slate-400">#NR-9821</td>
+<td class="px-8 py-6 font-semibold text-white">John Doe</td>
+<td class="px-8 py-6 text-slate-300">Site Visit</td>
+<td class="px-8 py-6 text-slate-400">10:45 AM</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full border border-primary/20">Completed</span>
+</td>
+</tr>
+<tr class="table-row-alt border-b border-white/5">
+<td class="px-8 py-6 font-mono text-slate-400">#NR-9819</td>
+<td class="px-8 py-6 font-semibold text-white">Sarah M.</td>
+<td class="px-8 py-6 text-slate-300">Data Entry</td>
+<td class="px-8 py-6 text-slate-400">09:12 AM</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full border border-primary/20">Completed</span>
+</td>
+</tr>
+<tr class="table-row-alt border-b border-white/5">
+<td class="px-8 py-6 font-mono text-slate-400">#NR-9815</td>
+<td class="px-8 py-6 font-semibold text-white">Mike R.</td>
+<td class="px-8 py-6 text-slate-300">Export</td>
+<td class="px-8 py-6 text-slate-400">Yesterday</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-neon-red/10 text-neon-red text-[10px] font-bold rounded-full border border-neon-red/20">Failed</span>
+</td>
+</tr>
+<tr class="table-row-alt">
+<td class="px-8 py-6 font-mono text-slate-400">#NR-9804</td>
+<td class="px-8 py-6 font-semibold text-white">John Doe</td>
+<td class="px-8 py-6 text-slate-300">Audit Final</td>
+<td class="px-8 py-6 text-slate-400">Yesterday</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full border border-primary/20">Completed</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-8 border-t border-white/5 flex items-center justify-between bg-white/[0.01]">
+<button class="px-6 py-2.5 glass-material rounded-full text-[11px] font-bold text-slate-400 uppercase active:scale-95 transition-all">Prev</button>
+<div class="flex gap-3">
+<button class="w-10 h-10 rounded-full bg-primary text-black text-[11px] font-bold shadow-[0_0_15px_rgba(190,242,100,0.3)]">1</button>
+<button class="w-10 h-10 rounded-full glass-material text-[11px] font-bold text-slate-400 hover:text-white transition-colors">2</button>
+<button class="w-10 h-10 rounded-full glass-material text-[11px] font-bold text-slate-400 hover:text-white transition-colors">3</button>
+</div>
+<button class="px-6 py-2.5 glass-material rounded-full text-[11px] font-bold text-slate-400 uppercase active:scale-95 transition-all">Next</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<div class="fixed bottom-8 left-6 right-6 z-[100] bg-black rounded-full p-2 shadow-2xl shadow-black/20">
+<nav class="flex items-center justify-between px-2">
+<a class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+</a>
+<a class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">calendar_today</span>
+</a>
+<a class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">add_circle</span>
+</a>
+<a class="w-12 h-12 flex items-center justify-center rounded-full bg-[#BEF264] text-white shadow-lg shadow-[#BEF264]/20" href="#">
+<span class="material-symbols-outlined text-[24px]">bar_chart</span>
+</a>
+<a class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">photo_camera</span>
+</a>
+</nav>
+</div>
+
+</body></html>

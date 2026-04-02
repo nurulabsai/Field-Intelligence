@@ -36,56 +36,59 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
   }, []);
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center z-[9999] bg-[#0B0F19] font-base nuru-screen overflow-hidden">
-      
-      {/* Absolute dark background to override any theme bleed */}
-      <div className="absolute inset-0 bg-[#0B0F19]" />
+    <div
+      className="fixed inset-0 flex flex-col items-center justify-center z-[9999] bg-bg-primary font-base overflow-hidden"
+      role="status"
+      aria-label="Loading NuruOS"
+    >
+      {/* Radial ambient glow — Stitch spec */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(190,242,100,0.06),transparent_65%)] pointer-events-none" />
 
       {/* Main Content Wrapper */}
       <div
-        className="relative z-10 flex flex-col items-center w-full max-w-[320px] transition-all duration-1000 ease-out"
+        className="relative z-10 flex flex-col items-center w-full max-w-[320px] px-8 transition-all duration-1000 ease-out"
         style={{
           opacity: logoVisible ? 1 : 0,
           transform: logoVisible ? 'translateY(0)' : 'translateY(10px)',
         }}
       >
-        
-        {/* Logo Container with Stitch-spec diffuse glow */}
-        <div className="relative mb-[120px]">
-          {/* Outer diffuse glow */}
-          <div className="absolute inset-0 bg-accent rounded-full blur-[45px] opacity-[0.25] transform scale-[2.5]" />
-          
-          {/* The Logo Circle — matching Stitch: border lime/30, neon-glow-diffused */}
-          <div className="relative w-[124px] h-[124px] rounded-full bg-[#0B0F19] border border-[#BEF264]/30 flex items-center justify-center shadow-[0_0_40px_rgba(190,242,100,0.15)]">
+        {/* Logo Container — Stitch neon-glow-diffused circle */}
+        <div className="relative mb-24">
+          <div className="absolute inset-0 bg-accent opacity-5 blur-3xl rounded-full scale-[2.5]" />
+          <div className="w-[124px] h-[124px] rounded-full border border-accent/30 flex items-center justify-center relative bg-bg-primary shadow-[0_0_40px_4px_rgba(190,242,100,0.35)]">
             <NuruLogo size={68} />
           </div>
         </div>
 
-        {/* Loading Text */}
-        <p className="text-white font-light text-[19px] tracking-wide mb-5 text-center font-heading">
-          Initializing Intelligence...
-        </p>
-
-        {/* Progress Bar Container */}
-        <div className="w-full h-[6px] bg-[#1E2534] rounded-full overflow-hidden shadow-inner">
+        {/* Status text + progress bar */}
+        <div className="w-full flex flex-col items-center space-y-6">
+          <p className="font-heading font-light text-lg text-white tracking-tight leading-none">
+            Initializing Intelligence\u2026
+          </p>
           <div
-            className="h-full bg-accent rounded-full transition-all duration-[50ms] ease-linear shadow-[0_0_12px_rgba(190,242,100,0.5)]"
-            style={{ width: `${progress}%` }}
-          />
+            className="w-full h-[6px] bg-[#1E293B] rounded-full overflow-hidden relative"
+            role="progressbar"
+            aria-valuenow={Math.round(progress)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <div
+              className="h-full bg-accent rounded-full absolute top-0 left-0 transition-all duration-75 ease-linear"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         </div>
-
       </div>
 
-      {/* Absolute Bottom Tagline */}
-      <div 
-        className="absolute bottom-10 w-full text-center transition-opacity duration-1000 delay-500"
-        style={{ opacity: logoVisible ? 1 : 0 }}
+      {/* Bottom tagline — Stitch spec */}
+      <div
+        className="absolute bottom-12 flex flex-col items-center w-full px-6 transition-opacity duration-1000 delay-500"
+        style={{ opacity: logoVisible ? 0.8 : 0 }}
       >
-        <p className="text-white/40 text-[10px] font-bold tracking-[0.25em] uppercase">
-          NuruOS Field Intelligence by Nuru Labs
+        <p className="font-base text-xs font-medium tracking-[0.2em] text-text-secondary uppercase text-center">
+          NuruOS Field Intelligence
         </p>
       </div>
-
     </div>
   );
 };

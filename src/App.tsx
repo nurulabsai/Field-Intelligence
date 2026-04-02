@@ -388,6 +388,7 @@ const DashboardWrapper: React.FC = () => {
       stressAlert={stressAlert}
       onAuditClick={(id) => navigate(`/audit/${id}`)}
       onViewAllAudits={() => navigate('/audits')}
+      onStartNewAudit={() => navigate('/audit/new')}
     />
   );
 };
@@ -598,35 +599,39 @@ const SettingsPlaceholder: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="p-6 max-w-[760px] mx-auto nuru-screen">
-      <h1 className="text-3xl font-light text-text-primary font-heading tracking-tight mb-6">
-        Settings
-      </h1>
+    <div className="min-h-screen bg-bg-primary font-base px-6 pt-12 pb-40">
+      <div className="max-w-[760px] mx-auto">
+        <h1 className="text-[24px] font-light text-white font-heading tracking-tight mb-8">
+          Settings
+        </h1>
 
-      <div className="nuru-glass-card rounded-[24px] p-6 mb-4">
-        <div className="mb-4">
-          <div className="text-xs text-text-tertiary mb-1">Name</div>
-          <div className="text-base text-text-primary">{user?.fullName || 'N/A'}</div>
+        <div className="nuru-glassmorphism rounded-[32px] p-8 mb-6 space-y-6">
+          <div>
+            <div className="text-[10px] font-bold text-text-tertiary uppercase tracking-[0.15em] mb-2">Name</div>
+            <div className="text-[15px] text-white font-medium">{user?.fullName || 'N/A'}</div>
+          </div>
+          <div className="border-t border-white/5" />
+          <div>
+            <div className="text-[10px] font-bold text-text-tertiary uppercase tracking-[0.15em] mb-2">Email</div>
+            <div className="text-[15px] text-white font-medium">{user?.email || 'N/A'}</div>
+          </div>
+          <div className="border-t border-white/5" />
+          <div>
+            <div className="text-[10px] font-bold text-text-tertiary uppercase tracking-[0.15em] mb-2">Role</div>
+            <div className="text-[15px] text-white font-medium capitalize">{user?.role || 'N/A'}</div>
+          </div>
         </div>
-        <div className="mb-4">
-          <div className="text-xs text-text-tertiary mb-1">Email</div>
-          <div className="text-base text-text-primary">{user?.email || 'N/A'}</div>
-        </div>
-        <div>
-          <div className="text-xs text-text-tertiary mb-1">Role</div>
-          <div className="text-base text-text-primary capitalize">{user?.role || 'N/A'}</div>
-        </div>
+
+        <button
+          onClick={async () => {
+            await signOut();
+            navigate('/auth/login');
+          }}
+          className="w-full py-4 px-6 bg-error/10 text-error border border-error/20 rounded-full text-sm font-bold uppercase tracking-[0.1em] cursor-pointer font-base active:scale-[0.98] transition-all"
+        >
+          Sign Out
+        </button>
       </div>
-
-      <button
-        onClick={async () => {
-          await signOut();
-          navigate('/auth/login');
-        }}
-        className="w-full py-3.5 px-6 bg-[rgba(239,68,68,0.1)] text-[#EF4444] border border-[rgba(239,68,68,0.2)] rounded-full text-base font-semibold cursor-pointer font-base"
-      >
-        Sign Out
-      </button>
     </div>
   );
 };

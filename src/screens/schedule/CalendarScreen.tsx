@@ -1,5 +1,6 @@
-import React from 'react';
-import { Search, Bell, Clock, User, Box, ArrowRightLeft } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Search, Bell, Clock, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '../../design-system';
 
 export type EventType = 'audit' | 'training' | 'meeting' | 'deadline';
@@ -14,190 +15,288 @@ export interface CalendarEvent {
   notes?: string;
 }
 
-interface CalendarScreenProps {
-  events?: CalendarEvent[];
-  onAddEvent?: (event: Omit<CalendarEvent, 'id'>) => void;
+// Internal display model with extra visual fields
+interface DisplayActivity {
+  id: string;
+  title: string;
+  type: EventType;
+  date: string;
+  time: string;
+  location: string;
+  progress: number;
+  color: string;
+  imageUrl: string;
+  status: 'completed' | 'pending';
+  category: string;
 }
 
-// --- Temporary Mock Data for UI Fidelity ---
-const DATES = [
-  { day: '10', label: 'MON', active: false },
-  { day: '11', label: 'TUE', active: false },
-  { day: '12', label: 'WED', active: true },
-  { day: '13', label: 'THU', active: false },
-  { day: '14', label: 'FRI', active: false },
-  { day: '15', label: 'SAT', active: false },
-];
+interface CalendarScreenProps {
+  events?: CalendarEvent[];
+  onAddEvent?: (event: { title: string; type: EventType; date: string; time: string; location: string; notes?: string }) => Promise<void>;
+  isLoading?: boolean;
+  error?: string | null;
+}
 
-const ACTIVITIES = [
+// Color map for event types
+const TYPE_COLORS: Record<EventType, string> = {
+  audit: '#BEF264',
+  training: '#67E8F9',
+  meeting: '#D8B4FE',
+  deadline: '#FBBF24',
+};
+
+const TYPE_IMAGES: Record<EventType, string> = {
+  audit: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD89wQuvoLzpExUZevyZsMgZx7IUaVmO0wH6ukF0PjBPl2lNgL1_zwpTkQQU5TgiLVUPjX69H-8pxBSY4flCkfeu3BPZJKnHmGJ8a65Y_0YWKWqCF5oGiHBrVkTAchQJ_HnqjjoqPqHLzj3nsruOzckDhWomkL_JwxKU2DPYVn47qe6Ndi33arHSuDX72KOlVrBMzB_lf62HnaP4kkNDgvqVa6k4dZt428Nq0iUuk-SFQ4ggq6CKrh4Q8PhEW_RUoW9iZWAgk_8qvuW',
+  training: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDcGErLNv0-42J33KKgOm8k2KtmUvcmUufl7U9ZSucXIsKv_DvEGes4HfF3xW6lf-adjl6hBvmcZrTtMmyUftfZBfWwjG6bNHZK7YKUcqKFHgqXfaW5AQKQ-W7KoJWiZYcHPrOkjIB5ylnm6ScbJ-VqAn2ls0s3Z3NsddaAIx9AHikPnXAkw30tkpmbFiFycLzFf6cBE3HJbaWXEGnMeRRLpfqapWPZ8Xt3PFyg1TdaSnV2su3f5XkCyTYa6aNjW7N9n6wxtV958cNY',
+  meeting: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDgzG3aOGeeO_xElNR0xwi3nB5064c1LuPKV68jILXcXK-lg0ldPkwJZKhCUVu-NfEhuybJKX2XYRzPSMAKyPyEbKt-uYXYhYjSDZ9h-La8YpIM4mY5vy0MsJLC3T_LEUgDsO7r3g8CGG1RjlnKsTHwYKi1a5CvVH-f2U76gGC5VOW_d-ou1Cc16fnoIIbT5JhnWhx8_ofSqQSxDWtdTKQ4b-B4IddbE5kO4S5pOaHM0smRrx58FyefvXzgEpWXCErbqJ8WkNwAtKUb',
+  deadline: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD89wQuvoLzpExUZevyZsMgZx7IUaVmO0wH6ukF0PjBPl2lNgL1_zwpTkQQU5TgiLVUPjX69H-8pxBSY4flCkfeu3BPZJKnHmGJ8a65Y_0YWKWqCF5oGiHBrVkTAchQJ_HnqjjoqPqHLzj3nsruOzckDhWomkL_JwxKU2DPYVn47qe6Ndi33arHSuDX72KOlVrBMzB_lf62HnaP4kkNDgvqVa6k4dZt428Nq0iUuk-SFQ4ggq6CKrh4Q8PhEW_RUoW9iZWAgk_8qvuW',
+};
+
+// Fallback mock data when no real events are provided
+const FALLBACK_ACTIVITIES: DisplayActivity[] = [
   {
-    id: '1',
+    id: 'mock-1',
     title: 'Green Valley Farm Audit',
-    location: 'California, US',
+    type: 'audit',
+    date: '12',
     time: '10:00 AM',
-    progress: 85,
-    progressColor: 'bg-[#BEF264]',
-    iconBg: 'bg-[#507675]', // Slate teal
-    icon: <User className="text-white" size={24} strokeWidth={1.5} />
+    location: 'California, US',
+    progress: 100,
+    color: '#BEF264',
+    imageUrl: TYPE_IMAGES.audit,
+    status: 'completed',
+    category: 'Farm',
   },
   {
-    id: '2',
+    id: 'mock-2',
     title: 'Retail Store Inspection',
-    location: 'Downtown Branch',
+    type: 'audit',
+    date: '12',
     time: '02:00 PM',
-    progress: 45,
-    progressColor: 'bg-[#4DD0E1]', // Cyan blue
-    iconBg: 'bg-[#1A1F2E]', // Dark slate
-    icon: <ArrowRightLeft className="text-white/50" size={20} strokeWidth={1.5} />
+    location: 'Downtown Branch',
+    progress: 72,
+    color: '#67E8F9',
+    imageUrl: TYPE_IMAGES.training,
+    status: 'pending',
+    category: 'Store',
   },
-  {
-    id: '3',
-    title: 'Warehouse Audit',
-    location: 'Logistics Hub B',
-    time: '06:00 PM',
-    progress: 10,
-    progressColor: 'bg-[#CE93D8]', // Purple/Pink
-    iconBg: 'bg-[#3A5653]', // Deep green/teal
-    icon: <Box className="text-white" size={22} strokeWidth={1.5} />
-  }
 ];
 
-const CalendarScreen: React.FC<CalendarScreenProps> = () => {
+const DATES = [
+  { day: '10', label: 'MON' },
+  { day: '11', label: 'TUE' },
+  { day: '12', label: 'WED' },
+  { day: '13', label: 'THU' },
+  { day: '14', label: 'FRI' },
+];
+
+const FILTERS = ['All', 'Completed', 'Pending'];
+
+const CalendarScreen: React.FC<CalendarScreenProps> = ({
+  events = [],
+  isLoading = false,
+  error = null,
+}) => {
+  const navigate = useNavigate();
+
+  const [selectedDate, setSelectedDate] = useState<string>('12');
+  const [selectedFilter, setSelectedFilter] = useState<string>('All');
+
+  // Convert real events into display activities, or fall back to mock data
+  const activities: DisplayActivity[] = useMemo(() => {
+    if (events.length > 0) {
+      return events.map((ev) => {
+        const evDate = new Date(ev.date);
+        const dayStr = String(evDate.getDate());
+        const color = TYPE_COLORS[ev.type] || '#BEF264';
+        const image = TYPE_IMAGES[ev.type] || TYPE_IMAGES.audit;
+        return {
+          id: ev.id,
+          title: ev.title,
+          type: ev.type,
+          date: dayStr,
+          time: ev.time,
+          location: ev.location || ev.notes || '',
+          progress: ev.type === 'deadline' ? 0 : 50,
+          color,
+          imageUrl: image,
+          status: 'pending' as const,
+          category: ev.type.charAt(0).toUpperCase() + ev.type.slice(1),
+        };
+      });
+    }
+    return FALLBACK_ACTIVITIES;
+  }, [events]);
+
+  // Dynamic filtering logic
+  const filteredActivities = useMemo(() => {
+    return activities.filter((activity) => {
+      if (activity.date !== selectedDate) return false;
+      if (selectedFilter === 'All') return true;
+      if (selectedFilter === 'Completed') return activity.status === 'completed';
+      if (selectedFilter === 'Pending') return activity.status === 'pending';
+      if (selectedFilter === 'Warehouse') return activity.category === 'Warehouse';
+      return true;
+    });
+  }, [activities, selectedDate, selectedFilter]);
+
   return (
-    <div className="min-h-screen bg-[#070A0F] font-base px-6 pt-14 pb-32">
-      
-      {/* Header */}
-      <div className="flex justify-between items-center mb-10 w-full max-w-lg mx-auto">
-        <h1 className="text-[36px] font-heading font-light text-white tracking-tight">
+    <div className="w-full min-h-screen relative flex flex-col bg-bg-primary font-base overflow-x-hidden">
+
+      <div className="px-8 pt-14 pb-6 flex justify-between items-center">
+        <h2 className="font-heading text-[32px] font-light tracking-tight text-white leading-tight">
           My Schedule
-        </h1>
+        </h2>
         <div className="flex items-center gap-3">
-          <button className="w-11 h-11 rounded-full bg-[#121623] border border-white/5 flex items-center justify-center text-white/60 hover:text-white transition-colors cursor-pointer shadow-xl">
-            <Search size={18} strokeWidth={2} />
+          <button type="button" className="w-12 h-12 rounded-full nuru-vital-card flex items-center justify-center text-white/60 hover:text-white transition-colors cursor-pointer">
+            <Search size={22} strokeWidth={1.5} />
           </button>
-          <button className="relative w-11 h-11 rounded-full bg-[#121623] border border-white/5 flex items-center justify-center text-white/60 hover:text-white transition-colors cursor-pointer shadow-xl">
-            <Bell size={18} strokeWidth={2} />
-            {/* Notification Dot */}
-            <div className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-accent rounded-full border-[2px] border-[#121623]" />
+          <button type="button" className="relative w-12 h-12 rounded-full nuru-vital-card flex items-center justify-center text-white/60 hover:text-white transition-colors cursor-pointer">
+            <Bell size={22} strokeWidth={1.5} />
+            <span className="absolute top-3.5 right-3.5 w-2 h-2 bg-accent rounded-full" />
           </button>
         </div>
       </div>
 
-      <div className="w-full max-w-lg mx-auto">
+      <div className="flex-1 flex flex-col">
         {/* Horizontal Calendar Scroller */}
-        <div className="mb-10 w-full">
-          {/* Months Ribbon Text */}
-          <div className="flex justify-between items-center mb-5 text-[10px] font-bold tracking-[0.15em] uppercase px-1">
+        <div className="px-8 pb-4">
+          <div className="flex items-center text-text-secondary text-xs font-semibold tracking-widest uppercase">
             <span className="text-white">February</span>
-            <div className="flex gap-5 text-[#3D4760]">
-              <span className="cursor-pointer hover:text-white/50 transition-colors">Jan</span>
-              <span className="cursor-pointer hover:text-white/50 transition-colors">Mar</span>
-            </div>
           </div>
+        </div>
 
-          {/* Dates Ribbon */}
-          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-6 -mx-6 px-6 snap-x">
-            {DATES.map((item, idx) => (
-              <button 
-                key={idx}
-                className={cn(
-                  "flex flex-col items-center justify-center w-[76px] h-[92px] rounded-full shrink-0 snap-center cursor-pointer transition-all border",
-                  item.active 
-                    ? "bg-accent border-accent text-[#080B10] shadow-[0_0_35px_rgba(190,242,100,0.25)]" 
-                    : "bg-[#121623] border-white/5 text-white/50 hover:bg-white/5"
-                )}
-              >
-                <span className={cn("text-[20px] font-semibold mb-1 tracking-tight", item.active ? "text-[#080B10]" : "text-white")}>
-                  {item.day}
-                </span>
-                <span className={cn("text-[10px] font-bold tracking-widest uppercase", item.active ? "text-[#080B10]/70" : "text-[#4A5570]")}>
-                  {item.label}
-                </span>
-              </button>
-            ))}
+        <div className="px-8 pb-10">
+          <div className="flex gap-4 overflow-x-auto no-scrollbar items-center">
+            {DATES.map((item, idx) => {
+              const isActive = item.day === selectedDate;
+              return (
+                <button 
+                  key={idx}
+                  onClick={() => setSelectedDate(item.day)}
+                  className={cn(
+                    "flex flex-col items-center justify-center min-w-[64px] h-[84px] rounded-full shrink-0 snap-center cursor-pointer transition-all border",
+                    isActive 
+                    ? "bg-accent border-accent text-bg-primary nuru-glow-lime-soft" 
+                    : "nuru-vital-card text-white/80 hover:bg-white/10"
+                  )}
+                >
+                  <span className={cn("text-[18px] mb-0.5 nuru-tabular-nums", isActive ? "font-extrabold" : "font-semibold opacity-80")}>
+                    {item.day}
+                  </span>
+                  <span className={cn("text-[10px] uppercase tracking-widest", isActive ? "font-bold" : "font-medium opacity-40")}>
+                    {item.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {/* KPI Score Card */}
-        <div className="bg-[#121623] border border-white/[0.04] rounded-[32px] p-7 mb-10 flex items-center justify-between shadow-2xl relative overflow-hidden">
-          {/* Subtle glowing orb in background */}
-          <div className="absolute -right-10 top-1/2 -translate-y-1/2 w-[120px] h-[120px] bg-accent/5 rounded-full blur-[30px] pointer-events-none" />
-          
-          <div className="relative z-10 flex flex-col justify-center">
-            <p className="text-[10px] font-bold tracking-[0.15em] text-[#5C6A8A] uppercase mb-[18px]">
-              Monthly Audit Grade
-            </p>
-            <h2 className="text-[25px] text-white font-medium leading-[1.1] tracking-tight mb-4 text-shadow-sm">
-              Total Audits<br />Completed
-            </h2>
-            <div className="flex items-center gap-2.5">
-              <div className="w-[5px] h-[5px] rounded-full bg-accent shadow-[0_0_8px_rgba(190,242,100,0.8)]" />
-              <span className="text-accent text-[13px] font-semibold tracking-wide">
-                24 Tasks this month
-              </span>
+        <div className="px-8 pb-10">
+          <div className="nuru-vital-card rounded-[32px] p-8 flex justify-between items-center relative overflow-hidden">
+            <div className="relative z-10">
+              <p className="text-text-secondary text-xs font-semibold tracking-wider uppercase mb-2">
+                Monthly Audit Grade
+              </p>
+              <h3 className="text-white text-2xl font-heading font-semibold tracking-tight">
+                Total Audits Completed
+              </h3>
+              <p className="text-accent font-medium mt-3 text-sm flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                {activities.length} Tasks this month
+              </p>
             </div>
-          </div>
-
-          {/* Grade Circle */}
-          <div className="relative z-10 shrink-0 w-[76px] h-[76px] rounded-full border border-[#2D3548] flex items-center justify-center shadow-inner bg-[#1A1F2E]/30 text-accent text-[30px] font-light tracking-tighter">
-            A+
+            <div className="relative z-10 w-20 h-20 rounded-full bg-accent/5 border border-accent/10 flex items-center justify-center">
+              <span className="text-accent text-3xl font-light font-heading">A+</span>
+            </div>
           </div>
         </div>
 
-        {/* Your Activity Section */}
-        <div className="w-full">
-          <h2 className="text-[23px] text-white font-medium tracking-tight mb-5 px-1">
+        {/* Activity Section */}
+        <div className="px-8 flex flex-col flex-1 pb-40">
+          <h3 className="font-heading font-light text-[28px] tracking-tight text-white mb-8">
             Your Activity
-          </h2>
+          </h3>
 
           {/* Filter Pills */}
-          <div className="flex gap-3 overflow-x-auto no-scrollbar pb-4 -mx-6 px-6 mb-3 snap-x">
-            <button className="bg-accent text-[#080B10] px-[28px] py-[13px] rounded-full text-[13px] font-bold tracking-wide shadow-[0_4px_20px_rgba(190,242,100,0.15)] shrink-0 snap-center cursor-pointer border-none">
-              All
-            </button>
-            <button className="bg-transparent border border-[#2A3143] text-[#7180A0] hover:text-white px-[28px] py-[13px] rounded-full text-[13px] font-semibold tracking-wide shrink-0 snap-center cursor-pointer transition-colors">
-              Completed
-            </button>
-            <button className="bg-transparent border border-[#2A3143] text-[#7180A0] hover:text-white px-[28px] py-[13px] rounded-full text-[13px] font-semibold tracking-wide shrink-0 snap-center cursor-pointer transition-colors">
-              Pending
-            </button>
+          <div className="flex gap-3 overflow-x-auto no-scrollbar mb-8">
+            {FILTERS.map(filter => {
+              const isActive = filter === selectedFilter;
+              return (
+                <button 
+                  key={filter}
+                  onClick={() => setSelectedFilter(filter)}
+                  className={cn(
+                    "px-8 py-3 rounded-full text-[14px] tracking-wide shrink-0 snap-center cursor-pointer transition-all whitespace-nowrap",
+                    isActive 
+                    ? "bg-accent text-bg-primary font-bold nuru-glow-lime-soft" 
+                    : "nuru-vital-card text-text-secondary font-semibold hover:text-white hover:bg-white/10"
+                  )}
+                >
+                  {filter}
+                </button>
+              );
+            })}
           </div>
 
           {/* Task Feed */}
-          <div className="flex flex-col gap-4">
-            {ACTIVITIES.map((activity) => (
+          <div className="space-y-6">
+            {isLoading && (
+              <div className="flex items-center justify-center py-16">
+                <Loader2 size={32} className="text-accent animate-spin" />
+              </div>
+            )}
+
+            {error && !isLoading && (
+              <div className="text-center py-10 bg-red-500/5 border border-red-500/10 rounded-[32px]">
+                <p className="text-red-400 text-[14px] tracking-wide mb-2">{error}</p>
+                <p className="text-text-secondary text-[12px]">Showing offline data</p>
+              </div>
+            )}
+
+            {!isLoading && filteredActivities.length === 0 && (
+              <div className="text-center py-10 bg-white/[0.02] border border-white/5 rounded-[32px]">
+                <p className="text-text-secondary text-[14px] tracking-wide">No activities matched for this filter.</p>
+              </div>
+            )}
+
+            {!isLoading && filteredActivities.map((activity) => (
               <div 
                 key={activity.id} 
-                className="bg-[#121623] rounded-[24px] p-5 flex flex-col justify-between border border-white/[0.03] shadow-lg relative overflow-hidden"
+                onClick={() => navigate('/audit/wizard/business')}
+                className="nuru-vital-card rounded-[32px] p-8 flex flex-col relative overflow-hidden cursor-pointer group"
               >
-                {/* Event Top Data Row */}
-                <div className="flex items-center gap-4 mb-6">
-                  {/* Custom Graphic Avatar Block */}
-                  <div className={cn("w-[68px] h-[68px] rounded-[18px] shrink-0 border border-white/5 flex items-center justify-center overflow-hidden", activity.iconBg)}>
-                     {/* Replace with actual User Avatars later, using lucide icons as placeholders for now */}
-                     {activity.icon}
+                <div className="flex gap-6">
+                  <div className="w-20 h-20 rounded-[24px] bg-zinc-900/50 overflow-hidden shrink-0 flex items-center justify-center border border-white/5">
+                    <img 
+                      alt="Audit Thumbnail" 
+                      className="w-full h-full object-cover opacity-70" 
+                      src={activity.imageUrl} 
+                    />
                   </div>
-                  
-                  {/* Text Details */}
-                  <div className="flex flex-col py-1">
-                    <h3 className="text-[17px] font-semibold text-white tracking-tight mb-1 line-clamp-2 leading-snug pr-4">
+                  <div className="flex-1 flex flex-col justify-center">
+                    <h4 className="font-heading font-semibold text-[20px] text-white leading-snug">
                       {activity.title}
-                    </h3>
-                    <p className="text-[#6D7A94] text-[13px] tracking-wide mb-2.5 font-medium">
+                    </h4>
+                    <p className="text-[14px] font-medium text-text-secondary mt-1 opacity-80">
                       {activity.location}
                     </p>
-                    <div className="flex items-center gap-1.5 text-white/90">
-                      <Clock size={12} strokeWidth={2.5} />
-                      <span className="text-[12px] font-bold tracking-wide">{activity.time}</span>
+                    <div className="flex items-center gap-1.5 mt-3" style={{ color: `${activity.color}B3` }}>
+                      <Clock size={16} strokeWidth={2.5} />
+                      <span className="text-[13px] font-bold tracking-wide">{activity.time}</span>
                     </div>
                   </div>
                 </div>
-
-                {/* Tracking Progress Bar */}
-                <div className="w-full h-[3px] bg-[#1E2538] rounded-full overflow-hidden mt-2 relative">
+                <div className="mt-8 w-full h-[4px] bg-white/5 rounded-full overflow-hidden">
                   <div 
-                    className={cn("absolute top-0 left-0 bottom-0 rounded-full", activity.progressColor)}
-                    style={{ width: `${activity.progress}%` }}
+                    className="h-full rounded-full"
+                    style={{ 
+                      width: `${activity.progress}%`,
+                      backgroundColor: activity.color,
+                      boxShadow: `0 0 12px ${activity.color}66`,
+                    }}
                   />
                 </div>
               </div>
