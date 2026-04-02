@@ -167,7 +167,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
         </div>
 
         <div className="px-8 pb-10">
-          <div className="flex gap-4 overflow-x-auto no-scrollbar items-center">
+          <div className="flex gap-3 items-center">
             {DATES.map((item, idx) => {
               const isActive = item.day === selectedDate;
               return (
@@ -175,7 +175,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
                   key={idx}
                   onClick={() => setSelectedDate(item.day)}
                   className={cn(
-                    "flex flex-col items-center justify-center min-w-[64px] h-[84px] rounded-full shrink-0 snap-center cursor-pointer transition-all border",
+                    "flex-1 flex flex-col items-center justify-center h-[84px] rounded-full cursor-pointer transition-all border",
                     isActive 
                     ? "bg-accent border-accent text-bg-primary nuru-glow-lime-soft" 
                     : "nuru-vital-card text-white/80 hover:bg-white/10"
@@ -221,7 +221,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
           </h3>
 
           {/* Filter Pills */}
-          <div className="flex gap-3 overflow-x-auto no-scrollbar mb-8">
+          <div className="flex gap-3 mb-8">
             {FILTERS.map(filter => {
               const isActive = filter === selectedFilter;
               return (
@@ -229,7 +229,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
                   key={filter}
                   onClick={() => setSelectedFilter(filter)}
                   className={cn(
-                    "px-8 py-3 rounded-full text-[14px] tracking-wide shrink-0 snap-center cursor-pointer transition-all whitespace-nowrap",
+                    "flex-1 py-3 rounded-full text-[14px] tracking-wide cursor-pointer transition-all whitespace-nowrap",
                     isActive 
                     ? "bg-accent text-bg-primary font-bold nuru-glow-lime-soft" 
                     : "nuru-vital-card text-text-secondary font-semibold hover:text-white hover:bg-white/10"

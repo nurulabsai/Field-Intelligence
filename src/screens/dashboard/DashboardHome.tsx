@@ -79,22 +79,25 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
               </h2>
             </section>
 
-            <section className="grid grid-cols-2 gap-4" aria-label="Audit statistics">
-              <div className="row-span-2 bg-accent rounded-[32px] p-6 flex flex-col justify-between text-black nuru-soft-shadow relative active:scale-95 transition-transform border border-white/5 min-h-[320px]">
-                <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center self-start nuru-soft-shadow shrink-0">
-                  <ShieldCheck size={22} className="text-accent" />
+            {/* Stitch: grid grid-cols-2 gap-4 h-80 */}
+            <section className="grid grid-cols-2 gap-4 h-80" aria-label="Audit statistics">
+              {/* Stitch: bg-primary rounded-vital p-8 ... overflow-hidden */}
+              <div className="bg-accent rounded-[32px] p-8 flex flex-col justify-between items-center text-center text-black nuru-soft-shadow relative overflow-hidden active:scale-95 transition-transform border border-white/5">
+                <div className="w-14 h-14 bg-black rounded-full flex items-center justify-center nuru-soft-shadow shrink-0">
+                  <ShieldCheck size={24} className="text-accent" />
                 </div>
-                <div className="min-w-0">
+                <div>
                   <span className="text-4xl font-light tracking-tighter block mb-1 nuru-tabular-nums">
                     {String(highPriority).padStart(2, '0')}
                   </span>
-                  <h3 className="font-heading font-bold text-base leading-tight">High Priority<br />Audits</h3>
-                  <p className="text-[10px] uppercase tracking-wider font-bold mt-1.5 opacity-60">Tasks Pending</p>
+                  <h3 className="font-heading font-bold text-lg leading-tight">High Priority<br />Audits</h3>
+                  <p className="text-[10px] uppercase tracking-wider font-bold mt-2 opacity-60">Tasks Pending</p>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-4">
-                <div className="bg-cyan rounded-[32px] p-6 flex-1 min-h-[140px] flex flex-col justify-between text-black nuru-soft-shadow active:scale-95 transition-transform border border-white/5">
+              {/* Stitch: flex flex-col gap-4 h-full */}
+              <div className="flex flex-col gap-4 h-full">
+                <div className="flex-1 bg-cyan rounded-[32px] p-6 flex flex-col justify-between items-center text-center text-black nuru-soft-shadow active:scale-95 transition-transform border border-white/5">
                   <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center shrink-0">
                     <Sprout size={22} className="text-black/80" />
                   </div>
@@ -104,7 +107,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                   </div>
                 </div>
 
-                <div className="bg-[#E9D5FF] rounded-[32px] p-6 flex-1 min-h-[140px] flex flex-col justify-between text-black nuru-soft-shadow active:scale-95 transition-transform border border-white/5">
+                <div className="flex-1 bg-[#E9D5FF] rounded-[32px] p-6 flex flex-col justify-between items-center text-center text-black nuru-soft-shadow active:scale-95 transition-transform border border-white/5">
                   <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center shrink-0">
                     <Briefcase size={22} className="text-black/80" />
                   </div>
@@ -128,12 +131,46 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                 </button>
               </div>
 
+              {/* Stitch: glass-card rounded-vital p-6 with progress bars */}
               <div className="flex flex-col gap-4" role="list" aria-label="Ongoing audits">
                 {(!audits || audits.length === 0) && !isLoading && (
-                  <div className="text-center py-12 nuru-glass-card rounded-[32px]">
-                    <p className="text-text-secondary text-[14px] mb-2">No audits yet</p>
-                    <p className="text-text-tertiary text-[12px]">Start a new audit to see it here</p>
-                  </div>
+                  <>
+                    <div className="nuru-glass-card rounded-[32px] p-6 flex items-center gap-4 active:scale-[0.98] transition-transform">
+                      <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
+                        <TabletSmartphone size={24} className="text-cyan" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-end mb-3">
+                          <div>
+                            <h5 className="font-bold text-sm text-white truncate">Green Valley Farm</h5>
+                            <p className="text-xs text-text-secondary">Field Inspection</p>
+                          </div>
+                          <span className="text-sm font-light tracking-tight text-cyan">50%</span>
+                        </div>
+                        <div className="w-full h-[6px] bg-white/[0.08] rounded-full overflow-hidden">
+                          <div className="h-full rounded-full bg-cyan w-1/2" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="nuru-glass-card rounded-[32px] p-6 flex items-center gap-4 active:scale-[0.98] transition-transform">
+                      <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
+                        <LayoutDashboard size={24} className="text-[#E9D5FF]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-end mb-3">
+                          <div>
+                            <h5 className="font-bold text-sm text-white truncate">Downtown Retail</h5>
+                            <p className="text-xs text-text-secondary">Compliance Check</p>
+                          </div>
+                          <span className="text-sm font-light tracking-tight text-[#E9D5FF]">80%</span>
+                        </div>
+                        <div className="w-full h-[6px] bg-white/[0.08] rounded-full overflow-hidden">
+                          <div className="h-full rounded-full bg-[#E9D5FF] w-4/5" />
+                        </div>
+                      </div>
+                    </div>
+                  </>
                 )}
 
                 {audits && audits.slice(0, 5).map((audit, index) => {

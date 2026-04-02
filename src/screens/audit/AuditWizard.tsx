@@ -87,7 +87,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ onComplete }) => {
       </div>
 
       {/* Progress Node Bar */}
-      <div className="flex items-center justify-between gap-1 mb-8 overflow-hidden">
+      <div className="flex items-center justify-between gap-1 mb-8">
         {[1, 2, 3, 4, 5].map((i) => (
           <React.Fragment key={i}>
             <div className="w-[16px] h-[16px] rounded-full bg-accent flex items-center justify-center shrink-0">
