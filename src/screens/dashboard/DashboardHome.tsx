@@ -22,7 +22,18 @@ interface DashboardHomeProps {
   onProfilePress?: () => void;
 }
 
-const PROGRESS_COLORS: string[] = ['#67E8F9', '#E9D5FF', '#BEF264', '#FBBF24', '#FB7185'];
+/** Stitch `nuruos_premium_dashboard_home_2`: secondary-cyan, secondary-purple, display primary lime */
+const STITCH_DASH_LIME = '#d1fa7d';
+const STITCH_DASH_CYAN = '#4edaff';
+const STITCH_DASH_PURPLE = '#e0c6fd';
+
+const PROGRESS_COLORS: string[] = [
+  STITCH_DASH_CYAN,
+  STITCH_DASH_PURPLE,
+  STITCH_DASH_LIME,
+  '#FBBF24',
+  '#FB7185',
+];
 
 const DashboardHome: React.FC<DashboardHomeProps> = ({
   userName,
@@ -89,10 +100,13 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
 
             {/* Stitch: grid grid-cols-2 gap-4 h-80 */}
             <section className="grid grid-cols-2 gap-4 h-80" aria-label="Audit statistics">
-              {/* Stitch: bg-primary rounded-vital p-8 ... overflow-hidden */}
-              <div className="bg-accent rounded-[32px] p-8 flex flex-col justify-between items-center text-center text-black nuru-soft-shadow relative overflow-hidden active:scale-95 transition-transform border border-white/5">
+              {/* Stitch home_2: bg-primary #d1fa7d (display lime), icon text-primary on black */}
+              <div
+                className="rounded-[32px] p-8 flex flex-col justify-between items-center text-center text-slate-900 nuru-soft-shadow relative overflow-hidden active:scale-95 transition-transform border border-white/5"
+                style={{ backgroundColor: STITCH_DASH_LIME }}
+              >
                 <div className="w-14 h-14 bg-black rounded-full flex items-center justify-center nuru-soft-shadow shrink-0">
-                  <MaterialIcon name="verified_user" size={24} className="text-accent" />
+                  <MaterialIcon name="verified_user" size={24} style={{ color: STITCH_DASH_LIME }} />
                 </div>
                 <div>
                   <span className="text-4xl font-light tracking-tighter block mb-1 nuru-tabular-nums">
@@ -105,7 +119,10 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
 
               {/* Stitch: flex flex-col gap-4 h-full */}
               <div className="flex flex-col gap-4 h-full">
-                <div className="flex-1 bg-cyan rounded-[32px] p-6 flex flex-col justify-between items-center text-center text-black nuru-soft-shadow active:scale-95 transition-transform border border-white/5">
+                <div
+                  className="flex-1 rounded-[32px] p-6 flex flex-col justify-between items-center text-center text-slate-900 nuru-soft-shadow active:scale-95 transition-transform border border-white/5"
+                  style={{ backgroundColor: STITCH_DASH_CYAN }}
+                >
                   <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center shrink-0">
                     <MaterialIcon name="eco" size={22} className="text-black/80" />
                   </div>
@@ -115,7 +132,10 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                   </div>
                 </div>
 
-                <div className="flex-1 bg-[#E9D5FF] rounded-[32px] p-6 flex flex-col justify-between items-center text-center text-black nuru-soft-shadow active:scale-95 transition-transform border border-white/5">
+                <div
+                  className="flex-1 rounded-[32px] p-6 flex flex-col justify-between items-center text-center text-slate-900 nuru-soft-shadow active:scale-95 transition-transform border border-white/5"
+                  style={{ backgroundColor: STITCH_DASH_PURPLE }}
+                >
                   <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center shrink-0">
                     <MaterialIcon name="business_center" size={22} className="text-black/80" />
                   </div>
@@ -145,7 +165,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                   <>
                     <div className="nuru-glass-card rounded-[32px] p-6 flex items-center gap-4 active:scale-[0.98] transition-transform">
                       <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
-                        <MaterialIcon name="devices" size={24} className="text-cyan" />
+                        <MaterialIcon name="devices" size={24} style={{ color: STITCH_DASH_CYAN }} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-end mb-3">
@@ -153,17 +173,19 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                             <h5 className="font-bold text-sm text-white truncate">Green Valley Farm</h5>
                             <p className="text-xs text-text-secondary">Field Inspection</p>
                           </div>
-                          <span className="text-sm font-light tracking-tight text-cyan">50%</span>
+                          <span className="text-sm font-light tracking-tight" style={{ color: STITCH_DASH_CYAN }}>
+                            50%
+                          </span>
                         </div>
                         <div className="w-full h-[6px] bg-white/[0.08] rounded-full overflow-hidden">
-                          <div className="h-full rounded-full bg-cyan w-1/2" />
+                          <div className="h-full rounded-full w-1/2" style={{ backgroundColor: STITCH_DASH_CYAN }} />
                         </div>
                       </div>
                     </div>
 
                     <div className="nuru-glass-card rounded-[32px] p-6 flex items-center gap-4 active:scale-[0.98] transition-transform">
                       <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
-                        <MaterialIcon name="dashboard" size={24} className="text-[#E9D5FF]" />
+                        <MaterialIcon name="dashboard" size={24} style={{ color: STITCH_DASH_PURPLE }} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-end mb-3">
@@ -171,10 +193,12 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                             <h5 className="font-bold text-sm text-white truncate">Downtown Retail</h5>
                             <p className="text-xs text-text-secondary">Compliance Check</p>
                           </div>
-                          <span className="text-sm font-light tracking-tight text-[#E9D5FF]">80%</span>
+                          <span className="text-sm font-light tracking-tight" style={{ color: STITCH_DASH_PURPLE }}>
+                            80%
+                          </span>
                         </div>
                         <div className="w-full h-[6px] bg-white/[0.08] rounded-full overflow-hidden">
-                          <div className="h-full rounded-full bg-[#E9D5FF] w-4/5" />
+                          <div className="h-full rounded-full w-4/5" style={{ backgroundColor: STITCH_DASH_PURPLE }} />
                         </div>
                       </div>
                     </div>
