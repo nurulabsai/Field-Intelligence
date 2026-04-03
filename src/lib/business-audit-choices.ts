@@ -2,7 +2,7 @@
  * Business Audit Choice Lists — derived from NuruOS KoboToolbox XLSForm v1
  *
  * Each list mirrors the "choices" sheet exactly so field values stay
- * compatible with the backend and with the KoboToolbox data pipeline.
+ * compatible with the API/KoboToolbox data pipeline.
  */
 
 export interface Choice {

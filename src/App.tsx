@@ -3,12 +3,13 @@ import { Routes, Route, Navigate, useNavigate, useLocation, useParams } from 're
 import { useAuthStore } from './store/index';
 import { useUIStore } from './store/index';
 import { useAuditStore } from './store/index';
-import { schedule, dashboard } from './lib/supabase';
-import { enqueueAuditSync } from './lib/syncService';
+import { schedule, dashboard, uploadYieldPhotosFromFormData } from './lib/supabase';
+import { enqueueAuditSync, drainSyncQueue } from './lib/syncService';
 import LoadingScreen from './screens/LoadingScreen';
 import OfflineBanner from './components/OfflineBanner';
 import NuruSideNav from './components/NuruSideNav';
 import NuruBottomNav from './components/NuruBottomNav';
+import MobileNavDrawer from './components/MobileNavDrawer';
 import ToastProvider from './components/ToastProvider';
 import LoadingSkeleton from './components/LoadingSkeleton';
 
@@ -62,6 +63,8 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const signOut = useAuthStore((s) => s.signOut);
   const navigate = useNavigate();
   const location = useLocation();
+  const sideNavOpen = useUIStore((s) => s.sideNavOpen);
+  const setSideNavOpen = useUIStore((s) => s.setSideNavOpen);
 
   const handleNavigate = (path: string) => {
     const leavingAudit = location.pathname.startsWith('/audit') && !path.startsWith('/audit');
@@ -70,11 +73,31 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       const ok = window.confirm('You have unsaved audit changes. Leave this screen?');
       if (!ok) return;
     }
+    setSideNavOpen(false);
     navigate(path);
   };
 
   return (
     <div className="flex min-h-screen nuru-screen">
+      <MobileNavDrawer
+        open={sideNavOpen}
+        onClose={() => setSideNavOpen(false)}
+        currentPath={location.pathname}
+        onNavigate={handleNavigate}
+        user={{ name: user?.fullName ?? 'User', role: user?.role ?? 'Agent' }}
+        onLogout={async () => {
+          const leavingAudit = location.pathname.startsWith('/audit');
+          const hasUnsavedAudit = typeof window !== 'undefined' && sessionStorage.getItem('nuru_audit_dirty') === 'true';
+          if (leavingAudit && hasUnsavedAudit) {
+            const ok = window.confirm('You have unsaved audit changes. Sign out anyway?');
+            if (!ok) return;
+          }
+          setSideNavOpen(false);
+          await signOut();
+          navigate('/auth/login');
+        }}
+      />
+
       {/* Desktop Sidebar */}
       <NuruSideNav
         currentPath={location.pathname}
@@ -87,6 +110,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             const ok = window.confirm('You have unsaved audit changes. Sign out anyway?');
             if (!ok) return;
           }
+          setSideNavOpen(false);
           await signOut();
           navigate('/auth/login');
         }}
@@ -322,6 +346,7 @@ const DashboardWrapper: React.FC = () => {
   const user = useAuthStore((s) => s.user);
   const pendingSync = useUIStore((s) => s.pendingSyncCount);
   const addToast = useUIStore((s) => s.addToast);
+  const setSideNavOpen = useUIStore((s) => s.setSideNavOpen);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [stats, setStats] = useState<{ totalAudits: number; submittedToday: number; pendingSync: number; verified: number }>();
@@ -399,14 +424,57 @@ const DashboardWrapper: React.FC = () => {
       onAuditClick={(id) => navigate(`/audit/${id}`)}
       onViewAllAudits={() => navigate('/audits')}
       onStartNewAudit={() => navigate('/audit/new')}
+      onMenuPress={() => setSideNavOpen(true)}
+      onProfilePress={() => navigate('/settings')}
     />
   );
 };
+
+async function tryUploadYieldPhotos(
+  addToast: (t: { type: 'warning'; message: string }) => void,
+  auditId: string,
+  farmId: string,
+  formData: Record<string, unknown>,
+): Promise<void> {
+  try {
+    await uploadYieldPhotosFromFormData(auditId, farmId, formData);
+  } catch (err) {
+    console.error('[audit photos]', err);
+    addToast({
+      type: 'warning',
+      message:
+        'Audit saved but some photos could not be uploaded. Create the Storage bucket and policies in Supabase (see .env.example).',
+    });
+  }
+}
+
+function escapeCsvCell(s: string): string {
+  return `"${s.replace(/"/g, '""')}"`;
+}
+
+function downloadAuditsCsv(
+  rows: Array<{ id: string; farmName: string; date: string; status: string; location?: string }>,
+): void {
+  const header = ['id', 'farmName', 'date', 'status', 'location'].map(escapeCsvCell).join(',');
+  const body = rows.map((a) =>
+    [a.id, a.farmName, a.date, a.status, a.location ?? '']
+      .map((x) => escapeCsvCell(String(x)))
+      .join(','),
+  );
+  const blob = new Blob([[header, ...body].join('\n')], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `nuruos-audits-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
 
 // ─── Audit Wrappers ─────────────────────────────────────────────────────────
 const AuditListWrapper: React.FC = () => {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
+  const addToast = useUIStore((s) => s.addToast);
   const audits = useAuditStore((s) => s.audits);
   const loadAudits = useAuditStore((s) => s.loadAudits);
   const isLoading = useAuditStore((s) => s.isLoading);
@@ -414,7 +482,7 @@ const AuditListWrapper: React.FC = () => {
   useEffect(() => {
     if (!user?.id) return;
     loadAudits(user.id).catch(() => {
-      // Keep UI usable even when backend fetch fails.
+      // Keep UI usable even when Supabase fetch fails.
     });
   }, [user?.id, loadAudits]);
 
@@ -450,7 +518,29 @@ const AuditListWrapper: React.FC = () => {
       audits={mappedAudits}
       isLoading={isLoading}
       onAuditClick={(id) => navigate(`/audit/${id}`)}
-      onNewAudit={() => navigate('/audit/new')}
+      onSettingsPress={() => navigate('/settings')}
+      onExportCsv={() => {
+        if (mappedAudits.length === 0) {
+          addToast({ type: 'warning', message: 'No audits to export yet.' });
+          return;
+        }
+        downloadAuditsCsv(mappedAudits);
+        addToast({ type: 'success', message: 'CSV downloaded.' });
+      }}
+      onFilterDatesPress={() =>
+        addToast({
+          type: 'info',
+          message: 'Date range filters will be available in a future update.',
+        })
+      }
+      onRetrySyncPress={async () => {
+        try {
+          await drainSyncQueue();
+          addToast({ type: 'success', message: 'Sync queue processed.' });
+        } catch {
+          addToast({ type: 'error', message: 'Could not run sync.' });
+        }
+      }}
     />
   );
 };
@@ -498,9 +588,16 @@ const AuditWizardWrapper: React.FC = () => {
         try {
           if (id) {
             await submitAudit(id);
+            await tryUploadYieldPhotos(addToast, id, farmLocalId, data as Record<string, unknown>);
           } else {
             const created = await createAudit(auditRow);
             await submitAudit(created.id);
+            await tryUploadYieldPhotos(
+              addToast,
+              created.id,
+              farmLocalId,
+              data as Record<string, unknown>,
+            );
           }
 
           addToast({ type: 'success', message: 'Audit submitted successfully.' });
@@ -554,6 +651,12 @@ const BusinessWizardWrapper: React.FC = () => {
         try {
           const created = await createAudit(auditRow);
           await submitAudit(created.id);
+          await tryUploadYieldPhotos(
+            addToast,
+            created.id,
+            created.farm_id,
+            data as Record<string, unknown>,
+          );
           addToast({ type: 'success', message: 'Business audit submitted successfully.' });
           navigate('/audits');
         } catch {
@@ -624,6 +727,12 @@ const CalendarWrapper: React.FC = () => {
   return (
     <CalendarScreen
       events={events}
+      onSearchPress={() =>
+        addToast({ type: 'info', message: 'Schedule search is not available yet.' })
+      }
+      onNotificationsPress={() =>
+        addToast({ type: 'info', message: 'No new notifications.' })
+      }
       onAddEvent={async (event) => {
         try {
           const isoStart = new Date(`${event.date}T${event.time}:00`).toISOString();
@@ -683,6 +792,13 @@ const SettingsPlaceholder: React.FC = () => {
   return (
     <div className="min-h-screen bg-bg-primary font-base px-6 pt-12 pb-40">
       <div className="max-w-[760px] mx-auto">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="mb-6 flex items-center gap-2 text-text-secondary text-sm font-medium bg-transparent border-none cursor-pointer font-inherit hover:text-white transition-colors"
+        >
+          <span aria-hidden>←</span> Back
+        </button>
         <h1 className="text-[24px] font-light text-white font-heading tracking-tight mb-8">
           Settings
         </h1>

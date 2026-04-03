@@ -16,6 +16,10 @@ interface DashboardHomeProps {
   onAuditClick?: (id: string) => void;
   onViewAllAudits?: () => void;
   onStartNewAudit?: () => void;
+  /** Mobile: opens navigation drawer when the desktop sidebar is hidden. */
+  onMenuPress?: () => void;
+  /** Opens Settings / profile. */
+  onProfilePress?: () => void;
 }
 
 const PROGRESS_COLORS: string[] = ['#67E8F9', '#E9D5FF', '#BEF264', '#FBBF24', '#FB7185'];
@@ -28,6 +32,8 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
   audits,
   onAuditClick,
   onViewAllAudits,
+  onMenuPress,
+  onProfilePress,
 }) => {
   const highPriority = stats?.pendingSync ?? 0;
   const farmChecks = stats?.totalAudits ?? 0;
@@ -40,16 +46,18 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            aria-label="Menu"
-            className="w-10 h-10 rounded-full bg-white/5 border border-white/5 flex items-center justify-center cursor-pointer text-white/80 active:scale-95 transition-transform"
+            aria-label="Open menu"
+            onClick={() => onMenuPress?.()}
+            className="md:hidden w-10 h-10 rounded-full bg-white/5 border border-white/5 flex items-center justify-center cursor-pointer text-white/80 active:scale-95 transition-transform"
           >
             <MaterialIcon name="menu" size={20} />
           </button>
-          <h1 className="font-heading font-light tracking-tight text-xl ml-2 text-white">NuruOS</h1>
+          <h1 className="font-heading font-light tracking-tight text-xl md:ml-0 ml-2 text-white">NuruOS</h1>
         </div>
         <button
           type="button"
-          aria-label="Profile"
+          aria-label="Settings and profile"
+          onClick={() => onProfilePress?.()}
           className="w-10 h-10 rounded-full border border-white/5 bg-white/5 flex items-center justify-center cursor-pointer text-text-secondary active:scale-95 transition-transform"
         >
           <MaterialIcon name="person" size={20} />

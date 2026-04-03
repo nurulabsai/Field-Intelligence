@@ -109,11 +109,13 @@ describe('useUIStore', () => {
       vi.useRealTimers();
     });
 
-    it('auto-dismisses after duration', () => {
+    it('keeps toast in store until removeToast (ToastProvider handles timed dismiss)', () => {
       vi.useFakeTimers();
       useUIStore.getState().addToast({ message: 'Bye', type: 'warning', duration: 2000 });
       expect(useUIStore.getState().toasts).toHaveLength(1);
-      vi.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(10000);
+      expect(useUIStore.getState().toasts).toHaveLength(1);
+      useUIStore.getState().removeToast(useUIStore.getState().toasts[0]!.id);
       expect(useUIStore.getState().toasts).toHaveLength(0);
       vi.useRealTimers();
     });

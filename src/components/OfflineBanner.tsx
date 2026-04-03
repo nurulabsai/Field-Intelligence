@@ -22,7 +22,9 @@ const OfflineBanner: React.FC = () => {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-[100] transition-transform duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
+      className={`fixed top-0 left-0 right-0 z-[100] transition-transform duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        showBanner ? 'pointer-events-auto' : 'pointer-events-none'
+      }`}
       style={{
         transform: showBanner ? 'translateY(0)' : 'translateY(-100%)',
       }}

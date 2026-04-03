@@ -5,7 +5,10 @@ interface AuditListProps {
   audits?: Array<{ id: string; farmName: string; auditType?: string; date: string; status: 'draft' | 'submitted' | 'verified' | 'synced' | 'failed'; location?: string }>;
   isLoading?: boolean;
   onAuditClick?: (id: string) => void;
-  onNewAudit?: () => void;
+  onSettingsPress?: () => void;
+  onExportCsv?: () => void;
+  onFilterDatesPress?: () => void;
+  onRetrySyncPress?: () => void;
 }
 
 const STATUS_ICON: Record<string, { iconName: string; color: string; bg: string; badgeBg: string; badgeBorder: string; badgeText: string; label: string }> = {
@@ -16,8 +19,33 @@ const STATUS_ICON: Record<string, { iconName: string; color: string; bg: string;
   draft: { iconName: 'folder', color: 'text-white/50', bg: 'bg-white/5', badgeBg: 'bg-white/5', badgeBorder: 'border-white/10', badgeText: 'text-white/50', label: 'Draft' },
 };
 
-const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }) => {
+const PAGE_SIZE = 6;
+
+const AuditList: React.FC<AuditListProps> = ({
+  audits,
+  isLoading,
+  onAuditClick,
+  onSettingsPress,
+  onExportCsv,
+  onFilterDatesPress,
+  onRetrySyncPress,
+}) => {
   const hasPropData = audits && audits.length > 0;
+  const [page, setPage] = React.useState(1);
+
+  React.useEffect(() => {
+    setPage(1);
+  }, [audits?.length]);
+
+  const totalPages =
+    hasPropData && audits ? Math.max(1, Math.ceil(audits.length / PAGE_SIZE)) : 1;
+
+  React.useEffect(() => {
+    if (page > totalPages) setPage(totalPages);
+  }, [page, totalPages]);
+
+  const pagedAudits =
+    hasPropData && audits ? audits.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) : [];
 
   return (
     <div className="flex-1 pb-40 overflow-x-hidden">
@@ -30,16 +58,18 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
           <button
             type="button"
             aria-label="Settings"
+            onClick={() => onSettingsPress?.()}
             className="w-10 h-10 rounded-full border border-white/5 flex items-center justify-center bg-white/5 cursor-pointer active:scale-95 transition-transform"
           >
             <MaterialIcon name="settings" size={20} className="text-text-secondary" />
           </button>
         </div>
 
-        {/* Action Buttons — Stitch: glass-material rounded-full */}
+        {/* Action Buttons — Stitch: two equal pills (Export CSV + Filter Dates) */}
         <div className="flex items-center gap-4">
           <button
             type="button"
+            onClick={() => onExportCsv?.()}
             className="flex-1 bg-accent text-black font-bold py-3.5 px-6 rounded-full flex items-center justify-center gap-2 active:scale-95 transition-transform text-sm cursor-pointer border-none"
           >
             <MaterialIcon name="download" size={20} />
@@ -47,7 +77,8 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
           </button>
           <button
             type="button"
-            className="flex-1 nuru-glassmorphism text-white font-medium py-3.5 px-6 rounded-full flex items-center justify-center gap-2 active:scale-95 transition-transform text-sm cursor-pointer"
+            onClick={() => onFilterDatesPress?.()}
+            className="flex-1 nuru-glassmorphism text-white font-medium py-3.5 px-6 rounded-full flex items-center justify-center gap-2 active:scale-95 transition-transform text-sm cursor-pointer border-none font-inherit"
           >
             <MaterialIcon name="calendar_today" size={20} className="text-white/70" />
             Filter Dates
@@ -125,6 +156,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
                       <button
                         type="button"
                         aria-label="Retry upload"
+                        onClick={() => onRetrySyncPress?.()}
                         className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center cursor-pointer text-text-secondary active:scale-90 border border-white/5 transition-transform shrink-0"
                       >
                         <MaterialIcon name="sync" size={18} />
@@ -162,7 +194,11 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
                         {audit.status === 'failed' && (
                           <button
                             type="button"
-                            aria-label="Retry"
+                            aria-label="Retry sync"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onRetrySyncPress?.();
+                            }}
                             className="w-10 h-10 rounded-full bg-white/5 border border-white/5 flex items-center justify-center cursor-pointer text-text-secondary active:scale-90 transition-transform shrink-0"
                           >
                             <MaterialIcon name="sync" size={18} />
@@ -209,7 +245,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
                   </thead>
                   <tbody className="text-[13px]">
                     {hasPropData ? (
-                      audits!.slice(0, 6).map((audit) => {
+                      pagedAudits.map((audit) => {
                         const style = (STATUS_ICON[audit.status] ?? STATUS_ICON.draft)!;
                         return (
                           <tr
@@ -273,23 +309,25 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
                 </table>
               </div>
 
-              {/* Pagination — Stitch: p-8, glass-material Prev/Next, lime active page */}
-              <div className="p-4 border-t border-white/5 flex items-center justify-between bg-white/[0.01]">
-                <button type="button" className="px-6 py-2.5 nuru-glassmorphism rounded-full text-[11px] font-bold text-text-tertiary uppercase active:scale-95 transition-all cursor-pointer">
+              {/* Pagination */}
+              <div className="p-4 border-t border-white/5 flex items-center justify-between bg-white/[0.01] gap-3">
+                <button
+                  type="button"
+                  disabled={!hasPropData || page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  className="px-6 py-2.5 nuru-glassmorphism rounded-full text-[11px] font-bold text-text-tertiary uppercase active:scale-95 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                >
                   Prev
                 </button>
-                <div className="flex gap-3">
-                  <button type="button" className="w-10 h-10 rounded-full bg-accent text-black text-[11px] font-bold shadow-[0_0_15px_rgba(190,242,100,0.3)] cursor-pointer border-none">
-                    1
-                  </button>
-                  <button type="button" className="w-10 h-10 rounded-full nuru-glassmorphism text-[11px] font-bold text-text-tertiary hover:text-white transition-colors cursor-pointer">
-                    2
-                  </button>
-                  <button type="button" className="w-10 h-10 rounded-full nuru-glassmorphism text-[11px] font-bold text-text-tertiary hover:text-white transition-colors cursor-pointer">
-                    3
-                  </button>
-                </div>
-                <button type="button" className="px-6 py-2.5 nuru-glassmorphism rounded-full text-[11px] font-bold text-text-tertiary uppercase active:scale-95 transition-all cursor-pointer">
+                <span className="text-[11px] font-semibold text-text-secondary whitespace-nowrap">
+                  {hasPropData ? `Page ${page} / ${totalPages}` : 'Sample data'}
+                </span>
+                <button
+                  type="button"
+                  disabled={!hasPropData || page >= totalPages}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  className="px-6 py-2.5 nuru-glassmorphism rounded-full text-[11px] font-bold text-text-tertiary uppercase active:scale-95 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                >
                   Next
                 </button>
               </div>

@@ -6,7 +6,7 @@
  *        → Plot[] → PlotObservation[]
  *
  * Every entity carries a local temp ID (generated client-side) that
- * becomes the foreign key for child records. On submission the backend
+ * becomes the foreign key for child records. On submission Supabase
  * resolves these to real database IDs.
  */
 

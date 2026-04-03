@@ -291,7 +291,7 @@ interface UIState {
   clearToasts: () => void;
 }
 
-export const useUIStore = create<UIState>((set, get) => ({
+export const useUIStore = create<UIState>((set) => ({
   isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
   pendingSyncCount: 0,
   sideNavOpen: false,
@@ -338,15 +338,7 @@ export const useUIStore = create<UIState>((set, get) => ({
     const id = crypto.randomUUID();
     const newToast: Toast = { ...toast, id };
     set((s) => ({ toasts: [...s.toasts, newToast] }));
-
-    // Auto-dismiss after duration (default 4 seconds)
-    const duration = toast.duration ?? 4000;
-    if (duration > 0) {
-      setTimeout(() => {
-        const current = get().toasts;
-        set({ toasts: current.filter((t) => t.id !== id) });
-      }, duration);
-    }
+    // Dismissal is handled by ToastProvider’s ToastItem (timer + close button).
   },
 
   removeToast(id: string) {

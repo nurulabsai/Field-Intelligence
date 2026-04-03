@@ -31,12 +31,3 @@ jobs:
 
       - name: Build frontend
         run: npm run build
-
-      # Backend
-      - name: Install backend dependencies
-        working-directory: backend
-        run: npm ci
-
-      - name: TypeScript check (backend)
-        working-directory: backend
-        run: npx tsc --noEmit

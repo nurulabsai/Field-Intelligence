@@ -1,16 +1,15 @@
 /* ============================================================
    NuruOS Field Intelligence – Service Worker v4
    Offline-first strategy:
-     • App shell  → Cache First (serve instantly offline)
-     • API calls  → Network First with cache fallback
-     • Everything else → Stale-While-Revalidate
+     • App shell  → Network first for navigations, cache fallback
+     • Static assets → Stale-While-Revalidate
+     • Supabase/API traffic is not cached here (handled by the client SDK)
    Background Sync: queues failed sync calls and retries
    when connectivity is restored.
    ============================================================ */
 
-const CACHE_NAME       = 'nuruos-shell-v4';
-const DATA_CACHE_NAME  = 'nuruos-data-v2';
-const SYNC_TAG         = 'nuruos-sync-queue';
+const CACHE_NAME = 'nuruos-shell-v4';
+const SYNC_TAG = 'nuruos-sync-queue';
 
 // App-shell assets to pre-cache on install
 const PRECACHE_URLS = [
@@ -18,12 +17,6 @@ const PRECACHE_URLS = [
   './index.html',
   // The actual hashed JS/CSS filenames are unknown at SW write-time
   // so we rely on runtime caching for them.
-];
-
-// API origin(s) to treat with Network-First strategy
-const API_ORIGINS = [
-  'localhost:3001',
-  'api.nuruos.com',         // replace with your prod API domain
 ];
 
 // ── Install: pre-cache app shell ──────────────────────────────────────────
@@ -42,7 +35,7 @@ self.addEventListener('install', (event) => {
 
 // ── Activate: prune old caches ────────────────────────────────────────────
 self.addEventListener('activate', (event) => {
-  const VALID_CACHES = new Set([CACHE_NAME, DATA_CACHE_NAME]);
+  const VALID_CACHES = new Set([CACHE_NAME]);
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(
@@ -78,27 +71,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2. API calls → Network First with Data Cache fallback
-  const isAPI = API_ORIGINS.some((origin) => url.host.includes(origin));
-  if (isAPI || url.pathname.startsWith('/api/')) {
-    event.respondWith(
-      fetch(request.clone())
-        .then((res) => {
-          if (res.ok && request.method === 'GET') {
-            const clone = res.clone();
-            caches.open(DATA_CACHE_NAME).then((c) => c.put(request, clone));
-          }
-          return res;
-        })
-        .catch(() => caches.match(request, { cacheName: DATA_CACHE_NAME }))
-    );
-    return;
-  }
-
-  // 3. Skip chrome-extension and non-http(s) requests
+  // 2. Skip chrome-extension and non-http(s) requests
   if (!url.protocol.startsWith('http')) return;
 
-  // 4. Everything else → Stale-While-Revalidate
+  // 3. Everything else → Stale-While-Revalidate
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) =>
       cache.match(request).then((cached) => {

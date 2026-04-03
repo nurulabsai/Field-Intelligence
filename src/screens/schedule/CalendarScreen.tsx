@@ -35,6 +35,8 @@ interface CalendarScreenProps {
   onAddEvent?: (event: { title: string; type: EventType; date: string; time: string; location: string; notes?: string }) => Promise<void>;
   isLoading?: boolean;
   error?: string | null;
+  onSearchPress?: () => void;
+  onNotificationsPress?: () => void;
 }
 
 // Color map for event types
@@ -96,6 +98,8 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
   events = [],
   isLoading = false,
   error = null,
+  onSearchPress,
+  onNotificationsPress,
 }) => {
   const navigate = useNavigate();
 
@@ -148,10 +152,20 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
           My Schedule
         </h2>
         <div className="flex items-center gap-3">
-          <button type="button" className="w-12 h-12 rounded-full nuru-vital-card flex items-center justify-center text-white/60 hover:text-white transition-colors cursor-pointer">
+          <button
+            type="button"
+            aria-label="Search schedule"
+            onClick={() => onSearchPress?.()}
+            className="w-12 h-12 rounded-full nuru-vital-card flex items-center justify-center text-white/60 hover:text-white transition-colors cursor-pointer border-none font-inherit"
+          >
             <MaterialIcon name="search" size={22} />
           </button>
-          <button type="button" className="relative w-12 h-12 rounded-full nuru-vital-card flex items-center justify-center text-white/60 hover:text-white transition-colors cursor-pointer">
+          <button
+            type="button"
+            aria-label="Notifications"
+            onClick={() => onNotificationsPress?.()}
+            className="relative w-12 h-12 rounded-full nuru-vital-card flex items-center justify-center text-white/60 hover:text-white transition-colors cursor-pointer border-none font-inherit"
+          >
             <MaterialIcon name="notifications" size={22} />
             <span className="absolute top-3.5 right-3.5 w-2 h-2 bg-accent rounded-full" />
           </button>

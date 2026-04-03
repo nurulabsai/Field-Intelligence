@@ -1,8 +1,8 @@
 import React from 'react';
 import MaterialIcon from './MaterialIcon';
-import { create } from 'zustand';
+import { useUIStore } from '../store/index';
 
-// --- Toast Store ---
+/** Toast shape (mirrors uiStore). */
 export interface Toast {
   id: string;
   type: 'success' | 'error' | 'warning' | 'info';
@@ -10,37 +10,16 @@ export interface Toast {
   duration?: number;
 }
 
-interface ToastStore {
-  toasts: Toast[];
-  addToast: (toast: Omit<Toast, 'id'>) => void;
-  removeToast: (id: string) => void;
-}
-
-export const useToastStore = create<ToastStore>((set) => ({
-  toasts: [],
-  addToast: (toast) => {
-    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    set((state) => ({
-      toasts: [...state.toasts, { ...toast, id }],
-    }));
-  },
-  removeToast: (id) => {
-    set((state) => ({
-      toasts: state.toasts.filter((t) => t.id !== id),
-    }));
-  },
-}));
-
-// Convenience helper
+/** Use `useUIStore.getState().addToast` or these helpers — ToastProvider renders `uiStore.toasts`. */
 export const toast = {
   success: (message: string) =>
-    useToastStore.getState().addToast({ type: 'success', message }),
+    useUIStore.getState().addToast({ type: 'success', message }),
   error: (message: string) =>
-    useToastStore.getState().addToast({ type: 'error', message }),
+    useUIStore.getState().addToast({ type: 'error', message }),
   warning: (message: string) =>
-    useToastStore.getState().addToast({ type: 'warning', message }),
+    useUIStore.getState().addToast({ type: 'warning', message }),
   info: (message: string) =>
-    useToastStore.getState().addToast({ type: 'info', message }),
+    useUIStore.getState().addToast({ type: 'info', message }),
 };
 
 // --- Toast Item Component ---
@@ -96,7 +75,8 @@ const ToastItem: React.FC<{ toast: Toast; onDismiss: () => void }> = ({
 
 // --- Toast Provider ---
 const ToastProvider: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
-  const { toasts, removeToast } = useToastStore();
+  const toasts = useUIStore((s) => s.toasts);
+  const removeToast = useUIStore((s) => s.removeToast);
 
   return (
     <>

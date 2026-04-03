@@ -390,6 +390,61 @@ export const photos = {
   },
 };
 
+const AUDIT_PHOTOS_BUCKET =
+  (import.meta.env.VITE_SUPABASE_AUDIT_PHOTOS_BUCKET as string | undefined)?.trim() ||
+  'audit-photos';
+
+async function dataUrlToBlob(dataUrl: string): Promise<Blob> {
+  const res = await fetch(dataUrl);
+  if (!res.ok) throw new Error('Invalid photo data');
+  return res.blob();
+}
+
+/**
+ * Upload one yield-step photo (data URL from Step6) to Supabase Storage and insert audit_photos.
+ * Requires a public or signed bucket policy for authenticated users (see Supabase dashboard).
+ */
+export async function uploadAuditPhotoFromDataUrl(
+  auditId: string,
+  farmId: string,
+  dataUrl: string,
+  label: string | null,
+): Promise<AuditPhotoRow> {
+  const blob = await dataUrlToBlob(dataUrl);
+  const mime = blob.type || 'image/jpeg';
+  const ext = mime.includes('png') ? 'png' : mime.includes('webp') ? 'webp' : 'jpg';
+  const path = `${auditId}/${crypto.randomUUID()}.${ext}`;
+  const { error: upErr } = await supabase.storage.from(AUDIT_PHOTOS_BUCKET).upload(path, blob, {
+    contentType: mime,
+    upsert: false,
+  });
+  if (upErr) throw upErr;
+
+  return photos.create({
+    audit_id: auditId,
+    farm_id: farmId,
+    storage_path: path,
+    label,
+  });
+}
+
+/** Upload all data-URL photos from wizard formData (yield step). No-ops if none. */
+export async function uploadYieldPhotosFromFormData(
+  auditId: string,
+  farmId: string,
+  formData: Record<string, unknown>,
+): Promise<void> {
+  const raw = formData.photos;
+  if (!Array.isArray(raw) || raw.length === 0) return;
+
+  let i = 0;
+  for (const item of raw) {
+    if (typeof item !== 'string' || !item.startsWith('data:')) continue;
+    i += 1;
+    await uploadAuditPhotoFromDataUrl(auditId, farmId, item, `yield_${i}`);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Schedule / Events
 // ---------------------------------------------------------------------------

@@ -7,6 +7,7 @@ interface NuruTopNavProps {
   rightAction?: React.ReactNode;
   showNotifications?: boolean;
   notificationCount?: number;
+  onNotificationsPress?: () => void;
 }
 
 const NuruTopNav: React.FC<NuruTopNavProps> = ({
@@ -15,6 +16,7 @@ const NuruTopNav: React.FC<NuruTopNavProps> = ({
   rightAction,
   showNotifications = false,
   notificationCount = 0,
+  onNotificationsPress,
 }) => {
   return (
     <nav
@@ -41,6 +43,8 @@ const NuruTopNav: React.FC<NuruTopNavProps> = ({
       <div className="w-12 flex items-center justify-end gap-2">
         {showNotifications && (
           <button
+            type="button"
+            onClick={() => onNotificationsPress?.()}
             className="bg-transparent border-none text-white cursor-pointer p-2 rounded-lg flex items-center justify-center relative transition-colors duration-[var(--transition-base)] hover:bg-white/[0.05]"
           >
             <MaterialIcon name="notifications" size={20} />

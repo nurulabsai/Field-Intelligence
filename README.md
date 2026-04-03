@@ -116,17 +116,18 @@ Create a `.env.local` file with the following:
 ```env
 # Required
 VITE_GEMINI_API_KEY=your_gemini_api_key_here
+VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
 
 # Optional
-VITE_API_BASE_URL=https://api.nuruos.com
-VITE_R2_BUCKET_URL=https://your-r2-bucket.r2.dev
+VITE_SUPABASE_AUDIT_PHOTOS_BUCKET=audit-photos
 VITE_SENTRY_DSN=your_sentry_dsn
 ```
 
 ### API Keys
 
 1. **Gemini API**: Get your free API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. **Backend API** (optional): Set up your own backend for production use
+2. **Supabase**: Create a project for auth, Postgres (`farm_audits`, etc.), and Storage (yield photos bucket; see `.env.example`)
 
 ---
 
@@ -242,7 +243,7 @@ const compressed = await compressImage(base64Image, {
 ### Sync Failures
 **Error**: Audits not syncing
 
-**Fix**: Check network connection and backend endpoints in `services/syncService.ts`
+**Fix**: Check network connection, Supabase URL/key, and RLS policies; sync runs via `src/lib/syncService.ts` and `src/lib/supabase.ts`
 
 ---
 

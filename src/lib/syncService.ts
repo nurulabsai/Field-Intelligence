@@ -18,7 +18,7 @@ import {
   getSyncQueueCount,
   type SyncQueueEntry,
 } from './offlineDb';
-import { audits as auditsApi } from './supabase';
+import { audits as auditsApi, uploadYieldPhotosFromFormData } from './supabase';
 import type { FarmAuditRow } from './supabase';
 
 type PendingCountListener = (count: number) => void;
@@ -103,11 +103,19 @@ async function processEntry(entry: SyncQueueEntry): Promise<void> {
     if (entry.type === 'create_and_submit_audit') {
       const p = entry.payload as unknown as AuditSyncPayload;
 
+      let auditId: string;
       if (p.existingAuditId) {
         await auditsApi.submit(p.existingAuditId);
+        auditId = p.existingAuditId;
       } else {
         const created = await auditsApi.create(p.auditRow);
         await auditsApi.submit(created.id);
+        auditId = created.id;
+      }
+
+      const farmId = p.auditRow.farm_id;
+      if (farmId) {
+        await uploadYieldPhotosFromFormData(auditId, farmId, p.formData);
       }
     }
 
