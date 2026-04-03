@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Bell } from 'lucide-react';
+import MaterialIcon from './MaterialIcon';
 
 interface NuruTopNavProps {
   title: string;
@@ -27,7 +27,7 @@ const NuruTopNav: React.FC<NuruTopNavProps> = ({
             onClick={onBack}
             className="bg-transparent border-none text-white cursor-pointer p-2 rounded-lg flex items-center justify-center transition-colors duration-[var(--transition-base)] hover:bg-white/[0.05]"
           >
-            <ArrowLeft size={20} />
+            <MaterialIcon name="arrow_back" size={20} />
           </button>
         )}
       </div>
@@ -43,7 +43,7 @@ const NuruTopNav: React.FC<NuruTopNavProps> = ({
           <button
             className="bg-transparent border-none text-white cursor-pointer p-2 rounded-lg flex items-center justify-center relative transition-colors duration-[var(--transition-base)] hover:bg-white/[0.05]"
           >
-            <Bell size={20} />
+            <MaterialIcon name="notifications" size={20} />
             {notificationCount > 0 && (
               <span className="absolute top-1 right-1 bg-accent text-white text-[10px] font-bold min-w-4 h-4 rounded-full flex items-center justify-center px-1">
                 {notificationCount > 99 ? '99+' : notificationCount}

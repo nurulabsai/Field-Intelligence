@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { MapPin, Navigation, AlertTriangle, ChevronDown } from 'lucide-react';
+import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
 
 interface Step2Props {
@@ -56,7 +56,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
   const region = (data.region as string) || '';
 
-  const inputBaseClasses = "w-full py-3 px-4 nuru-glass-card rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150";
+  const inputBaseClasses = "w-full py-3 px-4 bg-bg-input rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150";
 
   return (
     <div>
@@ -67,7 +67,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
         Capture farm location and administrative details
       </p>
 
-      <div className="nuru-glass-card rounded-[28px] p-6 flex flex-col gap-5">
+      <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5">
         {/* Region Dropdown */}
         <div>
           <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
@@ -86,7 +86,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
               <span className={region ? 'text-white' : 'text-text-tertiary'}>
                 {region || 'Select region'}
               </span>
-              <ChevronDown size={18} className="text-text-tertiary" />
+              <MaterialIcon name="expand_more" size={18} className="text-text-tertiary" />
             </button>
             {regionOpen && (
               <div className="absolute top-full left-0 right-0 mt-1 nuru-glass-card border border-border-dark rounded-[18px] z-50 max-h-60 overflow-y-auto shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
@@ -96,7 +96,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
                     type="button"
                     onClick={() => { handleChange('region', r); setRegionOpen(false); }}
                     className={cn(
-                      'w-full py-2.5 px-4 border-none text-sm text-left cursor-pointer font-inherit',
+                      'w-full min-h-12 py-2.5 px-4 border-none text-sm text-left cursor-pointer font-inherit',
                       region === r ? 'bg-accent/15 text-accent' : 'bg-transparent text-white',
                     )}
                   >
@@ -173,12 +173,12 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
               </>
             ) : lat ? (
               <>
-                <Navigation size={16} />
+                <MaterialIcon name="near_me" size={16} />
                 GPS Captured - Tap to Recapture
               </>
             ) : (
               <>
-                <MapPin size={16} />
+                <MaterialIcon name="location_on" size={16} />
                 Capture GPS Location
               </>
             )}
@@ -216,7 +216,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
           {/* Accuracy Warning */}
           {accuracy !== undefined && accuracy > 50 && (
             <div className="flex items-center gap-2 mt-2 py-2.5 px-3.5 bg-warning/10 border border-warning/25 rounded-[10px]">
-              <AlertTriangle size={16} className="text-warning shrink-0" />
+              <MaterialIcon name="warning" size={16} className="text-warning shrink-0" />
               <span className="text-[0.813rem] text-warning-light">
                 GPS accuracy is low ({accuracy.toFixed(0)}m). Move to an open area and try again.
               </span>
@@ -231,7 +231,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
         {/* Map Placeholder */}
         <div className="w-full h-[200px] nuru-glass-card rounded-[18px] border border-border-glass flex items-center justify-center text-text-tertiary">
           <div className="text-center">
-            <MapPin size={32} className="mx-auto mb-2 opacity-50" />
+            <MaterialIcon name="location_on" size={32} className="mx-auto mb-2 opacity-50" />
             <p className="text-[0.813rem]">
               {lat ? `Location: ${lat.toFixed(4)}, ${lng?.toFixed(4)}` : 'Map will display after GPS capture'}
             </p>

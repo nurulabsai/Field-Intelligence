@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, User, ShieldCheck, Sprout, Briefcase, TabletSmartphone, LayoutDashboard, Loader2, AlertTriangle } from 'lucide-react';
+import MaterialIcon from '../../components/MaterialIcon';
 
 interface DashboardHomeProps {
   userName?: string;
@@ -43,7 +43,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
             aria-label="Menu"
             className="w-10 h-10 rounded-full bg-white/5 border border-white/5 flex items-center justify-center cursor-pointer text-white/80 active:scale-95 transition-transform"
           >
-            <Menu size={20} strokeWidth={2} />
+            <MaterialIcon name="menu" size={20} />
           </button>
           <h1 className="font-heading font-light tracking-tight text-xl ml-2 text-white">NuruOS</h1>
         </div>
@@ -52,7 +52,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
           aria-label="Profile"
           className="w-10 h-10 rounded-full border border-white/5 bg-white/5 flex items-center justify-center cursor-pointer text-text-secondary active:scale-95 transition-transform"
         >
-          <User size={20} strokeWidth={2} />
+          <MaterialIcon name="person" size={20} />
         </button>
       </header>
 
@@ -60,14 +60,14 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
 
         {stressAlert && (
           <div className="bg-amber-500/10 border border-amber-500/20 rounded-[20px] px-5 py-3.5 flex items-center gap-3" role="alert">
-            <AlertTriangle size={18} className="text-amber-400 shrink-0" />
+            <MaterialIcon name="warning" size={18} className="text-amber-400 shrink-0" />
             <p className="text-amber-300 text-[13px] font-medium">{stressAlert}</p>
           </div>
         )}
 
         {isLoading && (
           <div className="flex items-center justify-center py-20" aria-label="Loading dashboard data">
-            <Loader2 size={36} className="text-accent animate-spin" />
+            <MaterialIcon name="progress_activity" size={36} className="text-accent animate-spin" />
           </div>
         )}
 
@@ -84,7 +84,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
               {/* Stitch: bg-primary rounded-vital p-8 ... overflow-hidden */}
               <div className="bg-accent rounded-[32px] p-8 flex flex-col justify-between items-center text-center text-black nuru-soft-shadow relative overflow-hidden active:scale-95 transition-transform border border-white/5">
                 <div className="w-14 h-14 bg-black rounded-full flex items-center justify-center nuru-soft-shadow shrink-0">
-                  <ShieldCheck size={24} className="text-accent" />
+                  <MaterialIcon name="verified_user" size={24} className="text-accent" />
                 </div>
                 <div>
                   <span className="text-4xl font-light tracking-tighter block mb-1 nuru-tabular-nums">
@@ -99,7 +99,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
               <div className="flex flex-col gap-4 h-full">
                 <div className="flex-1 bg-cyan rounded-[32px] p-6 flex flex-col justify-between items-center text-center text-black nuru-soft-shadow active:scale-95 transition-transform border border-white/5">
                   <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center shrink-0">
-                    <Sprout size={22} className="text-black/80" />
+                    <MaterialIcon name="eco" size={22} className="text-black/80" />
                   </div>
                   <div>
                     <span className="text-2xl font-light tracking-tighter block nuru-tabular-nums">{farmChecks}</span>
@@ -109,7 +109,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
 
                 <div className="flex-1 bg-[#E9D5FF] rounded-[32px] p-6 flex flex-col justify-between items-center text-center text-black nuru-soft-shadow active:scale-95 transition-transform border border-white/5">
                   <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center shrink-0">
-                    <Briefcase size={22} className="text-black/80" />
+                    <MaterialIcon name="business_center" size={22} className="text-black/80" />
                   </div>
                   <div>
                     <span className="text-2xl font-light tracking-tighter block nuru-tabular-nums">{businessReports}</span>
@@ -137,7 +137,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                   <>
                     <div className="nuru-glass-card rounded-[32px] p-6 flex items-center gap-4 active:scale-[0.98] transition-transform">
                       <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
-                        <TabletSmartphone size={24} className="text-cyan" />
+                        <MaterialIcon name="devices" size={24} className="text-cyan" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-end mb-3">
@@ -155,7 +155,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
 
                     <div className="nuru-glass-card rounded-[32px] p-6 flex items-center gap-4 active:scale-[0.98] transition-transform">
                       <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
-                        <LayoutDashboard size={24} className="text-[#E9D5FF]" />
+                        <MaterialIcon name="dashboard" size={24} className="text-[#E9D5FF]" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-end mb-3">
@@ -182,7 +182,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                     : audit.status === 'failed' ? 30
                     : 50;
 
-                  const IconComp = index % 2 === 0 ? TabletSmartphone : LayoutDashboard;
+                  const iconName = index % 2 === 0 ? 'devices' : 'dashboard';
 
                   return (
                     <div
@@ -193,8 +193,11 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                       onKeyDown={(e) => e.key === 'Enter' && onAuditClick?.(audit.id)}
                       tabIndex={0}
                     >
-                      <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
-                        <IconComp size={24} style={{ color }} />
+                      <div
+                        className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/5"
+                        style={{ color }}
+                      >
+                        <MaterialIcon name={iconName} size={24} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-end mb-3">

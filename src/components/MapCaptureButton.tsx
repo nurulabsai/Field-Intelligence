@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Loader2, AlertTriangle } from 'lucide-react';
+import MaterialIcon from './MaterialIcon';
 
 interface GeoValue {
   lat: number;
@@ -78,16 +78,20 @@ const MapCaptureButton: React.FC<MapCaptureButtonProps> = ({
         }}
       >
         {loading ? (
-          <Loader2
+          <MaterialIcon
+            name="progress_activity"
             size={20}
             className="animate-[nuru-geo-spin_1s_linear_infinite] shrink-0"
           />
         ) : (
-          <MapPin
-            size={20}
-            color={value ? (hasLowAccuracy ? '#F59E0B' : '#22C55E') : '#9CA3AF'}
-            className="shrink-0"
-          />
+          <span
+            className="inline-flex shrink-0"
+            style={{
+              color: value ? (hasLowAccuracy ? '#F59E0B' : '#22C55E') : '#9CA3AF',
+            }}
+          >
+            <MaterialIcon name="location_on" size={20} />
+          </span>
         )}
 
         <div className="flex-1 text-left">
@@ -113,7 +117,7 @@ const MapCaptureButton: React.FC<MapCaptureButtonProps> = ({
 
       {hasLowAccuracy && (
         <div className="flex items-center gap-1.5 mt-2 py-2 px-3 rounded-lg bg-[rgba(245,158,11,0.1)] text-xs text-[#F59E0B]">
-          <AlertTriangle size={14} />
+          <MaterialIcon name="warning" size={14} />
           Low accuracy ({Math.round(value.accuracy)}m). Move to an open area and try again.
         </div>
       )}

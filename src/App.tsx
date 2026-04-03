@@ -211,7 +211,7 @@ const App: React.FC = () => {
             element={
               <RequireAuth>
                 <AppShell>
-                  <BusinessWizard />
+                  <BusinessWizardWrapper />
                 </AppShell>
               </RequireAuth>
             }
@@ -510,6 +510,56 @@ const AuditWizardWrapper: React.FC = () => {
             await enqueueAuditSync({
               auditRow,
               existingAuditId: id,
+              formData: data,
+            });
+            resetDraft();
+            addToast({
+              type: 'warning',
+              message: 'You\'re offline — audit queued and will sync automatically.',
+            });
+            navigate('/audits');
+          } else {
+            addToast({ type: 'error', message: 'Failed to submit audit. Please try again.' });
+            throw new Error('Submit failed');
+          }
+        }
+      }}
+    />
+  );
+};
+
+const BusinessWizardWrapper: React.FC = () => {
+  const navigate = useNavigate();
+  const addToast = useUIStore((s) => s.addToast);
+  const isOnline = useUIStore((s) => s.isOnline);
+  const user = useAuthStore((s) => s.user);
+  const createAudit = useAuditStore((s) => s.createAudit);
+  const submitAudit = useAuditStore((s) => s.submitAudit);
+  const resetDraft = useAuditStore((s) => s.resetDraft);
+
+  return (
+    <BusinessWizard
+      onComplete={async (data) => {
+        const auditRow = {
+          campaign_id: null,
+          farm_id: crypto.randomUUID(),
+          assigned_to: user?.id ?? null,
+          status: 'submitted' as const,
+          audit_location: null,
+          gps_accuracy_m: null,
+          started_at: new Date().toISOString(),
+          completed_at: new Date().toISOString(),
+        };
+
+        try {
+          const created = await createAudit(auditRow);
+          await submitAudit(created.id);
+          addToast({ type: 'success', message: 'Business audit submitted successfully.' });
+          navigate('/audits');
+        } catch {
+          if (!isOnline || !navigator.onLine) {
+            await enqueueAuditSync({
+              auditRow,
               formData: data,
             });
             resetDraft();

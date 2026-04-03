@@ -1,5 +1,5 @@
 import React from 'react';
-import { WifiOff, RefreshCw } from 'lucide-react';
+import MaterialIcon from './MaterialIcon';
 import { useUIStore } from '../store/index';
 import { drainSyncQueue } from '../lib/syncService';
 
@@ -35,7 +35,9 @@ const OfflineBanner: React.FC = () => {
             : 'rgba(245, 158, 11, 0.95)',
         }}
       >
-        {!isOnline && <WifiOff size={16} color="#000000" />}
+        {!isOnline && (
+          <MaterialIcon name="wifi_off" size={16} className="text-black" />
+        )}
         <span className="text-[13px] font-semibold text-black">
           {isOnline ? 'Back online' : 'You are offline'}
         </span>
@@ -51,7 +53,8 @@ const OfflineBanner: React.FC = () => {
                 disabled={syncing}
                 className="text-xs font-semibold text-black bg-[rgba(0,0,0,0.15)] py-0.5 px-2.5 rounded-full border-none cursor-pointer flex items-center gap-1"
               >
-                <RefreshCw
+                <MaterialIcon
+                  name="sync"
                   size={12}
                   className={syncing ? 'animate-spin' : ''}
                 />

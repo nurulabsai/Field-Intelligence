@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { ChevronDown, AlertCircle } from 'lucide-react';
+import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
 
 interface Step3Props {
@@ -96,7 +96,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
     });
   }, [data, onChange]);
 
-  const inputBaseClasses = "w-full py-3 px-4 nuru-glass-card rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150";
+  const inputBaseClasses = "w-full py-3 px-4 bg-bg-input rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150";
 
   const renderDropdown = (
     key: string,
@@ -128,7 +128,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
             <span className={value ? 'text-white' : 'text-text-tertiary'}>
               {options.find(o => o.value === value)?.label || `Select ${label.toLowerCase()}`}
             </span>
-            <ChevronDown size={18} className="text-text-tertiary transition-transform duration-150" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }} />
+            <MaterialIcon name="expand_more" size={18} className="text-text-tertiary transition-transform duration-150" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }} />
           </button>
           {isOpen && (
             <div className="absolute top-full left-0 right-0 mt-1 nuru-glass-card border border-border-dark rounded-[18px] z-50 overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
@@ -141,7 +141,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
                     setOpenDropdown(null);
                   }}
                   className={cn(
-                    'w-full py-2.5 px-4 border-none text-sm text-left cursor-pointer font-inherit',
+                    'w-full min-h-12 py-2.5 px-4 border-none text-sm text-left cursor-pointer font-inherit',
                     value === opt.value ? 'bg-accent/15 text-accent' : 'bg-transparent text-white',
                   )}
                 >
@@ -168,7 +168,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
       {/* Error Summary Banner */}
       {hasErrors && Object.values(touched).some(Boolean) && (
         <div className="flex gap-3 p-4 bg-error/[0.08] border border-error/25 rounded-[14px] mb-6">
-          <AlertCircle size={20} className="text-error shrink-0 mt-0.5" />
+          <MaterialIcon name="error" size={20} className="text-error shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-semibold text-error-light mb-1.5">
               Please fix the following errors
@@ -184,7 +184,7 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
         </div>
       )}
 
-      <div className="nuru-glass-card rounded-[28px] p-6 flex flex-col gap-5">
+      <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5">
         {/* Total Area */}
         <div>
           <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, TrendingDown, Minus, Wheat } from 'lucide-react';
+import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
 
 interface CropPrice {
@@ -52,7 +52,7 @@ const CropPriceTable: React.FC<CropPriceTableProps> = ({ data }) => {
                 <td className="py-3.5 px-6">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center text-success shrink-0">
-                      <Wheat size={16} />
+                      <MaterialIcon name="agriculture" size={16} />
                     </div>
                     <span className="text-sm font-medium text-white">{row.crop}</span>
                   </div>
@@ -68,7 +68,13 @@ const CropPriceTable: React.FC<CropPriceTableProps> = ({ data }) => {
                       row.change > 0 ? 'text-success' : row.change < 0 ? 'text-error' : 'text-text-tertiary',
                     )}
                   >
-                    {row.change > 0 ? <TrendingUp size={14} /> : row.change < 0 ? <TrendingDown size={14} /> : <Minus size={14} />}
+                    {row.change > 0 ? (
+                      <MaterialIcon name="trending_up" size={14} />
+                    ) : row.change < 0 ? (
+                      <MaterialIcon name="trending_down" size={14} />
+                    ) : (
+                      <MaterialIcon name="remove" size={14} />
+                    )}
                     <span>{row.change > 0 ? '+' : ''}{row.change}%</span>
                   </div>
                 </td>
@@ -90,7 +96,7 @@ const CropPriceTable: React.FC<CropPriceTableProps> = ({ data }) => {
           >
             <div>
               <div className="flex items-center gap-2">
-                <Wheat size={14} className="text-success" />
+                <MaterialIcon name="agriculture" size={14} className="text-success" />
                 <span className="text-sm font-medium text-white">{row.crop}</span>
               </div>
               <span className="text-xs text-text-tertiary mt-0.5 block">{row.region}</span>

@@ -1,8 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import {
-  MapPin, Navigation, AlertTriangle, Play, Pause, Square, RotateCcw,
-  Crosshair, Footprints, Zap, Check, Undo2,
-} from 'lucide-react';
+import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
 import type {
   FarmBoundary, FarmProfile, GpsBoundaryPoint,
@@ -57,9 +54,9 @@ function computeAreaHa(points: GpsBoundaryPoint[]): number | null {
 }
 
 const MODE_OPTIONS: { value: BoundaryCaptureMethod; label: string; icon: React.ReactNode; desc: string }[] = [
-  { value: 'walk', label: 'Walk Boundary', icon: <Footprints size={20} />, desc: 'Auto-capture GPS as you walk the perimeter' },
-  { value: 'corner', label: 'Corner Points', icon: <Crosshair size={20} />, desc: 'Manually tap to capture each corner' },
-  { value: 'quick', label: 'Quick Draft', icon: <Zap size={20} />, desc: 'Fast rough capture for low-confidence drafts' },
+  { value: 'walk', label: 'Walk Boundary', icon: <MaterialIcon name="directions_walk" size={20} />, desc: 'Auto-capture GPS as you walk the perimeter' },
+  { value: 'corner', label: 'Corner Points', icon: <MaterialIcon name="crosshair" size={20} />, desc: 'Manually tap to capture each corner' },
+  { value: 'quick', label: 'Quick Draft', icon: <MaterialIcon name="bolt" size={20} />, desc: 'Fast rough capture for low-confidence drafts' },
 ];
 
 const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, errors }) => {
@@ -273,7 +270,7 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
               ? "bg-warning/10 border-warning/25"
               : "bg-error/10 border-error/25",
         )}>
-          <Navigation size={16} className={accuracyColor} />
+          <MaterialIcon name="near_me" size={16} className={accuracyColor} />
           <span className={cn("text-sm font-medium", accuracyColor)}>
             GPS Accuracy: {currentAccuracy.toFixed(1)}m
           </span>
@@ -285,7 +282,7 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
 
       {gpsError && (
         <div className="flex items-center gap-2 py-2.5 px-3.5 bg-error/10 border border-error/25 rounded-[10px] mb-4">
-          <AlertTriangle size={16} className="text-error shrink-0" />
+          <MaterialIcon name="warning" size={16} className="text-error shrink-0" />
           <span className="text-[0.813rem] text-error-light">{gpsError}</span>
         </div>
       )}
@@ -332,7 +329,7 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
                     key={reason}
                     type="button"
                     onClick={() => handleSkip(reason)}
-                    className="py-2.5 px-4 bg-border-light border border-border rounded-full text-sm text-text-secondary cursor-pointer font-inherit text-left"
+                    className="min-h-12 py-2.5 px-4 bg-border-light border border-border rounded-full text-sm text-text-secondary cursor-pointer font-inherit text-left"
                   >
                     {reason}
                   </button>
@@ -345,7 +342,7 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
 
       {/* Recording Controls */}
       {(captureState === 'recording' || captureState === 'paused') && (
-        <div className="nuru-glass-card rounded-[28px] p-6 mb-6">
+        <div className="nuru-glass-card rounded-[32px] p-6 mb-6">
           {/* Status header */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -369,7 +366,7 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
               onClick={captureOnePoint}
               className="w-full py-4 mb-4 bg-accent/15 border-2 border-accent/30 rounded-[18px] text-accent text-lg font-bold cursor-pointer font-inherit flex items-center justify-center gap-3 transition-all active:scale-[0.97]"
             >
-              <MapPin size={24} />
+              <MaterialIcon name="location_on" size={24} />
               Capture Point
             </button>
           )}
@@ -382,7 +379,7 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
                 onClick={pauseCapture}
                 className="flex-1 min-w-[120px] py-3 flex items-center justify-center gap-2 bg-warning/15 border border-warning/25 rounded-full text-warning text-sm font-semibold cursor-pointer font-inherit"
               >
-                <Pause size={16} /> Pause
+                <MaterialIcon name="pause" size={16} /> Pause
               </button>
             )}
 
@@ -392,7 +389,7 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
                 onClick={resumeCapture}
                 className="flex-1 min-w-[120px] py-3 flex items-center justify-center gap-2 bg-accent/15 border border-accent/25 rounded-full text-accent text-sm font-semibold cursor-pointer font-inherit"
               >
-                <Play size={16} /> Resume
+                <MaterialIcon name="play_arrow" size={16} /> Resume
               </button>
             )}
 
@@ -402,7 +399,7 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
                 onClick={removeLastPoint}
                 className="py-3 px-4 flex items-center justify-center gap-2 bg-border-glass border border-border rounded-full text-text-secondary text-sm font-medium cursor-pointer font-inherit"
               >
-                <Undo2 size={14} /> Undo
+                <MaterialIcon name="undo" size={14} /> Undo
               </button>
             )}
 
@@ -417,7 +414,7 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
                   : "bg-border-glass border border-border text-text-tertiary cursor-not-allowed",
               )}
             >
-              <Square size={14} /> Finish
+              <MaterialIcon name="stop" size={14} /> Finish
             </button>
 
             <button
@@ -425,7 +422,7 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
               onClick={resetCapture}
               className="py-3 px-4 flex items-center justify-center gap-2 bg-error/10 border border-error/20 rounded-full text-error text-xs font-medium cursor-pointer font-inherit"
             >
-              <RotateCcw size={14} /> Reset
+              <MaterialIcon name="sync" size={14} /> Reset
             </button>
           </div>
 
@@ -439,9 +436,9 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
 
       {/* Polygon Preview */}
       {pointCount >= 3 && (
-        <div className="nuru-glass-card rounded-[28px] p-5 mb-6 border border-border-glass">
-          <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-            <MapPin size={14} className="text-accent" /> Boundary Preview
+        <div className="nuru-glass-card rounded-[32px] p-5 mb-6 border border-border-glass">
+          <h3 className="text-sm font-semibold font-heading text-white mb-3 flex items-center gap-2">
+            <MaterialIcon name="location_on" size={14} className="text-accent" /> Boundary Preview
           </h3>
           <div className="bg-bg-dark rounded-[14px] overflow-hidden border border-border">
             {polygonPreview}
@@ -457,10 +454,10 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
 
       {/* Completion Summary */}
       {captureState === 'complete' && boundary.status !== 'skipped' && (
-        <div className="nuru-glass-card rounded-[28px] p-6 mb-6 border border-success/20">
+        <div className="nuru-glass-card rounded-[32px] p-6 mb-6 border border-success/20">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-success/15 flex items-center justify-center">
-              <Check size={20} className="text-success" />
+              <MaterialIcon name="check" size={20} className="text-success" />
             </div>
             <div>
               <p className="text-[0.938rem] font-semibold text-white">Boundary Captured</p>
@@ -499,9 +496,9 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
 
       {/* Skipped */}
       {captureState === 'complete' && boundary.status === 'skipped' && (
-        <div className="nuru-glass-card rounded-[28px] p-6 mb-6 border border-warning/20">
+        <div className="nuru-glass-card rounded-[32px] p-6 mb-6 border border-warning/20">
           <div className="flex items-center gap-3">
-            <AlertTriangle size={20} className="text-warning" />
+            <MaterialIcon name="warning" size={20} className="text-warning" />
             <div>
               <p className="text-[0.938rem] font-semibold text-white">Boundary Skipped</p>
               <p className="text-xs text-text-tertiary">{boundary.skip_reason}</p>
@@ -527,7 +524,7 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
           onChange={e => updateBoundary({ notes: e.target.value })}
           placeholder="Any notes about boundary conditions, access, or limitations..."
           rows={2}
-          className="w-full py-3 px-4 nuru-glass-card rounded-[16px] text-white text-[0.938rem] font-inherit outline-none border border-border focus:border-accent resize-y min-h-[60px]"
+          className="w-full py-3 px-4 bg-bg-input rounded-[16px] text-white text-[0.938rem] font-inherit outline-none border border-border focus:border-accent resize-y min-h-[60px]"
         />
       </div>
 

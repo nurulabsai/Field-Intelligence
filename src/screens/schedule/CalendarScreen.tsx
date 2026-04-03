@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Bell, Clock, Loader2 } from 'lucide-react';
+import MaterialIcon from '../../components/MaterialIcon';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../design-system';
 
@@ -149,10 +149,10 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
         </h2>
         <div className="flex items-center gap-3">
           <button type="button" className="w-12 h-12 rounded-full nuru-vital-card flex items-center justify-center text-white/60 hover:text-white transition-colors cursor-pointer">
-            <Search size={22} strokeWidth={1.5} />
+            <MaterialIcon name="search" size={22} />
           </button>
           <button type="button" className="relative w-12 h-12 rounded-full nuru-vital-card flex items-center justify-center text-white/60 hover:text-white transition-colors cursor-pointer">
-            <Bell size={22} strokeWidth={1.5} />
+            <MaterialIcon name="notifications" size={22} />
             <span className="absolute top-3.5 right-3.5 w-2 h-2 bg-accent rounded-full" />
           </button>
         </div>
@@ -245,7 +245,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
           <div className="space-y-6">
             {isLoading && (
               <div className="flex items-center justify-center py-16">
-                <Loader2 size={32} className="text-accent animate-spin" />
+                <MaterialIcon name="progress_activity" size={32} className="text-accent animate-spin" />
               </div>
             )}
 
@@ -284,7 +284,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
                       {activity.location}
                     </p>
                     <div className="flex items-center gap-1.5 mt-3" style={{ color: `${activity.color}B3` }}>
-                      <Clock size={16} strokeWidth={2.5} />
+                      <MaterialIcon name="schedule" size={16} />
                       <span className="text-[13px] font-bold tracking-wide">{activity.time}</span>
                     </div>
                   </div>

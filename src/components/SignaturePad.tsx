@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eraser } from 'lucide-react';
+import MaterialIcon from './MaterialIcon';
 
 interface SignaturePadProps {
   onSignature: (dataUrl: string) => void;
@@ -145,7 +145,7 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
             e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
           }}
         >
-          <Eraser size={14} />
+          <MaterialIcon name="ink_eraser" size={14} />
           Clear
         </button>
       </div>

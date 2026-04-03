@@ -1,5 +1,5 @@
 import React from 'react';
-import { ClipboardCheck, ChevronRight, FileText } from 'lucide-react';
+import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
 
 type AuditStatus = 'draft' | 'submitted' | 'verified' | 'synced' | 'failed';
@@ -30,7 +30,7 @@ const AuditFeed: React.FC<AuditFeedProps> = ({ items, onItemClick, onViewAll }) 
   if (items.length === 0) {
     return (
       <div className="nuru-glass-card border border-border-glass rounded-[24px] py-12 px-6 text-center">
-        <FileText size={48} className="text-text-tertiary mx-auto mb-4" />
+        <MaterialIcon name="description" size={48} className="text-text-tertiary mx-auto mb-4 block" />
         <p className="text-text-secondary text-base font-medium">No audits yet</p>
         <p className="text-text-tertiary text-sm mt-1">
           Start your first field audit to see it here
@@ -50,7 +50,7 @@ const AuditFeed: React.FC<AuditFeedProps> = ({ items, onItemClick, onViewAll }) 
             className="bg-transparent border-none text-text-accent text-sm font-semibold cursor-pointer font-[inherit] flex items-center gap-1"
           >
             View All
-            <ChevronRight size={14} />
+            <MaterialIcon name="chevron_right" size={14} />
           </button>
         )}
       </div>
@@ -70,7 +70,7 @@ const AuditFeed: React.FC<AuditFeedProps> = ({ items, onItemClick, onViewAll }) 
             >
               {/* Icon */}
               <div className="w-10 h-10 rounded-[10px] bg-accent/10 flex items-center justify-center text-text-accent shrink-0">
-                <ClipboardCheck size={18} />
+                <MaterialIcon name="assignment_turned_in" size={18} />
               </div>
 
               {/* Info */}

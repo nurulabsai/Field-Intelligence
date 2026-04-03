@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { User, Phone, CreditCard, Users, Home } from 'lucide-react';
+import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
 
 interface Step1Props {
@@ -17,11 +17,11 @@ const FIELDS: {
   required: boolean;
   prefix?: string;
 }[] = [
-  { key: 'farmer_name', label: 'Farmer Name', type: 'text', placeholder: 'Enter farmer full name', icon: <User size={18} />, required: true },
-  { key: 'farmer_phone', label: 'Phone Number', type: 'tel', placeholder: '712 345 678', icon: <Phone size={18} />, required: true, prefix: '+255' },
-  { key: 'farmer_national_id', label: 'National ID', type: 'text', placeholder: 'Enter national ID number', icon: <CreditCard size={18} />, required: true },
-  { key: 'cooperative', label: 'Cooperative', type: 'text', placeholder: 'Cooperative or group name', icon: <Users size={18} />, required: false },
-  { key: 'farm_name', label: 'Farm Name', type: 'text', placeholder: 'Name of the farm', icon: <Home size={18} />, required: true },
+  { key: 'farmer_name', label: 'Farmer Name', type: 'text', placeholder: 'Enter farmer full name', icon: <MaterialIcon name="person" size={18} />, required: true },
+  { key: 'farmer_phone', label: 'Phone Number', type: 'tel', placeholder: '712 345 678', icon: <MaterialIcon name="phone" size={18} />, required: true, prefix: '+255' },
+  { key: 'farmer_national_id', label: 'National ID', type: 'text', placeholder: 'Enter national ID number', icon: <MaterialIcon name="credit_card" size={18} />, required: true },
+  { key: 'cooperative', label: 'Cooperative', type: 'text', placeholder: 'Cooperative or group name', icon: <MaterialIcon name="group" size={18} />, required: false },
+  { key: 'farm_name', label: 'Farm Name', type: 'text', placeholder: 'Name of the farm', icon: <MaterialIcon name="home" size={18} />, required: true },
 ];
 
 const Step1_Identity: React.FC<Step1Props> = ({ data, onChange, errors }) => {
@@ -38,7 +38,7 @@ const Step1_Identity: React.FC<Step1Props> = ({ data, onChange, errors }) => {
         Capture the farmer and farm identification details
       </p>
 
-      <div className="nuru-glass-card rounded-[28px] p-6 flex flex-col gap-5">
+      <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5">
         {FIELDS.map(field => {
           const value = (data[field.key] as string) || '';
           const error = errors[field.key];
@@ -64,7 +64,7 @@ const Step1_Identity: React.FC<Step1Props> = ({ data, onChange, errors }) => {
                   onChange={e => handleChange(field.key, e.target.value)}
                   placeholder={field.placeholder}
                   className={cn(
-                    "w-full py-3 pr-4 nuru-glass-card rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 border",
+                    "w-full py-3 pr-4 bg-bg-input rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 border",
                     error ? 'border-error' : 'border-border',
                     'focus:border-accent',
                   )}

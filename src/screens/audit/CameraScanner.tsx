@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Zap, Grid3x3, RefreshCcw } from 'lucide-react';
+import MaterialIcon from '../../components/MaterialIcon';
 
 const CameraScanner: React.FC = () => {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const CameraScanner: React.FC = () => {
             onClick={() => navigate(-1)}
             className="w-10 h-10 rounded-full flex items-center justify-center bg-transparent border-none cursor-pointer hover:bg-white/5 transition-colors text-white hover:text-white"
           >
-            <ChevronLeft size={20} strokeWidth={2.5} className="mr-0.5" />
+            <MaterialIcon name="chevron_left" size={20} className="mr-0.5" />
           </button>
 
           {/* Center Indicator */}
@@ -32,10 +32,10 @@ const CameraScanner: React.FC = () => {
           {/* Right Tools */}
           <div className="flex items-center">
             <button type="button" className="w-10 h-10 rounded-full flex items-center justify-center bg-transparent border-none cursor-pointer hover:bg-white/5 text-white/70 hover:text-white transition-colors">
-              <Zap size={18} fill="currentColor" className="ml-0.5" />
+              <MaterialIcon name="bolt" size={18} className="ml-0.5" fill />
             </button>
             <button type="button" className="w-10 h-10 rounded-full flex items-center justify-center bg-transparent border-none cursor-pointer hover:bg-white/5 text-white/70 hover:text-white transition-colors">
-              <Grid3x3 size={18} strokeWidth={2} />
+              <MaterialIcon name="grid_on" size={18} />
             </button>
           </div>
         
@@ -91,7 +91,7 @@ const CameraScanner: React.FC = () => {
 
           {/* Flip Camera Tool */}
           <button type="button" className="w-[46px] h-[46px] rounded-full bg-[#1A1F2E] border border-white/5 flex items-center justify-center cursor-pointer hover:bg-white/10 transition-colors flex-shrink-0 text-white">
-            <RefreshCcw size={18} strokeWidth={2.5} />
+            <MaterialIcon name="sync" size={18} />
           </button>
 
         </div>

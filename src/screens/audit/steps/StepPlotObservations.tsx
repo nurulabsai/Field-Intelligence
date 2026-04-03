@@ -1,8 +1,5 @@
 import React, { useState, useCallback, useMemo, useRef } from 'react';
-import {
-  Bug, Leaf, Sun, Camera, Mic, MicOff,
-  ChevronLeft, ChevronRight, X, Check, AlertCircle,
-} from 'lucide-react';
+import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
 import type {
   Plot, PlotObservation, CropCondition, StressLevel,
@@ -63,7 +60,7 @@ const COMMON_DISEASES = [
   'Bacterial Wilt', 'Powdery Mildew', 'Root Rot', 'Leaf Spot', 'Other',
 ];
 
-const inputClasses = "w-full py-2.5 px-3.5 nuru-glass-card border border-border rounded-[14px] text-white text-sm font-inherit outline-none transition-colors duration-150 focus:border-accent";
+const inputClasses = "w-full py-2.5 px-3.5 bg-bg-input border border-border rounded-[14px] text-white text-sm font-inherit outline-none transition-colors duration-150 focus:border-accent";
 
 const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onChange, errors }) => {
   const plots: Plot[] = (data.plots as Plot[]) || [];
@@ -115,7 +112,7 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
   if (plots.length === 0) {
     return (
       <div className="text-center py-16">
-        <AlertCircle size={48} className="mx-auto mb-4 text-text-tertiary opacity-50" />
+        <MaterialIcon name="error" size={48} className="mx-auto mb-4 text-text-tertiary opacity-50" />
         <p className="text-white font-medium mb-2">No Plots Defined</p>
         <p className="text-sm text-text-tertiary">Go back to Plot Structure and add at least one plot</p>
       </div>
@@ -238,7 +235,7 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
                     setOpenDropdowns(p => ({ ...p, [ddKey]: false }));
                   }}
                   className={cn(
-                    'w-full py-2.5 px-3.5 border-none text-sm text-left cursor-pointer font-inherit',
+                    'w-full min-h-12 py-2.5 px-3.5 border-none text-sm text-left cursor-pointer font-inherit',
                     value === opt ? 'bg-accent/15 text-accent' : 'bg-transparent text-white',
                   )}
                 >
@@ -274,7 +271,7 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
               : 'text-accent cursor-pointer bg-accent/10',
           )}
         >
-          <ChevronLeft size={18} />
+          <MaterialIcon name="chevron_left" size={18} />
         </button>
 
         <div className="text-center flex-1">
@@ -295,7 +292,7 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
               : 'text-accent cursor-pointer bg-accent/10',
           )}
         >
-          <ChevronRight size={18} />
+          <MaterialIcon name="chevron_right" size={18} />
         </button>
       </div>
 
@@ -322,7 +319,7 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
 
       {/* Plot info banner */}
       <div className="py-3 px-4 bg-bg-tertiary rounded-[12px] mb-6 flex items-center gap-3">
-        <Leaf size={16} className="text-accent" />
+        <MaterialIcon name="eco" size={16} className="text-accent" />
         <div className="text-xs text-text-secondary">
           <span className="font-medium text-white">{activePlot.name}</span>
           {' · '}
@@ -340,13 +337,13 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
         {renderPillSelector('crop_condition', 'Overall Crop Condition', CROP_CONDITIONS, true)}
 
         {/* Pest / Disease */}
-        <div className="nuru-glass-card rounded-[24px] p-5 border border-border-glass">
-          <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-            <Bug size={14} className="text-warning" /> Pest & Disease
+        <div className="nuru-glass-card rounded-[32px] p-5 border border-border-glass">
+          <h3 className="text-sm font-semibold font-heading text-white mb-4 flex items-center gap-2">
+            <MaterialIcon name="bug_report" size={14} className="text-warning" /> Pest & Disease
           </h3>
 
           <div className="flex flex-col gap-5">
-            {renderYesNo('pest_present', 'Pest Present?', <Bug size={14} />)}
+            {renderYesNo('pest_present', 'Pest Present?', <MaterialIcon name="bug_report" size={14} />)}
 
             {activeObs.pest_present === true && (
               <div className="flex flex-col gap-3 pl-2 border-l-2 border-warning/25">
@@ -355,7 +352,7 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
               </div>
             )}
 
-            {renderYesNo('disease_present', 'Disease Present?', <Leaf size={14} />)}
+            {renderYesNo('disease_present', 'Disease Present?', <MaterialIcon name="eco" size={14} />)}
 
             {activeObs.disease_present === true && (
               <div className="flex flex-col gap-3 pl-2 border-l-2 border-error/25">
@@ -367,9 +364,9 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
         </div>
 
         {/* Agronomic Observations */}
-        <div className="nuru-glass-card rounded-[24px] p-5 border border-border-glass">
-          <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-            <Sun size={14} className="text-accent" /> Agronomic Observations
+        <div className="nuru-glass-card rounded-[32px] p-5 border border-border-glass">
+          <h3 className="text-sm font-semibold font-heading text-white mb-4 flex items-center gap-2">
+            <MaterialIcon name="wb_sunny" size={14} className="text-accent" /> Agronomic Observations
           </h3>
 
           <div className="flex flex-col gap-5">
@@ -387,8 +384,8 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
         </div>
 
         {/* Media & Notes */}
-        <div className="nuru-glass-card rounded-[24px] p-5 border border-border-glass">
-          <h3 className="text-sm font-semibold text-white mb-4">Evidence & Notes</h3>
+        <div className="nuru-glass-card rounded-[32px] p-5 border border-border-glass">
+          <h3 className="text-sm font-semibold font-heading text-white mb-4">Evidence & Notes</h3>
 
           {/* Photo */}
           <div className="mb-4">
@@ -400,7 +397,7 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
                   onClick={() => updateObservation('photo', '')}
                   className="absolute top-2 right-2 w-6 h-6 rounded-full bg-overlay border-none text-white cursor-pointer flex items-center justify-center"
                 >
-                  <X size={12} />
+                  <MaterialIcon name="close" size={12} />
                 </button>
               </div>
             ) : (
@@ -409,7 +406,7 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
                 onClick={() => photoRef.current?.click()}
                 className="w-full py-3 flex items-center justify-center gap-2 bg-border-light border border-dashed border-white/10 rounded-full text-text-secondary text-sm cursor-pointer font-inherit"
               >
-                <Camera size={16} /> Add Plot Photo
+                <MaterialIcon name="photo_camera" size={16} /> Add Plot Photo
               </button>
             )}
             <input
@@ -434,7 +431,7 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
                   : "bg-border-glass border-border text-text-secondary",
               )}
             >
-              {recording ? <MicOff size={16} /> : <Mic size={16} />}
+              {recording ? <MaterialIcon name="mic_off" size={16} /> : <MaterialIcon name="mic" size={16} />}
               {recording ? 'Stop Recording' : 'Voice Note'}
             </button>
           )}
@@ -458,13 +455,13 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
           className="w-full mt-6 py-3.5 flex items-center justify-center gap-2 bg-accent/10 border border-accent/25 rounded-full text-accent text-sm font-semibold cursor-pointer font-inherit"
         >
           Next: {plots[activePlotIndex + 1]?.name || `Plot ${activePlotIndex + 2}`}
-          <ChevronRight size={16} />
+          <MaterialIcon name="chevron_right" size={16} />
         </button>
       )}
 
       {activePlotIndex === plots.length - 1 && activeObs.crop_condition && (
         <div className="mt-6 py-3.5 px-4 bg-success/10 border border-success/25 rounded-[14px] flex items-center justify-center gap-2">
-          <Check size={16} className="text-success" />
+          <MaterialIcon name="check" size={16} className="text-success" />
           <span className="text-sm text-success font-medium">All plot observations complete</span>
         </div>
       )}

@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { ChevronDown } from 'lucide-react';
+import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
 
 interface Step5Props {
@@ -44,7 +44,7 @@ const SEED_SOURCES: DropdownOption[] = [
   { value: 'company', label: 'Company' },
 ];
 
-const inputClasses = "w-full py-3 px-4 nuru-glass-card border border-border rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 focus:border-accent";
+const inputClasses = "w-full py-3 px-4 bg-bg-input border border-border rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 focus:border-accent";
 
 const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -73,7 +73,7 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
             <span className={value ? 'text-white' : 'text-text-tertiary'}>
               {options.find(o => o.value === value)?.label || `Select ${label.toLowerCase()}`}
             </span>
-            <ChevronDown size={18} className={cn("text-text-tertiary transition-transform duration-150", isOpen && "rotate-180")} />
+            <MaterialIcon name="expand_more" size={18} className={cn("text-text-tertiary transition-transform duration-150", isOpen && "rotate-180")} />
           </button>
           {isOpen && (
             <div className="absolute top-full left-0 right-0 mt-1 nuru-glass-card border border-border rounded-[16px] z-50 overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
@@ -83,7 +83,7 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
                   type="button"
                   onClick={() => { handleChange(key, opt.value); setOpenDropdown(null); }}
                   className={cn(
-                    "w-full py-2.5 px-4 border-none text-sm text-left cursor-pointer font-inherit",
+                    "w-full min-h-12 py-2.5 px-4 border-none text-sm text-left cursor-pointer font-inherit",
                     value === opt.value
                       ? "bg-accent/[0.15] text-accent"
                       : "bg-transparent text-white"
@@ -109,10 +109,10 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
         Record fertilizers, pesticides and seed information
       </p>
 
-      <div className="nuru-glass-card rounded-[28px] p-6 flex flex-col gap-5">
+      <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5">
         {/* Fertilizer Section */}
         <div className="p-5 nuru-glass-card rounded-[20px] border border-border-glass">
-          <h3 className="text-[0.938rem] font-semibold text-white mb-4">
+          <h3 className="text-[0.938rem] font-semibold font-heading text-white mb-4">
             Fertilizer
           </h3>
           <div className="flex flex-col gap-4">
@@ -136,7 +136,7 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
 
         {/* Pesticide Section */}
         <div className="p-5 nuru-glass-card rounded-[20px] border border-border-glass">
-          <h3 className="text-[0.938rem] font-semibold text-white mb-4">
+          <h3 className="text-[0.938rem] font-semibold font-heading text-white mb-4">
             Pesticide
           </h3>
           <div className="flex flex-col gap-4">
@@ -160,7 +160,7 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
 
         {/* Seed Section */}
         <div className="p-5 nuru-glass-card rounded-[20px] border border-border-glass">
-          <h3 className="text-[0.938rem] font-semibold text-white mb-4">
+          <h3 className="text-[0.938rem] font-semibold font-heading text-white mb-4">
             Seeds
           </h3>
           <div className="flex flex-col gap-4">

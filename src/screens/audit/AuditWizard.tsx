@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Send, Save, AlertTriangle } from 'lucide-react';
+import MaterialIcon from '../../components/MaterialIcon';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../design-system';
 import { useAuditStore } from '../../store/index';
@@ -406,7 +406,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
               onClick={handleSaveDraft}
               className="flex items-center gap-1.5 py-2 px-3 bg-border-glass border border-border rounded-full text-xs text-text-secondary font-medium cursor-pointer font-inherit"
             >
-              <Save size={14} />
+              <MaterialIcon name="save" size={14} />
               Save Draft
             </button>
           </div>
@@ -428,7 +428,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
       {Object.keys(errors).length > 0 && (
         <div className="fixed bottom-[90px] left-4 right-4 max-w-[800px] mx-auto z-40">
           <div className="flex items-center gap-2 py-2.5 px-4 bg-error/15 border border-error/30 rounded-[12px] backdrop-blur-sm">
-            <AlertTriangle size={16} className="text-error shrink-0" />
+            <MaterialIcon name="warning" size={16} className="text-error shrink-0" />
             <p className="text-xs text-error-light truncate">
               Please fix {Object.keys(errors).length} error{Object.keys(errors).length > 1 ? 's' : ''} before continuing
             </p>
@@ -444,7 +444,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
             onClick={handleBack}
             className="flex items-center gap-1.5 py-3 px-4 text-text-secondary text-sm font-semibold bg-transparent border-none cursor-pointer font-inherit"
           >
-            <ChevronLeft size={18} strokeWidth={2.5} />
+            <MaterialIcon name="chevron_left" size={18} />
             {currentStep === 0 ? 'Exit' : 'Back'}
           </button>
 
@@ -467,7 +467,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
                 </span>
               ) : (
                 <>
-                  <Send size={16} />
+                  <MaterialIcon name="send" size={16} />
                   Submit Audit
                 </>
               )}
@@ -479,7 +479,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
               className="h-[52px] px-8 rounded-full text-sm font-bold tracking-wide flex items-center gap-2 cursor-pointer font-inherit transition-all border-none bg-accent text-black shadow-[0_0_20px_rgba(190,242,100,0.3)] hover:scale-[1.02] active:scale-[0.98]"
             >
               Next
-              <ChevronRight size={18} strokeWidth={2.5} />
+              <MaterialIcon name="chevron_right" size={18} />
             </button>
           )}
         </div>

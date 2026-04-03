@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { Plus, Trash2, ChevronDown, Wheat } from 'lucide-react';
+import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
 
 interface Step4Props {
@@ -51,7 +51,7 @@ function createEmptyCrop(): CropEntry {
   };
 }
 
-const inputClasses = "w-full py-2.5 px-3.5 nuru-glass-card border border-border rounded-[14px] text-white text-sm font-inherit outline-none transition-colors duration-150 focus:border-accent";
+const inputClasses = "w-full py-2.5 px-3.5 bg-bg-input border border-border rounded-[14px] text-white text-sm font-inherit outline-none transition-colors duration-150 focus:border-accent";
 
 const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
   const crops: CropEntry[] = useMemo(() => {
@@ -95,13 +95,13 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
         {crops.map((crop, index) => (
           <div
             key={crop.id}
-            className="nuru-glass-card border border-border-glass rounded-[24px] p-5"
+            className="nuru-glass-card border border-border-glass rounded-[32px] p-5"
           >
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-[10px] bg-success/10 flex items-center justify-center text-success">
-                  <Wheat size={16} />
+                  <MaterialIcon name="agriculture" size={16} />
                 </div>
                 <span className="text-[0.938rem] font-semibold text-white">Crop {index + 1}</span>
               </div>
@@ -111,7 +111,7 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
                   onClick={() => removeCrop(crop.id)}
                   className="flex items-center gap-1.5 py-1.5 px-3 bg-error/10 border border-error/20 rounded-full text-error text-xs font-medium cursor-pointer font-inherit"
                 >
-                  <Trash2 size={13} />
+                  <MaterialIcon name="delete" size={13} />
                   Remove
                 </button>
               )}
@@ -129,7 +129,7 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
                   <span className={crop.crop_id ? 'text-white' : 'text-text-tertiary'}>
                     {CROP_OPTIONS.find(o => o.value === crop.crop_id)?.label || 'Select crop'}
                   </span>
-                  <ChevronDown size={16} className="text-text-tertiary" />
+                  <MaterialIcon name="expand_more" size={16} className="text-text-tertiary" />
                 </button>
                 {openDropdowns[crop.id] && (
                   <div className="absolute top-full left-0 right-0 mt-1 nuru-glass-card border border-border rounded-[14px] z-50 max-h-[200px] overflow-y-auto shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
@@ -142,7 +142,7 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
                           setOpenDropdowns(p => ({ ...p, [crop.id]: false }));
                         }}
                         className={cn(
-                          "w-full py-2.5 px-3.5 border-none text-sm text-left cursor-pointer font-inherit",
+                          "w-full min-h-12 py-2.5 px-3.5 border-none text-sm text-left cursor-pointer font-inherit",
                           crop.crop_id === opt.value
                             ? "bg-accent/[0.15] text-accent"
                             : "bg-transparent text-white"
@@ -209,7 +209,7 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
         onClick={addCrop}
         className="flex items-center justify-center gap-2 w-full py-3.5 mt-4 bg-accent/[0.08] border border-dashed border-accent/30 rounded-[14px] text-text-accent text-sm font-semibold cursor-pointer font-inherit transition-all duration-150"
       >
-        <Plus size={16} />
+        <MaterialIcon name="add" size={16} />
         Add Another Crop
       </button>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import MaterialIcon from '../../components/MaterialIcon';
 import NuruLogo from '../../components/NuruLogo';
 
 interface WelcomeScreenProps {
@@ -73,7 +73,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNavigateToLogin, onNavi
           className="w-full bg-accent text-bg-primary h-[68px] rounded-full font-bold text-[15px] shadow-[0_20px_40px_-12px_rgba(190,242,100,0.25)] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 tracking-[0.08em] cursor-pointer border-none uppercase"
         >
           Get Started
-          <ArrowRight size={18} strokeWidth={2.5} />
+          <MaterialIcon name="arrow_forward" size={18} />
         </button>
 
         <button

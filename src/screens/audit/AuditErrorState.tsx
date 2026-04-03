@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, AlertTriangle, ChevronDown, EyeOff, XCircle, ArrowDown, FileText, AlertCircle } from 'lucide-react';
+import MaterialIcon from '../../components/MaterialIcon';
 interface StepItem {
   label: string;
   subtitle: string;
@@ -64,7 +64,7 @@ const AuditErrorState: React.FC = () => {
                   className="flex items-start gap-5 p-6 bg-[#FF4B4B]/5 rounded-[32px] border border-[#FF4B4B]/10"
                 >
                   <div className="w-6 h-6 rounded-full bg-[#FF4B4B] flex items-center justify-center z-10 shrink-0 mt-0.5">
-                    <AlertTriangle size={14} strokeWidth={2.5} className="text-white" />
+                    <MaterialIcon name="warning" size={14} className="text-white" />
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-center">
@@ -72,7 +72,7 @@ const AuditErrorState: React.FC = () => {
                         <h3 className="text-sm font-medium text-white">{step.label}</h3>
                         <p className="text-[10px] text-[#FF4B4B] uppercase font-bold tracking-widest">{step.subtitle}</p>
                       </div>
-                      <EyeOff size={16} className="text-white/30" />
+                      <MaterialIcon name="visibility_off" size={16} className="text-white/30" />
                     </div>
                   </div>
                 </div>
@@ -82,7 +82,7 @@ const AuditErrorState: React.FC = () => {
             return (
               <div key={step.label} className="flex items-center gap-5 py-2">
                 <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center z-10 shrink-0">
-                  <Check size={14} strokeWidth={3} className="text-black" />
+                  <MaterialIcon name="check" size={14} className="text-black" />
                 </div>
                 <div className="flex-1 flex justify-between items-center">
                   <div>
@@ -92,13 +92,13 @@ const AuditErrorState: React.FC = () => {
                   <div className="flex items-center gap-2">
                     {step.docCount && (
                       <div className="relative">
-                        <FileText size={18} className="text-white/30" />
+                        <MaterialIcon name="description" size={18} className="text-white/30" />
                         <span className="absolute -top-1 -right-1 bg-accent text-[8px] text-black font-extrabold w-3.5 h-3.5 flex items-center justify-center rounded-full">
                           {step.docCount}
                         </span>
                       </div>
                     )}
-                    <ChevronDown size={18} className="text-white/10" />
+                    <MaterialIcon name="expand_more" size={18} className="text-white/10" />
                   </div>
                 </div>
               </div>
@@ -112,7 +112,7 @@ const AuditErrorState: React.FC = () => {
             <h2 className="text-xl font-light text-white tracking-tight font-heading">Passport Information</h2>
             <div className="flex items-center text-[#FF4B4B] gap-1.5">
               <span className="text-[9px] font-bold uppercase tracking-[0.15em]">Declined</span>
-              <AlertCircle size={16} />
+              <MaterialIcon name="error" size={16} />
             </div>
           </div>
 
@@ -144,7 +144,7 @@ const AuditErrorState: React.FC = () => {
                   value="Kazakhstan"
                   className="w-full bg-white/[0.03] border border-white/5 rounded-2xl py-4 px-5 text-sm font-medium text-white/90 outline-none"
                 />
-                <ChevronDown size={18} className="absolute right-5 top-1/2 -translate-y-1/2 text-white/20" />
+                <MaterialIcon name="expand_more" size={18} className="absolute right-5 top-1/2 -translate-y-1/2 text-white/20" />
               </div>
             </div>
 
@@ -170,12 +170,12 @@ const AuditErrorState: React.FC = () => {
               {/* Errored file pill */}
               <div className="flex items-center justify-between bg-[#FF4B4B]/5 border border-[#FF4B4B]/20 rounded-full py-4 px-6">
                 <span className="text-sm font-medium text-white/90">passport_maria_kz.pdf</span>
-                <XCircle size={20} className="text-[#FF4B4B] cursor-pointer" />
+                <MaterialIcon name="cancel" size={20} className="text-[#FF4B4B] cursor-pointer" />
               </div>
 
               {/* Error message box */}
               <div className="flex items-start gap-3 bg-[#FF4B4B]/10 p-5 rounded-3xl">
-                <AlertCircle size={18} className="text-[#FF4B4B] mt-0.5 shrink-0" />
+                <MaterialIcon name="error" size={18} className="text-[#FF4B4B] mt-0.5 shrink-0" />
                 <p className="text-[11px] leading-relaxed text-[#FF4B4B] font-medium">
                   Oops! We couldn&apos;t read your file. It might be blurry or missing some details. Please try again with a clearer image.
                 </p>
@@ -184,7 +184,7 @@ const AuditErrorState: React.FC = () => {
               {/* File info card */}
               <div className="flex items-center bg-white/[0.03] p-5 rounded-3xl border border-white/5">
                 <div className="w-12 h-12 bg-white/5 rounded-xl overflow-hidden shrink-0 border border-white/5 flex items-center justify-center">
-                  <FileText size={20} className="text-white/40" />
+                  <MaterialIcon name="description" size={20} className="text-white/40" />
                 </div>
                 <div className="ml-4 flex-1">
                   <div className="flex items-center gap-2">
@@ -196,7 +196,7 @@ const AuditErrorState: React.FC = () => {
                   <p className="text-[10px] text-white/20 font-medium mt-0.5">12.10.2025 • 4.3MB</p>
                   <div className="flex items-center gap-1 text-[#FF4B4B]/60 mt-1">
                     <span className="text-[8px] font-bold uppercase tracking-widest">Declined</span>
-                    <AlertTriangle size={10} />
+                    <MaterialIcon name="warning" size={10} />
                   </div>
                 </div>
               </div>
@@ -225,7 +225,7 @@ const AuditErrorState: React.FC = () => {
           className="bg-accent text-[#0B0F19] py-4 px-10 rounded-full flex items-center gap-4 shadow-[0_12px_40px_-10px_rgba(190,242,100,0.4)] active:scale-95 transition-all cursor-pointer border-none"
         >
           <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Scroll down</span>
-          <ArrowDown size={16} />
+          <MaterialIcon name="arrow_downward" size={16} />
         </button>
       </div>
     </div>

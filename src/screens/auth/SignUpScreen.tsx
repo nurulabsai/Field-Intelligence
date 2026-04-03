@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { ChevronLeft, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import MaterialIcon from '../../components/MaterialIcon';
 
 interface SignUpFormData {
   full_name: string;
@@ -68,7 +68,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
           onClick={onNavigateToLogin}
           className="w-10 h-10 rounded-full bg-[#1A1F2E] flex items-center justify-center border border-white/5 cursor-pointer hover:bg-white/5 transition-colors text-white"
         >
-          <ChevronLeft size={18} strokeWidth={2.5} className="ml-[-1px]" />
+          <MaterialIcon name="chevron_left" size={18} className="ml-[-1px]" />
         </button>
 
         <h1 className="text-[36px] font-medium text-white font-heading tracking-tight mt-8 mb-2 leading-tight">
@@ -162,7 +162,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
                   onClick={() => setShowPassword(p => !p)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors p-1 bg-transparent border-none cursor-pointer"
                 >
-                  {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                  {showPassword ? <MaterialIcon name="visibility" size={18} /> : <MaterialIcon name="visibility_off" size={18} />}
                 </button>
               </div>
             </div>
@@ -185,7 +185,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
                   onClick={() => setShowConfirm(p => !p)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors p-1 bg-transparent border-none cursor-pointer"
                 >
-                  {showConfirm ? <Eye size={18} /> : <EyeOff size={18} />}
+                  {showConfirm ? <MaterialIcon name="visibility" size={18} /> : <MaterialIcon name="visibility_off" size={18} />}
                 </button>
               </div>
             </div>
@@ -203,7 +203,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
               className="w-full h-[58px] rounded-full bg-accent text-[#0B0F19] text-[13px] font-bold tracking-[0.1em] uppercase flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_30px_rgba(190,242,100,0.2)] transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 border-none mb-10"
             >
               {loading ? 'Creating...' : 'Register'}
-              <ArrowRight size={18} strokeWidth={2.5} className="ml-0.5" />
+              <MaterialIcon name="arrow_forward" size={18} className="ml-0.5" />
             </button>
 
             {/* Social Separator */}

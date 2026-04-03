@@ -1,8 +1,5 @@
 import React, { useState, useCallback, useMemo, useRef } from 'react';
-import {
-  Plus, Trash2, MapPin, Navigation, AlertTriangle, ChevronDown,
-  ChevronUp, Camera, Grid3X3, X, AlertCircle,
-} from 'lucide-react';
+import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
 import type { Plot, FarmProfile, PlotStatus, GrowthStage } from '../../../lib/audit-types';
 import { createPlot } from '../../../lib/audit-types';
@@ -45,7 +42,7 @@ const CROP_OPTIONS = [
 
 const SEASONS = ['Long rains (Masika)', 'Short rains (Vuli)', 'Dry season', 'Year-round'];
 
-const inputClasses = "w-full py-2.5 px-3.5 nuru-glass-card border border-border rounded-[14px] text-white text-sm font-inherit outline-none transition-colors duration-150 focus:border-accent";
+const inputClasses = "w-full py-2.5 px-3.5 bg-bg-input border border-border rounded-[14px] text-white text-sm font-inherit outline-none transition-colors duration-150 focus:border-accent";
 
 const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, errors }) => {
   const farmProfile = data.farm_profile as FarmProfile | undefined;
@@ -153,7 +150,7 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
             <span className={value ? 'text-white' : 'text-text-tertiary'}>
               {options.find(o => o.value === value)?.label || `Select`}
             </span>
-            <ChevronDown size={14} className="text-text-tertiary" />
+            <MaterialIcon name="expand_more" size={14} className="text-text-tertiary" />
           </button>
           {isOpen && (
             <div className="absolute top-full left-0 right-0 mt-1 nuru-glass-card border border-border rounded-[14px] z-50 max-h-[200px] overflow-y-auto shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
@@ -166,7 +163,7 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
                     setOpenDropdowns(p => ({ ...p, [ddKey]: false }));
                   }}
                   className={cn(
-                    'w-full py-2.5 px-3.5 border-none text-sm text-left cursor-pointer font-inherit',
+                    'w-full min-h-12 py-2.5 px-3.5 border-none text-sm text-left cursor-pointer font-inherit',
                     value === opt.value ? 'bg-accent/15 text-accent' : 'bg-transparent text-white',
                   )}
                 >
@@ -192,7 +189,7 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
       {/* Summary bar */}
       <div className="flex items-center justify-between py-3 px-4 nuru-glass-card rounded-[14px] border border-border-glass mb-6">
         <div className="flex items-center gap-3">
-          <Grid3X3 size={16} className="text-accent" />
+          <MaterialIcon name="grid_on" size={16} className="text-accent" />
           <span className="text-sm text-white font-medium">{plots.length} plot{plots.length !== 1 ? 's' : ''}</span>
         </div>
         <span className="text-xs text-text-tertiary">
@@ -203,7 +200,7 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
 
       {areaOverflow && (
         <div className="flex items-center gap-2 py-2.5 px-3.5 bg-warning/10 border border-warning/25 rounded-[10px] mb-4">
-          <AlertCircle size={16} className="text-warning shrink-0" />
+          <MaterialIcon name="error" size={16} className="text-warning shrink-0" />
           <span className="text-[0.813rem] text-warning-light">
             Total plot area ({totalPlotArea.toFixed(2)} ha) exceeds farm area ({farmArea} ha) by more than 20%
           </span>
@@ -226,7 +223,7 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
             <div
               key={plot.id}
               className={cn(
-                "nuru-glass-card border rounded-[24px] transition-all duration-150",
+                "nuru-glass-card border rounded-[32px] transition-all duration-150",
                 isExpanded ? "border-accent/20" : "border-border-glass",
               )}
             >
@@ -258,12 +255,12 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
                     <span
                       role="button"
                       onClick={e => { e.stopPropagation(); removePlot(plot.id); }}
-                      className="p-1.5 bg-error/10 rounded-full text-error cursor-pointer"
+                      className="p-2.5 bg-error/10 rounded-full text-error cursor-pointer"
                     >
-                      <Trash2 size={14} />
+                      <MaterialIcon name="delete" size={16} />
                     </span>
                   )}
-                  {isExpanded ? <ChevronUp size={18} className="text-text-tertiary" /> : <ChevronDown size={18} className="text-text-tertiary" />}
+                  {isExpanded ? <MaterialIcon name="expand_less" size={18} className="text-text-tertiary" /> : <MaterialIcon name="expand_more" size={18} className="text-text-tertiary" />}
                 </div>
               </button>
 
@@ -356,20 +353,20 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
                         </span>
                       ) : gps ? (
                         <>
-                          <Navigation size={16} />
+                          <MaterialIcon name="near_me" size={16} />
                           {gps.lat.toFixed(5)}, {gps.lon.toFixed(5)}
                           <span className="text-xs opacity-70">({gps.accuracy.toFixed(0)}m)</span>
                         </>
                       ) : (
                         <>
-                          <MapPin size={16} />
+                          <MaterialIcon name="location_on" size={16} />
                           Capture Plot Center GPS
                         </>
                       )}
                     </button>
                     {gps && gps.accuracy > 30 && (
                       <div className="flex items-center gap-1.5 mt-1.5">
-                        <AlertTriangle size={12} className="text-warning" />
+                        <MaterialIcon name="warning" size={12} className="text-warning" />
                         <span className="text-[10px] text-warning-light">Accuracy {gps.accuracy.toFixed(0)}m — consider recapturing</span>
                       </div>
                     )}
@@ -386,7 +383,7 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
                           onClick={() => updatePlot(plot.id, 'photo', '')}
                           className="absolute top-2 right-2 w-6 h-6 rounded-full bg-overlay border-none text-white cursor-pointer flex items-center justify-center"
                         >
-                          <X size={12} />
+                          <MaterialIcon name="close" size={12} />
                         </button>
                       </div>
                     ) : (
@@ -395,7 +392,7 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
                         onClick={() => photoInputRefs.current[plot.id]?.click()}
                         className="w-full py-3 flex items-center justify-center gap-2 bg-border-light border border-dashed border-white/10 rounded-full text-text-secondary text-sm cursor-pointer font-inherit"
                       >
-                        <Camera size={16} /> Take Photo
+                        <MaterialIcon name="photo_camera" size={16} /> Take Photo
                       </button>
                     )}
                     <input
@@ -432,7 +429,7 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
         onClick={addPlot}
         className="flex items-center justify-center gap-2 w-full py-3.5 mt-4 bg-accent/[0.08] border border-dashed border-accent/30 rounded-[14px] text-text-accent text-sm font-semibold cursor-pointer font-inherit"
       >
-        <Plus size={16} />
+        <MaterialIcon name="add" size={16} />
         Add Another Plot
       </button>
 

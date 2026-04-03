@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, Download, Calendar, Folder, FileText, RotateCw, Loader2, AlertCircle } from 'lucide-react';
+import MaterialIcon from '../../components/MaterialIcon';
 
 interface AuditListProps {
   audits?: Array<{ id: string; farmName: string; auditType?: string; date: string; status: 'draft' | 'submitted' | 'verified' | 'synced' | 'failed'; location?: string }>;
@@ -8,12 +8,12 @@ interface AuditListProps {
   onNewAudit?: () => void;
 }
 
-const STATUS_ICON: Record<string, { Icon: typeof Folder; color: string; fill: string; bg: string; badgeBg: string; badgeBorder: string; badgeText: string; label: string }> = {
-  synced: { Icon: FileText, color: 'text-accent', fill: '#BEF264', bg: 'bg-accent/10', badgeBg: 'bg-accent/10', badgeBorder: 'border-accent/20', badgeText: 'text-accent', label: 'Completed' },
-  submitted: { Icon: Folder, color: 'text-cyan', fill: '#67E8F9', bg: 'bg-cyan/10', badgeBg: 'bg-cyan/10', badgeBorder: 'border-cyan/30', badgeText: 'text-cyan', label: 'Syncing' },
-  verified: { Icon: FileText, color: 'text-accent', fill: '#BEF264', bg: 'bg-accent/10', badgeBg: 'bg-accent/10', badgeBorder: 'border-accent/20', badgeText: 'text-accent', label: 'Verified' },
-  failed: { Icon: FileText, color: 'text-[#F87171]', fill: '#F87171', bg: 'bg-[#FF4D4D]/10', badgeBg: 'bg-[#FF4D4D]/10', badgeBorder: 'border-[#FF4D4D]/20', badgeText: 'text-[#FF4D4D]', label: 'Failed' },
-  draft: { Icon: Folder, color: 'text-white/50', fill: '#94A3B8', bg: 'bg-white/5', badgeBg: 'bg-white/5', badgeBorder: 'border-white/10', badgeText: 'text-white/50', label: 'Draft' },
+const STATUS_ICON: Record<string, { iconName: string; color: string; bg: string; badgeBg: string; badgeBorder: string; badgeText: string; label: string }> = {
+  synced: { iconName: 'description', color: 'text-accent', bg: 'bg-accent/10', badgeBg: 'bg-accent/10', badgeBorder: 'border-accent/20', badgeText: 'text-accent', label: 'Completed' },
+  submitted: { iconName: 'folder', color: 'text-cyan', bg: 'bg-cyan/10', badgeBg: 'bg-cyan/10', badgeBorder: 'border-cyan/30', badgeText: 'text-cyan', label: 'Syncing' },
+  verified: { iconName: 'description', color: 'text-accent', bg: 'bg-accent/10', badgeBg: 'bg-accent/10', badgeBorder: 'border-accent/20', badgeText: 'text-accent', label: 'Verified' },
+  failed: { iconName: 'description', color: 'text-[#F87171]', bg: 'bg-[#FF4D4D]/10', badgeBg: 'bg-[#FF4D4D]/10', badgeBorder: 'border-[#FF4D4D]/20', badgeText: 'text-[#FF4D4D]', label: 'Failed' },
+  draft: { iconName: 'folder', color: 'text-white/50', bg: 'bg-white/5', badgeBg: 'bg-white/5', badgeBorder: 'border-white/10', badgeText: 'text-white/50', label: 'Draft' },
 };
 
 const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }) => {
@@ -32,7 +32,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
             aria-label="Settings"
             className="w-10 h-10 rounded-full border border-white/5 flex items-center justify-center bg-white/5 cursor-pointer active:scale-95 transition-transform"
           >
-            <Settings size={20} className="text-text-secondary" />
+            <MaterialIcon name="settings" size={20} className="text-text-secondary" />
           </button>
         </div>
 
@@ -42,14 +42,14 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
             type="button"
             className="flex-1 bg-accent text-black font-bold py-3.5 px-6 rounded-full flex items-center justify-center gap-2 active:scale-95 transition-transform text-sm cursor-pointer border-none"
           >
-            <Download size={20} strokeWidth={2.5} />
+            <MaterialIcon name="download" size={20} />
             Export CSV
           </button>
           <button
             type="button"
             className="flex-1 nuru-glassmorphism text-white font-medium py-3.5 px-6 rounded-full flex items-center justify-center gap-2 active:scale-95 transition-transform text-sm cursor-pointer"
           >
-            <Calendar size={20} className="text-white/70" />
+            <MaterialIcon name="calendar_today" size={20} className="text-white/70" />
             Filter Dates
           </button>
         </div>
@@ -59,7 +59,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
       <main className="px-6 flex flex-col gap-8">
         {isLoading && (
           <div className="flex items-center justify-center py-20">
-            <Loader2 size={32} className="text-accent animate-spin" />
+            <MaterialIcon name="progress_activity" size={32} className="text-accent animate-spin" />
           </div>
         )}
 
@@ -75,7 +75,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-cyan/10 rounded-2xl flex items-center justify-center shrink-0">
-                          <Folder size={24} className="text-cyan" fill="#67E8F9" />
+                          <MaterialIcon name="folder" size={24} className="text-cyan" />
                         </div>
                         <div>
                           <h3 className="font-bold text-sm text-white">Site_Photos_A.zip</h3>
@@ -95,7 +95,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
                   <div className="nuru-glassmorphism rounded-[32px] p-5 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center shrink-0">
-                        <FileText size={24} className="text-accent" fill="#BEF264" />
+                        <MaterialIcon name="description" size={24} className="text-accent" />
                       </div>
                       <div>
                         <h3 className="font-bold text-sm text-white">Audit_Report_v2.pdf</h3>
@@ -111,7 +111,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
                   <div className="nuru-glassmorphism rounded-[32px] p-5 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-[#FF4D4D]/10 rounded-2xl flex items-center justify-center shrink-0">
-                        <FileText size={24} className="text-[#F87171]" fill="#F87171" />
+                        <MaterialIcon name="description" size={24} className="text-[#F87171]" />
                       </div>
                       <div>
                         <h3 className="font-bold text-sm text-white">Soil_Data.csv</h3>
@@ -127,7 +127,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
                         aria-label="Retry upload"
                         className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center cursor-pointer text-text-secondary active:scale-90 border border-white/5 transition-transform shrink-0"
                       >
-                        <RotateCw size={18} />
+                        <MaterialIcon name="sync" size={18} />
                       </button>
                     </div>
                   </div>
@@ -136,7 +136,6 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
 
               {hasPropData && audits!.map((audit) => {
                 const style = (STATUS_ICON[audit.status] ?? STATUS_ICON.draft)!;
-                const StatusIcon = style.Icon;
                 return (
                   <div
                     key={audit.id}
@@ -149,7 +148,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className={`w-12 h-12 rounded-2xl ${style.bg} flex items-center justify-center shrink-0`}>
-                          <StatusIcon size={24} className={style.color} fill={style.fill} />
+                          <MaterialIcon name={style.iconName} size={24} className={style.color} />
                         </div>
                         <div>
                           <h4 className="text-white font-bold text-sm tracking-wide">{audit.farmName}</h4>
@@ -166,7 +165,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
                             aria-label="Retry"
                             className="w-10 h-10 rounded-full bg-white/5 border border-white/5 flex items-center justify-center cursor-pointer text-text-secondary active:scale-90 transition-transform shrink-0"
                           >
-                            <RotateCw size={18} />
+                            <MaterialIcon name="sync" size={18} />
                           </button>
                         )}
                       </div>
@@ -190,7 +189,7 @@ const AuditList: React.FC<AuditListProps> = ({ audits, isLoading, onAuditClick }
 
             {hasPropData && audits!.length === 0 && (
               <div className="text-center py-12 nuru-vital-card rounded-[32px]">
-                <AlertCircle size={28} className="text-text-secondary mx-auto mb-3" />
+                <MaterialIcon name="error" size={28} className="text-text-secondary mx-auto mb-3" />
                 <p className="text-text-secondary text-[14px] mb-1">No activity to show</p>
                 <p className="text-text-tertiary text-[12px]">Completed audits will appear here</p>
               </div>

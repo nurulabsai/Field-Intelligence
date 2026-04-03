@@ -1,11 +1,11 @@
 import React from 'react';
-import { Home, Calendar, Plus, BarChart2, Camera } from 'lucide-react';
+import MaterialIcon from './MaterialIcon';
 import { cn } from '../design-system';
 
 interface NavItem {
   id: string;
   path: string;
-  icon: React.FC<{ size: number; className?: string; strokeWidth?: number }>;
+  iconName: string;
 }
 
 interface NuruBottomNavProps {
@@ -15,11 +15,11 @@ interface NuruBottomNavProps {
 }
 
 const navItems: NavItem[] = [
-  { id: 'home', path: '/dashboard', icon: Home },
-  { id: 'calendar', path: '/schedule', icon: Calendar },
-  { id: 'add', path: '/audit/new', icon: Plus },
-  { id: 'analytics', path: '/audits', icon: BarChart2 },
-  { id: 'camera', path: '/scanner', icon: Camera },
+  { id: 'home', path: '/dashboard', iconName: 'home' },
+  { id: 'calendar', path: '/schedule', iconName: 'calendar_today' },
+  { id: 'add', path: '/audit/new', iconName: 'add' },
+  { id: 'analytics', path: '/audits', iconName: 'bar_chart' },
+  { id: 'camera', path: '/scanner', iconName: 'photo_camera' },
 ];
 
 const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
@@ -34,7 +34,6 @@ const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
       >
         {navItems.map((item) => {
           const isActive = currentPath === item.path;
-          const Icon = item.icon;
 
           if (isActive) {
             return (
@@ -43,7 +42,7 @@ const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
                 onClick={() => onNavigate(item.path)}
                 className="w-12 h-12 flex items-center justify-center bg-accent rounded-full text-white border-none cursor-pointer active:scale-95 transition-transform outline-none shadow-lg shadow-accent/20"
               >
-                <Icon size={24} strokeWidth={2} />
+                <MaterialIcon name={item.iconName} size={24} />
               </button>
             );
           }
@@ -56,7 +55,7 @@ const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
                 "flex-1 flex justify-center items-center py-2 text-gray-400 bg-transparent border-none cursor-pointer transition-colors outline-none"
               )}
             >
-              <Icon size={24} strokeWidth={1.5} />
+              <MaterialIcon name={item.iconName} size={24} />
             </button>
           );
         })}

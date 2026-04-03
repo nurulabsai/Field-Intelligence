@@ -9,13 +9,20 @@ import { z } from 'zod';
 // Shared validators
 // ---------------------------------------------------------------------------
 
-/** Tanzanian phone: +255 followed by 9 digits (leading zero dropped) */
-const tanzanianPhone = z
+/** Tanzanian phone: +255 followed by 9 digits (leading zero dropped).
+ *  Accepts bare 9-digit input (UI shows +255 prefix separately). */
+const tanzanianPhone = z.preprocess((val) => {
+  if (typeof val !== 'string') return val;
+  let v = val.trim();
+  if (/^0\d{9}$/.test(v)) v = v.slice(1);
+  if (/^[1-9]\d{8}$/.test(v)) v = `+255${v}`;
+  return v;
+}, z
   .string()
   .regex(
     /^\+255[1-9]\d{8}$/,
     'Must be a valid Tanzanian phone number (+255XXXXXXXXX)',
-  );
+  ));
 
 /** GPS latitude must fall within Tanzania: approx -11.75 to -1.0 */
 const tanzaniaLat = z

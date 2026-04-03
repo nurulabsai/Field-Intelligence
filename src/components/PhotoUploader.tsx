@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, X } from 'lucide-react';
+import MaterialIcon from './MaterialIcon';
 
 interface PhotoUploaderProps {
   photos: File[];
@@ -56,7 +56,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
               onClick={() => handleRemove(i)}
               className="absolute top-1 right-1 w-[22px] h-[22px] rounded-full bg-[rgba(0,0,0,0.7)] text-white border-none cursor-pointer flex items-center justify-center p-0"
             >
-              <X size={12} />
+              <MaterialIcon name="close" size={12} />
             </button>
           </div>
         ))}
@@ -74,7 +74,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
               e.currentTarget.style.color = '#6B7280';
             }}
           >
-            <Camera size={20} />
+            <MaterialIcon name="photo_camera" size={20} />
             <span className="text-[11px] font-medium">Add</span>
           </button>
         )}

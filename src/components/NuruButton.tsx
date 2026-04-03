@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2 } from 'lucide-react';
+import MaterialIcon from './MaterialIcon';
 import { cn } from '../design-system';
 
 interface NuruButtonProps {
@@ -55,7 +55,8 @@ const NuruButton: React.FC<NuruButtonProps> = ({
       )}
     >
       {loading ? (
-        <Loader2
+        <MaterialIcon
+          name="progress_activity"
           size={size === 'sm' ? 14 : size === 'md' ? 16 : 20}
           className="animate-spin"
         />

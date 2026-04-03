@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useRef } from 'react';
-import { Camera, MapPin, Navigation, Mic, MicOff, X } from 'lucide-react';
+import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
 
 interface Step6Props {
@@ -35,7 +35,7 @@ function formatTZS(amount: number): string {
   return `TZS ${amount.toLocaleString('en-TZ')}`;
 }
 
-const inputClasses = "w-full py-3 px-4 nuru-glass-card border border-border rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 focus:border-accent";
+const inputClasses = "w-full py-3 px-4 bg-bg-input border border-border rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 focus:border-accent";
 
 const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
   const [gpsLoading, setGpsLoading] = useState(false);
@@ -137,8 +137,8 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
 
       <div className="flex flex-col gap-6">
         {/* Yield Inputs */}
-        <div className="p-5 nuru-glass-card rounded-[24px] border border-border-glass">
-          <h3 className="text-[0.938rem] font-semibold text-white mb-4">
+        <div className="p-5 nuru-glass-card rounded-[32px] border border-border-glass">
+          <h3 className="text-[0.938rem] font-semibold font-heading text-white mb-4">
             Yield Data
           </h3>
           <div className="nuru-yield-grid grid grid-cols-3 gap-3.5">
@@ -193,8 +193,8 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
         </div>
 
         {/* Market Channel */}
-        <div className="p-5 nuru-glass-card rounded-[24px] border border-border-glass">
-          <h3 className="text-[0.938rem] font-semibold text-white mb-4">
+        <div className="p-5 nuru-glass-card rounded-[32px] border border-border-glass">
+          <h3 className="text-[0.938rem] font-semibold font-heading text-white mb-4">
             Market Information
           </h3>
 
@@ -243,8 +243,8 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
         </div>
 
         {/* Constraint Severity Grid */}
-        <div className="p-5 nuru-glass-card rounded-[24px] border border-border-glass">
-          <h3 className="text-[0.938rem] font-semibold text-white mb-4">
+        <div className="p-5 nuru-glass-card rounded-[32px] border border-border-glass">
+          <h3 className="text-[0.938rem] font-semibold font-heading text-white mb-4">
             Constraint Severity
           </h3>
 
@@ -283,8 +283,8 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
         </div>
 
         {/* Photo Upload */}
-        <div className="p-5 nuru-glass-card rounded-[24px] border border-border-glass">
-          <h3 className="text-[0.938rem] font-semibold text-white mb-1">
+        <div className="p-5 nuru-glass-card rounded-[32px] border border-border-glass">
+          <h3 className="text-[0.938rem] font-semibold font-heading text-white mb-1">
             Photos
           </h3>
           <p className="text-xs text-text-tertiary mb-3.5">
@@ -308,7 +308,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
                   onClick={() => removePhoto(i)}
                   className="absolute top-1 right-1 w-[22px] h-[22px] rounded-full bg-overlay border-none text-white cursor-pointer flex items-center justify-center"
                 >
-                  <X size={12} />
+                  <MaterialIcon name="close" size={12} />
                 </button>
               </div>
             ))}
@@ -320,7 +320,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
               onClick={() => fileInputRef.current?.click()}
               className="flex items-center justify-center gap-2 w-full py-3.5 bg-border-light border border-dashed border-white/[0.15] rounded-full text-text-secondary text-sm font-medium cursor-pointer font-inherit"
             >
-              <Camera size={16} />
+              <MaterialIcon name="photo_camera" size={16} />
               Upload Photo
             </button>
           )}
@@ -353,12 +353,12 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
               'Capturing...'
             ) : yieldLat ? (
               <>
-                <Navigation size={16} />
+                <MaterialIcon name="near_me" size={16} />
                 {(yieldLat as number).toFixed(4)}, {(yieldLng as number).toFixed(4)}
               </>
             ) : (
               <>
-                <MapPin size={16} />
+                <MaterialIcon name="location_on" size={16} />
                 Capture GPS
               </>
             )}
@@ -376,7 +376,7 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
                   : "bg-border-glass border-border text-text-secondary"
               )}
             >
-              {recording ? <MicOff size={16} /> : <Mic size={16} />}
+              {recording ? <MaterialIcon name="mic_off" size={16} /> : <MaterialIcon name="mic" size={16} />}
               {recording ? 'Stop' : 'Voice Note'}
             </button>
           )}

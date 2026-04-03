@@ -1,14 +1,15 @@
 import React from 'react';
-import { Check } from 'lucide-react';
+import MaterialIcon from './MaterialIcon';
 import { cn } from '../design-system';
 
 interface AuditStepIndicatorProps {
   totalSteps?: number;
   currentStep: number;
   completedSteps: number[];
+  stepLabels?: readonly string[];
 }
 
-const STEP_LABELS = [
+const DEFAULT_LABELS = [
   'Identity',
   'Location',
   'Farm',
@@ -19,14 +20,16 @@ const STEP_LABELS = [
   'Crops',
   'Inputs',
   'Yield',
-];
+] as const;
 
 const AuditStepIndicator: React.FC<AuditStepIndicatorProps> = ({
   totalSteps = 10,
   currentStep,
   completedSteps,
+  stepLabels,
 }) => {
-  const steps = STEP_LABELS.slice(0, totalSteps);
+  const labels = stepLabels ?? DEFAULT_LABELS;
+  const steps = labels.slice(0, totalSteps);
 
   return (
     <div className="flex items-center w-full py-2 font-base overflow-x-auto scrollbar-none">
@@ -47,7 +50,11 @@ const AuditStepIndicator: React.FC<AuditStepIndicatorProps> = ({
                   !isCurrent && !isCompleted && 'bg-bg-input text-text-tertiary',
                 )}
               >
-                {isCompleted && !isCurrent ? <Check size={12} strokeWidth={3} /> : stepNum}
+                {isCompleted && !isCurrent ? (
+                  <MaterialIcon name="check" size={12} />
+                ) : (
+                  stepNum
+                )}
               </div>
               {(isCurrent || isCompleted) && (
                 <span

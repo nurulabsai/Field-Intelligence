@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Home, User, Phone, MapPin, ChevronDown, Droplets, FileText, AlertCircle } from 'lucide-react';
+import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
 import type { FarmProfile, TenureType, FarmingSystem } from '../../../lib/audit-types';
 import { createFarmProfile } from '../../../lib/audit-types';
@@ -37,7 +37,7 @@ const WATER_SOURCES = [
   'Rain', 'River', 'Borehole', 'Dam', 'Spring', 'Piped', 'Well', 'None',
 ];
 
-const inputBase = "w-full py-3 px-4 nuru-glass-card rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 border";
+const inputBase = "w-full py-3 px-4 bg-bg-input rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 border";
 
 const StepFarmProfile: React.FC<StepFarmProfileProps> = ({ data, onChange, errors }) => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -89,7 +89,7 @@ const StepFarmProfile: React.FC<StepFarmProfileProps> = ({ data, onChange, error
             <span className={cn('flex-1', value ? 'text-white' : 'text-text-tertiary')}>
               {options.find(o => o.value === value)?.label || `Select ${label.toLowerCase()}`}
             </span>
-            <ChevronDown size={18} className={cn("text-text-tertiary transition-transform duration-150", isOpen && "rotate-180")} />
+            <MaterialIcon name="expand_more" size={18} className={cn("text-text-tertiary transition-transform duration-150", isOpen && "rotate-180")} />
           </button>
           {isOpen && (
             <div className="absolute top-full left-0 right-0 mt-1 nuru-glass-card border border-border-dark rounded-[18px] z-50 max-h-60 overflow-y-auto shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
@@ -99,7 +99,7 @@ const StepFarmProfile: React.FC<StepFarmProfileProps> = ({ data, onChange, error
                   type="button"
                   onClick={() => { update(field, opt.value); setOpenDropdown(null); }}
                   className={cn(
-                    'w-full py-2.5 px-4 border-none text-sm text-left cursor-pointer font-inherit',
+                    'w-full min-h-12 py-2.5 px-4 border-none text-sm text-left cursor-pointer font-inherit',
                     value === opt.value ? 'bg-accent/15 text-accent' : 'bg-transparent text-white',
                   )}
                 >
@@ -187,43 +187,43 @@ const StepFarmProfile: React.FC<StepFarmProfileProps> = ({ data, onChange, error
       </p>
 
       {/* Farm Identity */}
-      <div className="nuru-glass-card rounded-[28px] p-6 flex flex-col gap-5 mb-6">
-        <h3 className="text-[0.938rem] font-semibold text-white flex items-center gap-2">
-          <Home size={16} className="text-accent" />
+      <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5 mb-6">
+        <h3 className="text-[0.938rem] font-semibold font-heading text-white flex items-center gap-2">
+          <MaterialIcon name="home" size={16} className="text-accent" />
           Farm Identity
         </h3>
 
         {renderInput('farm_name', 'Farm Name / Local Reference', {
           placeholder: 'e.g. Mchaina Farm',
           required: true,
-          icon: <Home size={18} />,
+          icon: <MaterialIcon name="home" size={18} />,
         })}
 
         {renderInput('farmer_name', 'Farmer Name', {
           placeholder: 'Full name of farmer',
           required: true,
-          icon: <User size={18} />,
+          icon: <MaterialIcon name="person" size={18} />,
         })}
 
         {renderInput('farmer_phone', 'Farmer Phone', {
           type: 'tel',
           placeholder: '712 345 678',
           required: true,
-          icon: <Phone size={18} />,
+          icon: <MaterialIcon name="phone" size={18} />,
           prefix: '+255',
         })}
 
         {renderInput('contact_number', 'Alternative Contact', {
           type: 'tel',
           placeholder: 'Optional secondary number',
-          icon: <Phone size={18} />,
+          icon: <MaterialIcon name="phone" size={18} />,
         })}
       </div>
 
       {/* Location */}
-      <div className="nuru-glass-card rounded-[28px] p-6 flex flex-col gap-5 mb-6">
-        <h3 className="text-[0.938rem] font-semibold text-white flex items-center gap-2">
-          <MapPin size={16} className="text-accent" />
+      <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5 mb-6">
+        <h3 className="text-[0.938rem] font-semibold font-heading text-white flex items-center gap-2">
+          <MaterialIcon name="location_on" size={16} className="text-accent" />
           Administrative Location
         </h3>
 
@@ -235,9 +235,9 @@ const StepFarmProfile: React.FC<StepFarmProfileProps> = ({ data, onChange, error
       </div>
 
       {/* Farm Details */}
-      <div className="nuru-glass-card rounded-[28px] p-6 flex flex-col gap-5">
-        <h3 className="text-[0.938rem] font-semibold text-white flex items-center gap-2">
-          <FileText size={16} className="text-accent" />
+      <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5">
+        <h3 className="text-[0.938rem] font-semibold font-heading text-white flex items-center gap-2">
+          <MaterialIcon name="description" size={16} className="text-accent" />
           Farm Details
         </h3>
 
@@ -250,7 +250,7 @@ const StepFarmProfile: React.FC<StepFarmProfileProps> = ({ data, onChange, error
 
         {totalAreaWarning && (
           <div className="flex items-center gap-2 py-2.5 px-3.5 bg-warning/10 border border-warning/25 rounded-[10px]">
-            <AlertCircle size={16} className="text-warning shrink-0" />
+            <MaterialIcon name="error" size={16} className="text-warning shrink-0" />
             <span className="text-[0.813rem] text-warning-light">{totalAreaWarning}</span>
           </div>
         )}
@@ -263,7 +263,7 @@ const StepFarmProfile: React.FC<StepFarmProfileProps> = ({ data, onChange, error
           'Water Source',
           WATER_SOURCES.map(w => ({ value: w.toLowerCase(), label: w })),
           false,
-          <Droplets size={18} />,
+          <MaterialIcon name="water_drop" size={18} />,
         )}
 
         <div>

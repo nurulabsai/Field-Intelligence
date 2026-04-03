@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  LayoutDashboard,
-  ClipboardCheck,
-  Calendar,
-  Settings,
-  LogOut,
-} from 'lucide-react';
+import MaterialIcon from './MaterialIcon';
 import NuruAvatar from './NuruAvatar';
 import { cn } from '../design-system';
 
@@ -23,10 +17,10 @@ interface NuruSideNavProps {
 }
 
 const navItems: NavItem[] = [
-  { label: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
-  { label: 'Audits', path: '/audits', icon: <ClipboardCheck size={20} /> },
-  { label: 'Calendar', path: '/schedule', icon: <Calendar size={20} /> },
-  { label: 'Settings', path: '/settings', icon: <Settings size={20} /> },
+  { label: 'Dashboard', path: '/dashboard', icon: <MaterialIcon name="space_dashboard" size={20} /> },
+  { label: 'Audits', path: '/audits', icon: <MaterialIcon name="assignment_turned_in" size={20} /> },
+  { label: 'Calendar', path: '/schedule', icon: <MaterialIcon name="calendar_today" size={20} /> },
+  { label: 'Settings', path: '/settings', icon: <MaterialIcon name="settings" size={20} /> },
 ];
 
 const NuruSideNav: React.FC<NuruSideNavProps> = ({
@@ -89,7 +83,7 @@ const NuruSideNav: React.FC<NuruSideNavProps> = ({
           title="Logout"
           className="bg-transparent border-none text-text-tertiary cursor-pointer p-1.5 rounded-md flex items-center transition-colors duration-[var(--transition-base)] hover:text-error"
         >
-          <LogOut size={16} />
+          <MaterialIcon name="logout" size={16} />
         </button>
       </div>
 

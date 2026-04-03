@@ -1,330 +1,801 @@
-import React, { useState, useRef } from 'react';
-import { Check, ChevronDown, AlertCircle, EyeOff, FileText, Calendar, X, Triangle, ArrowDown, ChevronLeft, UploadCloud } from 'lucide-react';
+import React, { useState, useCallback, useEffect } from 'react';
+import MaterialIcon from '../../components/MaterialIcon';
 import { useNavigate } from 'react-router-dom';
-import { useUIStore } from '../../store';
+import { cn } from '../../design-system';
+import { useAuditStore } from '../../store/index';
+import {
+  DISTRICTS, STAKEHOLDER_TYPES, INPUT_CATEGORIES, COMMODITIES,
+  VOLUME_CATEGORIES, PAYMENT_TERMS, VEHICLE_TYPES, SERVICE_TYPES,
+  STOCK_LEVELS, MARKET_ACTIVITY, PRODUCT_CATEGORIES, PRODUCT_CONDITIONS,
+  YES_NO_UNCLEAR, CHALLENGES, DATA_QUALITY, BUSINESS_STEP_LABELS,
+  BUSINESS_TOTAL_STEPS,
+  type Choice,
+} from '../../lib/business-audit-choices';
+import AuditStepIndicator from '../../components/AuditStepIndicator';
 
-const BusinessWizard: React.FC = () => {
+type FormData = Record<string, unknown>;
+
+interface BusinessWizardProps {
+  onComplete?: (data: FormData) => void;
+}
+
+// ---------------------------------------------------------------------------
+// Reusable field primitives
+// ---------------------------------------------------------------------------
+
+function FieldLabel({ label, required }: { label: string; required?: boolean }) {
+  return (
+    <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
+      {label}
+      {required && <span className="text-text-accent ml-1">*</span>}
+    </label>
+  );
+}
+
+function TextInput({
+  field, value, onChange, placeholder, type = 'text', error, icon,
+}: {
+  field: string; value: string; onChange: (k: string, v: string) => void;
+  placeholder?: string; type?: string; error?: string; icon?: React.ReactNode;
+}) {
+  return (
+    <div>
+      <div className="relative flex items-center">
+        {icon && (
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none">
+            {icon}
+          </span>
+        )}
+        <input
+          type={type}
+          value={value}
+          onChange={e => onChange(field, e.target.value)}
+          placeholder={placeholder}
+          inputMode={type === 'number' ? 'numeric' : undefined}
+          className={cn(
+            'w-full py-3 pr-4 bg-bg-input rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 border',
+            error ? 'border-error' : 'border-border',
+            'focus:border-accent',
+          )}
+          style={{ paddingLeft: icon ? '44px' : '16px' }}
+        />
+      </div>
+      {error && <p className="text-xs text-error-light mt-1">{error}</p>}
+    </div>
+  );
+}
+
+function TextArea({
+  field, value, onChange, placeholder, error,
+}: {
+  field: string; value: string; onChange: (k: string, v: string) => void;
+  placeholder?: string; error?: string;
+}) {
+  return (
+    <div>
+      <textarea
+        value={value}
+        onChange={e => onChange(field, e.target.value)}
+        placeholder={placeholder}
+        rows={3}
+        className={cn(
+          'w-full py-3 px-4 bg-bg-input rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 border resize-none',
+          error ? 'border-error' : 'border-border',
+          'focus:border-accent',
+        )}
+      />
+      {error && <p className="text-xs text-error-light mt-1">{error}</p>}
+    </div>
+  );
+}
+
+function SelectOne({
+  field, value, choices, onChange, error,
+}: {
+  field: string; value: string; choices: Choice[]; onChange: (k: string, v: string) => void; error?: string;
+}) {
+  return (
+    <div>
+      <div className="grid grid-cols-1 gap-1.5">
+        {choices.map(c => (
+          <button
+            key={c.value}
+            type="button"
+            onClick={() => onChange(field, c.value)}
+            className={cn(
+              'min-h-12 py-2.5 px-4 rounded-[14px] text-left text-[0.875rem] font-medium border transition-all cursor-pointer',
+              value === c.value
+                ? 'bg-accent/15 border-accent text-accent'
+                : 'bg-bg-input border-border text-text-secondary hover:border-border-dark',
+            )}
+          >
+            {c.label}
+          </button>
+        ))}
+      </div>
+      {error && <p className="text-xs text-error-light mt-1">{error}</p>}
+    </div>
+  );
+}
+
+function SelectMultiple({
+  field, value, choices, onChange,
+}: {
+  field: string; value: string[]; choices: Choice[]; onChange: (k: string, v: string[]) => void;
+}) {
+  const toggle = (v: string) => {
+    const next = value.includes(v) ? value.filter(x => x !== v) : [...value, v];
+    onChange(field, next);
+  };
+  return (
+    <div className="flex flex-wrap gap-2">
+      {choices.map(c => (
+        <button
+          key={c.value}
+          type="button"
+          onClick={() => toggle(c.value)}
+          className={cn(
+            'py-2 px-3 rounded-full text-[0.8rem] font-medium border transition-all cursor-pointer',
+            value.includes(c.value)
+              ? 'bg-accent/15 border-accent text-accent'
+              : 'bg-bg-input border-border text-text-secondary hover:border-border-dark',
+          )}
+        >
+          {c.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function YesNo({
+  field, value, onChange, label,
+}: {
+  field: string; value: string; onChange: (k: string, v: string) => void; label?: string;
+}) {
+  return (
+    <div>
+      {label && <FieldLabel label={label} />}
+      <div className="flex gap-2">
+        {(['yes', 'no'] as const).map(v => (
+          <button
+            key={v}
+            type="button"
+            onClick={() => onChange(field, v)}
+            className={cn(
+              'flex-1 min-h-12 py-2.5 rounded-[14px] text-[0.875rem] font-semibold border transition-all cursor-pointer',
+              value === v
+                ? (v === 'yes' ? 'bg-success/15 border-success text-success' : 'bg-error/15 border-error text-error')
+                : 'bg-bg-input border-border text-text-secondary hover:border-border-dark',
+            )}
+          >
+            {v === 'yes' ? 'Yes / Ndiyo' : 'No / Hapana'}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function NumberInput({
+  field, value, onChange, placeholder, suffix, error,
+}: {
+  field: string; value: number | string; onChange: (k: string, v: string) => void;
+  placeholder?: string; suffix?: string; error?: string;
+}) {
+  return (
+    <div>
+      <div className="relative flex items-center">
+        <input
+          type="text"
+          inputMode="numeric"
+          value={value === 0 ? '' : String(value)}
+          onChange={e => onChange(field, e.target.value.replace(/[^0-9]/g, ''))}
+          placeholder={placeholder}
+          className={cn(
+            'w-full py-3 px-4 bg-bg-input rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 border',
+            error ? 'border-error' : 'border-border',
+            'focus:border-accent',
+          )}
+        />
+        {suffix && (
+          <span className="absolute right-4 text-text-tertiary text-xs font-semibold pointer-events-none">{suffix}</span>
+        )}
+      </div>
+      {error && <p className="text-xs text-error-light mt-1">{error}</p>}
+    </div>
+  );
+}
+
+function StockPriceRow({
+  stockField, priceField, label, priceSuffix, data, onChange,
+}: {
+  stockField: string; priceField: string; label: string; priceSuffix: string;
+  data: FormData; onChange: (k: string, v: unknown) => void;
+}) {
+  const stock = (data[stockField] as string) || '';
+  const price = (data[priceField] as string) || '';
+  return (
+    <div className="nuru-glass-card rounded-[32px] p-4 space-y-3">
+      <p className="text-sm font-semibold text-white">{label}</p>
+      <div>
+        <FieldLabel label="Stock Level" />
+        <SelectOne field={stockField} value={stock} choices={STOCK_LEVELS} onChange={(k, v) => onChange(k, v)} />
+      </div>
+      {stock && stock !== 'out_of_stock' && stock !== 'not_sold' && (
+        <div>
+          <FieldLabel label={`Price (${priceSuffix})`} />
+          <NumberInput field={priceField} value={price} onChange={(k, v) => onChange(k, v)} placeholder="0" suffix="TZS" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SectionNote({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="bg-accent/5 border border-accent/20 rounded-[14px] p-3 mb-4">
+      <p className="text-xs text-accent/80">{children}</p>
+    </div>
+  );
+}
+
+function PhotoCapture({ field, label, data, onChange }: {
+  field: string; label: string; data: FormData; onChange: (k: string, v: unknown) => void;
+}) {
+  const captured = Boolean(data[field]);
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(field, captured ? '' : `captured_${Date.now()}`)}
+      className={cn(
+        'w-full py-4 rounded-[16px] border border-dashed flex items-center justify-center gap-2 text-sm font-medium cursor-pointer transition-all',
+        captured
+          ? 'bg-success/10 border-success/40 text-success'
+          : 'bg-bg-input border-border text-text-secondary hover:border-accent',
+      )}
+    >
+      <MaterialIcon name="photo_camera" size={18} />
+      {captured ? `${label} captured` : label}
+    </button>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Step Components
+// ---------------------------------------------------------------------------
+
+function Step0_AuditInfo({ data, onChange }: { data: FormData; onChange: (k: string, v: unknown) => void }) {
+  const set = (k: string, v: string) => onChange(k, v);
+  return (
+    <div>
+      <h2 className="text-2xl font-light font-heading tracking-tight text-white mb-1">Audit Information</h2>
+      <p className="text-sm text-text-tertiary mb-7">Taarifa za Ukaguzi</p>
+      <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5">
+        <div><FieldLabel label="Auditor Name / Jina la Mkaguzi" required /><TextInput field="enumerator_name" value={(data.enumerator_name as string) || ''} onChange={set} placeholder="Your full name" /></div>
+        <div><FieldLabel label="GPS Location / Mahali" required /><PhotoCapture field="gps_location" label="Capture GPS" data={data} onChange={onChange} /></div>
+        <div><FieldLabel label="District / Wilaya" required /><SelectOne field="district" value={(data.district as string) || ''} choices={DISTRICTS} onChange={set} /></div>
+        <div><FieldLabel label="Ward / Kata" /><TextInput field="ward" value={(data.ward as string) || ''} onChange={set} placeholder="Ward name" /></div>
+        <div><FieldLabel label="Street/Area / Mtaa" /><TextInput field="street_area" value={(data.street_area as string) || ''} onChange={set} placeholder="Specific location name" icon={<MaterialIcon name="location_on" size={18} />} /></div>
+      </div>
+    </div>
+  );
+}
+
+function Step1_Stakeholder({ data, onChange }: { data: FormData; onChange: (k: string, v: unknown) => void }) {
+  const set = (k: string, v: string) => onChange(k, v);
+  return (
+    <div>
+      <h2 className="text-2xl font-light font-heading tracking-tight text-white mb-1">Stakeholder Details</h2>
+      <p className="text-sm text-text-tertiary mb-7">Maelezo ya Mdau</p>
+      <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5">
+        <div><FieldLabel label="Stakeholder Type / Aina ya Mdau" required /><SelectOne field="stakeholder_type" value={(data.stakeholder_type as string) || ''} choices={STAKEHOLDER_TYPES} onChange={set} /></div>
+        <div><FieldLabel label="Business Name / Jina la Biashara" required /><TextInput field="business_name" value={(data.business_name as string) || ''} onChange={set} placeholder="Enter business name" icon={<MaterialIcon name="business" size={18} />} /></div>
+        <div><FieldLabel label="Owner/Manager Name / Jina la Mmiliki" required /><TextInput field="owner_name" value={(data.owner_name as string) || ''} onChange={set} placeholder="Full name" /></div>
+        <div><FieldLabel label="Primary Phone / Simu 1" required /><TextInput field="phone_primary" value={(data.phone_primary as string) || ''} onChange={set} placeholder="0712345678" type="tel" /></div>
+        <div><FieldLabel label="Secondary Phone / Simu 2" /><TextInput field="phone_secondary" value={(data.phone_secondary as string) || ''} onChange={set} placeholder="Optional" type="tel" /></div>
+        <YesNo field="phone_verified" value={(data.phone_verified as string) || ''} onChange={set} label="Phone Verified? / Simu Imethibitishwa?" />
+        <div><FieldLabel label="Physical Address / Anwani" required /><TextArea field="physical_address" value={(data.physical_address as string) || ''} onChange={set} placeholder="Building, landmark" /></div>
+        <div><FieldLabel label="Operating Hours / Saa za Kazi" /><TextInput field="operating_hours" value={(data.operating_hours as string) || ''} onChange={set} placeholder="e.g., 8am-6pm Mon-Sat" /></div>
+        <div><FieldLabel label="Photo of Premises / Picha ya Mahali" required /><PhotoCapture field="photo_premises" label="Capture Photo" data={data} onChange={onChange} /></div>
+      </div>
+    </div>
+  );
+}
+
+function Step2_Activities({ data, onChange }: { data: FormData; onChange: (k: string, v: unknown) => void }) {
+  const set = (k: string, v: unknown) => onChange(k, v);
+  const sellsInputs = data.sells_inputs === 'yes';
+  const buysCommodities = data.buys_commodities === 'yes';
+  const providesTransport = data.provides_transport === 'yes';
+  const providesServices = data.provides_services === 'yes';
+
+  return (
+    <div>
+      <h2 className="text-2xl font-light font-heading tracking-tight text-white mb-1">Business Activities</h2>
+      <p className="text-sm text-text-tertiary mb-7">Shughuli za Biashara</p>
+      <div className="flex flex-col gap-6">
+        <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5">
+          <YesNo field="sells_inputs" value={(data.sells_inputs as string) || ''} onChange={(k, v) => set(k, v)} label="Sells Agricultural Inputs? / Anauza Pembejeo?" />
+          {sellsInputs && (
+            <>
+              <div><FieldLabel label="Input Categories Sold / Aina za Pembejeo" required /><SelectMultiple field="input_categories" value={(data.input_categories as string[]) || []} choices={INPUT_CATEGORIES} onChange={(k, v) => set(k, v)} /></div>
+              <div><FieldLabel label="Key Brands / Chapa Kuu" /><TextInput field="key_brands" value={(data.key_brands as string) || ''} onChange={(k, v) => set(k, v)} placeholder="e.g., Yara, Syngenta, Pannar" /></div>
+            </>
+          )}
+        </div>
+
+        <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5">
+          <YesNo field="buys_commodities" value={(data.buys_commodities as string) || ''} onChange={(k, v) => set(k, v)} label="Buys Agricultural Commodities? / Ananunua Mazao?" />
+          {buysCommodities && (
+            <>
+              <div><FieldLabel label="Commodities Bought / Mazao Yanayonunuliwa" required /><SelectMultiple field="commodities_bought" value={(data.commodities_bought as string[]) || []} choices={COMMODITIES} onChange={(k, v) => set(k, v)} /></div>
+              <div><FieldLabel label="Typical Volume / Kiasi" /><SelectOne field="typical_volume" value={(data.typical_volume as string) || ''} choices={VOLUME_CATEGORIES} onChange={(k, v) => set(k, v)} /></div>
+              <div><FieldLabel label="Payment Terms / Malipo" /><SelectMultiple field="payment_terms" value={(data.payment_terms as string[]) || []} choices={PAYMENT_TERMS} onChange={(k, v) => set(k, v)} /></div>
+            </>
+          )}
+        </div>
+
+        <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5">
+          <YesNo field="provides_transport" value={(data.provides_transport as string) || ''} onChange={(k, v) => set(k, v)} label="Provides Transport? / Anatoa Usafiri?" />
+          {providesTransport && (
+            <>
+              <div><FieldLabel label="Vehicle Types / Magari" required /><SelectMultiple field="vehicle_types" value={(data.vehicle_types as string[]) || []} choices={VEHICLE_TYPES} onChange={(k, v) => set(k, v)} /></div>
+              <div><FieldLabel label="Max Capacity (tons) / Uwezo" /><NumberInput field="max_capacity_tons" value={(data.max_capacity_tons as string) || ''} onChange={(k, v) => set(k, v)} placeholder="0" suffix="tons" /></div>
+              <div><FieldLabel label="Routes / Njia" /><TextInput field="routes_served" value={(data.routes_served as string) || ''} onChange={(k, v) => set(k, v)} placeholder="e.g., Morogoro-Dar" /></div>
+              <div><FieldLabel label="Rate to Dar (TZS/ton)" /><NumberInput field="rate_to_dar" value={(data.rate_to_dar as string) || ''} onChange={(k, v) => set(k, v)} placeholder="0" suffix="TZS/ton" /></div>
+            </>
+          )}
+        </div>
+
+        <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5">
+          <YesNo field="provides_services" value={(data.provides_services as string) || ''} onChange={(k, v) => set(k, v)} label="Provides Other Services? / Huduma Nyingine?" />
+          {providesServices && (
+            <>
+              <div><FieldLabel label="Services Offered / Huduma" required /><SelectMultiple field="service_types" value={(data.service_types as string[]) || []} choices={SERVICE_TYPES} onChange={(k, v) => set(k, v)} /></div>
+              <div><FieldLabel label="Service Details / Maelezo" /><TextArea field="service_details" value={(data.service_details as string) || ''} onChange={(k, v) => set(k, v)} placeholder="Additional details" /></div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Step3_InputStock({ data, onChange }: { data: FormData; onChange: (k: string, v: unknown) => void }) {
+  const cats = (data.input_categories as string[]) || [];
+  const hasFert = cats.includes('fertilizer');
+  const hasSeeds = cats.includes('seeds');
+  const hasChem = cats.includes('pesticides') || cats.includes('herbicides');
+
+  if (data.sells_inputs !== 'yes') {
+    return (
+      <div>
+        <h2 className="text-2xl font-light font-heading tracking-tight text-white mb-1">Input Stock & Prices</h2>
+        <p className="text-sm text-text-tertiary mb-7">Stoku na Bei za Pembejeo</p>
+        <div className="nuru-glass-card rounded-[32px] p-8 text-center">
+          <MaterialIcon name="inventory_2" size={40} className="mx-auto text-text-tertiary mb-3 opacity-50" />
+          <p className="text-text-secondary text-sm">This business does not sell inputs.</p>
+          <p className="text-text-tertiary text-xs mt-1">Tap Next to continue.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h2 className="text-2xl font-light font-heading tracking-tight text-white mb-1">Input Stock & Prices</h2>
+      <p className="text-sm text-text-tertiary mb-7">Stoku na Bei za Pembejeo</p>
+      <SectionNote>Record current stock levels and prices for available products.</SectionNote>
+      <div className="flex flex-col gap-5">
+        {hasFert && (
+          <div className="flex flex-col gap-4">
+            <h3 className="text-sm font-semibold font-heading text-accent">Fertilizer / Mbolea</h3>
+            <StockPriceRow stockField="dap_stock" priceField="dap_price_50kg" label="DAP" priceSuffix="TZS/50kg" data={data} onChange={onChange} />
+            <StockPriceRow stockField="urea_stock" priceField="urea_price_50kg" label="Urea" priceSuffix="TZS/50kg" data={data} onChange={onChange} />
+            <StockPriceRow stockField="npk_stock" priceField="npk_price_50kg" label="NPK" priceSuffix="TZS/50kg" data={data} onChange={onChange} />
+            <StockPriceRow stockField="can_stock" priceField="can_price_50kg" label="CAN" priceSuffix="TZS/50kg" data={data} onChange={onChange} />
+          </div>
+        )}
+        {hasSeeds && (
+          <div className="flex flex-col gap-4">
+            <h3 className="text-sm font-semibold font-heading text-accent">Seeds / Mbegu</h3>
+            <StockPriceRow stockField="maize_seed_stock" priceField="maize_seed_price_2kg" label="Maize Seed" priceSuffix="TZS/2kg" data={data} onChange={onChange} />
+            {(data.maize_seed_stock as string) && (data.maize_seed_stock as string) !== 'out_of_stock' && (
+              <div className="ml-4"><FieldLabel label="Maize Varieties Available" /><TextInput field="maize_seed_varieties" value={(data.maize_seed_varieties as string) || ''} onChange={(k, v) => onChange(k, v)} placeholder="e.g., SC403, DK, Pannar" /></div>
+            )}
+            <StockPriceRow stockField="rice_seed_stock" priceField="rice_seed_price_kg" label="Rice Seed" priceSuffix="TZS/kg" data={data} onChange={onChange} />
+            <StockPriceRow stockField="vegetable_seed_stock" priceField="vegetable_seed_types" label="Vegetable Seeds" priceSuffix="" data={data} onChange={onChange} />
+          </div>
+        )}
+        {hasChem && (
+          <div className="flex flex-col gap-4">
+            <h3 className="text-sm font-semibold font-heading text-accent">Chemicals / Dawa</h3>
+            <StockPriceRow stockField="pesticide_general_stock" priceField="pesticide_brands" label="Pesticides" priceSuffix="" data={data} onChange={onChange} />
+            <StockPriceRow stockField="herbicide_general_stock" priceField="herbicide_brands" label="Herbicides" priceSuffix="" data={data} onChange={onChange} />
+            <YesNo field="has_fall_armyworm_products" value={(data.has_fall_armyworm_products as string) || ''} onChange={(k, v) => onChange(k, v)} label="Fall Armyworm Products? / Dawa za Viwavi?" />
+            {data.has_fall_armyworm_products === 'yes' && (
+              <div><FieldLabel label="FAW Products Available" /><TextInput field="faw_products" value={(data.faw_products as string) || ''} onChange={(k, v) => onChange(k, v)} placeholder="List products" /></div>
+            )}
+          </div>
+        )}
+        <PhotoCapture field="photo_products" label="Photo of Products / Picha ya Bidhaa" data={data} onChange={onChange} />
+        <div><FieldLabel label="Stock Notes / Maelezo ya Stoku" /><TextArea field="input_stock_notes" value={(data.input_stock_notes as string) || ''} onChange={(k, v) => onChange(k, v)} placeholder="Shortages, expected deliveries, etc." /></div>
+      </div>
+    </div>
+  );
+}
+
+function Step4_BuyingPrices({ data, onChange }: { data: FormData; onChange: (k: string, v: unknown) => void }) {
+  const comms = (data.commodities_bought as string[]) || [];
+
+  if (data.buys_commodities !== 'yes') {
+    return (
+      <div>
+        <h2 className="text-2xl font-light font-heading tracking-tight text-white mb-1">Buying Prices</h2>
+        <p className="text-sm text-text-tertiary mb-7">Bei za Ununuzi wa Mazao</p>
+        <div className="nuru-glass-card rounded-[32px] p-8 text-center">
+          <MaterialIcon name="shopping_cart" size={40} className="mx-auto text-text-tertiary mb-3 opacity-50" />
+          <p className="text-text-secondary text-sm">This business does not buy commodities.</p>
+          <p className="text-text-tertiary text-xs mt-1">Tap Next to continue.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const grains = [
+    { key: 'maize_buying_price', label: 'Maize / Mahindi', comm: 'maize' },
+    { key: 'rice_paddy_buying_price', label: 'Rice Paddy / Mpunga', comm: 'rice' },
+    { key: 'rice_milled_buying_price', label: 'Milled Rice / Mchele', comm: 'rice' },
+    { key: 'beans_buying_price', label: 'Beans / Maharage', comm: 'beans' },
+    { key: 'sorghum_buying_price', label: 'Sorghum / Mtama', comm: 'sorghum' },
+  ].filter(g => comms.includes(g.comm));
+
+  const oilseeds = [
+    { key: 'sunflower_buying_price', label: 'Sunflower / Alizeti', comm: 'sunflower' },
+    { key: 'sesame_buying_price', label: 'Sesame / Ufuta', comm: 'sesame' },
+    { key: 'groundnut_buying_price', label: 'Groundnuts / Karanga', comm: 'groundnuts' },
+  ].filter(g => comms.includes(g.comm));
+
+  const others = [
+    { key: 'cassava_buying_price', label: 'Cassava / Muhogo', comm: 'cassava' },
+    { key: 'cashew_buying_price', label: 'Cashew / Korosho', comm: 'cashew' },
+  ].filter(g => comms.includes(g.comm));
+
+  return (
+    <div>
+      <h2 className="text-2xl font-light font-heading tracking-tight text-white mb-1">Buying Prices</h2>
+      <p className="text-sm text-text-tertiary mb-7">Bei za Ununuzi wa Mazao</p>
+      <SectionNote>Record current buying prices offered to farmers (TZS per kg).</SectionNote>
+      <div className="flex flex-col gap-6">
+        {grains.length > 0 && (
+          <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-4">
+            <h3 className="text-sm font-semibold font-heading text-accent">Grains / Nafaka</h3>
+            {grains.map(g => (
+              <div key={g.key}><FieldLabel label={g.label} /><NumberInput field={g.key} value={(data[g.key] as string) || ''} onChange={(k, v) => onChange(k, v)} placeholder="0" suffix="TZS/kg" /></div>
+            ))}
+          </div>
+        )}
+        {oilseeds.length > 0 && (
+          <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-4">
+            <h3 className="text-sm font-semibold font-heading text-accent">Oilseeds / Mbegu za Mafuta</h3>
+            {oilseeds.map(g => (
+              <div key={g.key}><FieldLabel label={g.label} /><NumberInput field={g.key} value={(data[g.key] as string) || ''} onChange={(k, v) => onChange(k, v)} placeholder="0" suffix="TZS/kg" /></div>
+            ))}
+          </div>
+        )}
+        {others.length > 0 && (
+          <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-4">
+            <h3 className="text-sm font-semibold font-heading text-accent">Other Crops / Mazao Mengine</h3>
+            {others.map(g => (
+              <div key={g.key}><FieldLabel label={g.label} /><NumberInput field={g.key} value={(data[g.key] as string) || ''} onChange={(k, v) => onChange(k, v)} placeholder="0" suffix="TZS/kg" /></div>
+            ))}
+          </div>
+        )}
+        <div><FieldLabel label="Price Notes / Maelezo ya Bei" /><TextArea field="buying_price_notes" value={(data.buying_price_notes as string) || ''} onChange={(k, v) => onChange(k, v)} placeholder="Quality requirements, volume discounts, etc." /></div>
+      </div>
+    </div>
+  );
+}
+
+function Step5_MarketPrices({ data, onChange }: { data: FormData; onChange: (k: string, v: unknown) => void }) {
+  return (
+    <div>
+      <h2 className="text-2xl font-light font-heading tracking-tight text-white mb-1">Market Prices Observed</h2>
+      <p className="text-sm text-text-tertiary mb-7">Bei za Soko Zilizoonekana</p>
+      <SectionNote>Record retail/wholesale prices you observe in the area (TZS/kg unless noted).</SectionNote>
+      <div className="flex flex-col gap-6">
+        <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-4">
+          <h3 className="text-sm font-semibold font-heading text-accent">Grain Prices / Bei za Nafaka</h3>
+          {([
+            ['maize_market_retail', 'Maize Retail / Mahindi Rejareja'],
+            ['maize_market_wholesale', 'Maize Wholesale / Mahindi Jumla'],
+            ['rice_market_retail', 'Rice Retail / Mchele Rejareja'],
+            ['rice_market_wholesale', 'Rice Wholesale / Mchele Jumla'],
+            ['beans_market_retail', 'Beans Retail / Maharage Rejareja'],
+            ['beans_market_wholesale', 'Beans Wholesale / Maharage Jumla'],
+          ] as const).map(([k, l]) => (
+            <div key={k}><FieldLabel label={l} /><NumberInput field={k} value={(data[k] as string) || ''} onChange={(fk, v) => onChange(fk, v)} placeholder="0" suffix="TZS/kg" /></div>
+          ))}
+        </div>
+        <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-4">
+          <h3 className="text-sm font-semibold font-heading text-accent">Vegetable Prices / Bei za Mboga</h3>
+          {([
+            ['tomatoes_price', 'Tomatoes / Nyanya (TZS/kg)'],
+            ['onions_price', 'Onions / Vitunguu (TZS/kg)'],
+            ['cabbage_price', 'Cabbage / Kabichi (TZS/head)'],
+            ['sukuma_price', 'Sukuma Wiki (TZS/bunch)'],
+          ] as const).map(([k, l]) => (
+            <div key={k}><FieldLabel label={l} /><NumberInput field={k} value={(data[k] as string) || ''} onChange={(fk, v) => onChange(fk, v)} placeholder="0" suffix="TZS" /></div>
+          ))}
+        </div>
+        <div><FieldLabel label="Market Activity Level / Hali ya Soko" /><SelectOne field="market_activity" value={(data.market_activity as string) || ''} choices={MARKET_ACTIVITY} onChange={(k, v) => onChange(k, v)} /></div>
+        <div><FieldLabel label="Market Notes / Maelezo ya Soko" /><TextArea field="market_notes" value={(data.market_notes as string) || ''} onChange={(k, v) => onChange(k, v)} placeholder="Supply situation, price trends, shortages" /></div>
+      </div>
+    </div>
+  );
+}
+
+function Step6_ProductAudit({ data, onChange }: { data: FormData; onChange: (k: string, v: unknown) => void }) {
+  const doAudit = data.do_product_audit === 'yes';
+
+  function ProductForm({ prefix, label }: { prefix: string; label: string }) {
+    return (
+      <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-4">
+        <h3 className="text-sm font-semibold font-heading text-white">{label}</h3>
+        <div><FieldLabel label="Category / Aina" required /><SelectOne field={`${prefix}_category`} value={(data[`${prefix}_category`] as string) || ''} choices={PRODUCT_CATEGORIES} onChange={(k, v) => onChange(k, v)} /></div>
+        <div><FieldLabel label="Product Name / Jina" required /><TextInput field={`${prefix}_name`} value={(data[`${prefix}_name`] as string) || ''} onChange={(k, v) => onChange(k, v)} placeholder="Full name as on package" /></div>
+        <div><FieldLabel label="Brand / Chapa" /><TextInput field={`${prefix}_brand`} value={(data[`${prefix}_brand`] as string) || ''} onChange={(k, v) => onChange(k, v)} placeholder="Brand name" /></div>
+        <div><FieldLabel label="Unit Size / Ukubwa" required /><TextInput field={`${prefix}_unit`} value={(data[`${prefix}_unit`] as string) || ''} onChange={(k, v) => onChange(k, v)} placeholder="e.g., 50kg, 1L, 500g" /></div>
+        <div><FieldLabel label="Price (TZS) / Bei" required /><NumberInput field={`${prefix}_price`} value={(data[`${prefix}_price`] as string) || ''} onChange={(k, v) => onChange(k, v)} placeholder="0" suffix="TZS" /></div>
+        <div><FieldLabel label="Stock Level / Stoku" required /><SelectOne field={`${prefix}_stock`} value={(data[`${prefix}_stock`] as string) || ''} choices={STOCK_LEVELS} onChange={(k, v) => onChange(k, v)} /></div>
+        <div><FieldLabel label="Packaging Condition / Hali" /><SelectOne field={`${prefix}_condition`} value={(data[`${prefix}_condition`] as string) || ''} choices={PRODUCT_CONDITIONS} onChange={(k, v) => onChange(k, v)} /></div>
+        <div><FieldLabel label="Has Certification? / Ina Cheti?" /><SelectOne field={`${prefix}_certified`} value={(data[`${prefix}_certified`] as string) || ''} choices={YES_NO_UNCLEAR} onChange={(k, v) => onChange(k, v)} /></div>
+        <PhotoCapture field={`${prefix}_photo`} label="Product Photo / Picha" data={data} onChange={onChange} />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h2 className="text-2xl font-light font-heading tracking-tight text-white mb-1">Detailed Product Audit</h2>
+      <p className="text-sm text-text-tertiary mb-7">Ukaguzi wa Bidhaa (Optional)</p>
+      <div className="flex flex-col gap-5">
+        <YesNo field="do_product_audit" value={(data.do_product_audit as string) || ''} onChange={(k, v) => onChange(k, v)} label="Audit Specific Product? / Kagua Bidhaa Maalum?" />
+        {doAudit && (
+          <>
+            <ProductForm prefix="product" label="Product 1 / Bidhaa ya 1" />
+            <YesNo field="audit_another" value={(data.audit_another as string) || ''} onChange={(k, v) => onChange(k, v)} label="Audit Another Product? / Kagua Bidhaa Nyingine?" />
+            {data.audit_another === 'yes' && (
+              <ProductForm prefix="product_2" label="Product 2 / Bidhaa ya 2" />
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Step7_FinalNotes({ data, onChange }: { data: FormData; onChange: (k: string, v: unknown) => void }) {
+  return (
+    <div>
+      <h2 className="text-2xl font-light font-heading tracking-tight text-white mb-1">Final Notes</h2>
+      <p className="text-sm text-text-tertiary mb-7">Maelezo ya Mwisho</p>
+      <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5">
+        <div><FieldLabel label="Challenges Mentioned / Changamoto" /><SelectMultiple field="challenges_reported" value={(data.challenges_reported as string[]) || []} choices={CHALLENGES} onChange={(k, v) => onChange(k, v)} /></div>
+        <div><FieldLabel label="Challenge Details / Maelezo" /><TextArea field="challenge_details" value={(data.challenge_details as string) || ''} onChange={(k, v) => onChange(k, v)} placeholder="Describe specific issues" /></div>
+        <div><FieldLabel label="Opportunities Noted / Fursa" /><TextArea field="opportunities" value={(data.opportunities as string) || ''} onChange={(k, v) => onChange(k, v)} placeholder="Business opportunities, unmet needs" /></div>
+        <div><FieldLabel label="General Notes / Maelezo Mengine" /><TextArea field="general_notes" value={(data.general_notes as string) || ''} onChange={(k, v) => onChange(k, v)} placeholder="Any other observations" /></div>
+        <div><FieldLabel label="Data Confidence / Uhakika wa Data" required /><SelectOne field="data_confidence" value={(data.data_confidence as string) || ''} choices={DATA_QUALITY} onChange={(k, v) => onChange(k, v)} /></div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Wizard Shell
+// ---------------------------------------------------------------------------
+
+const STEP_ICON_NAMES = [
+  'location_on', 'business', 'shopping_cart', 'inventory_2', 'trending_up',
+  'bar_chart', 'assignment_turned_in', 'description',
+] as const;
+
+const BusinessWizard: React.FC<BusinessWizardProps> = ({ onComplete }) => {
   const navigate = useNavigate();
-  const addToast = useUIStore((s) => s.addToast);
+  const { currentStep, setStep, currentDraft, saveDraft, resetDraft } = useAuditStore();
 
-  // -- State Tracking --
-  const [activeStep, setActiveStep] = useState<number>(3);
-  const [uploadError, setUploadError] = useState<boolean>(true);
-  const [formData] = useState({
-    dob: '03.04.1993',
-    nationality: 'Kazakhstan',
-    address: 'Ul. Pushkina 15, kv. 42, Almaty\n050000, Kazakhstan',
-    fullName: 'Maria Volkova',
-    passportFile: 'passport_maria_kz.pdf'
-  });
+  const [formData, setFormData] = useState<FormData>(() => ({ ...(currentDraft ?? {}) }));
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
 
-  const uploadSectionRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    sessionStorage.setItem('nuru_audit_dirty', 'true');
+    return () => { sessionStorage.removeItem('nuru_audit_dirty'); };
+  }, []);
 
-  const scrollToUpload = () => {
-    if (uploadSectionRef.current) {
-      uploadSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const handleChange = useCallback((key: string, value: unknown) => {
+    setFormData(prev => {
+      const next = { ...prev, [key]: value };
+      saveDraft(next as Record<string, unknown>);
+      return next;
+    });
+    if (Object.keys(errors).length > 0) setErrors({});
+  }, [errors, saveDraft]);
+
+  const validateCurrentStep = useCallback((): boolean => {
+    const errs: Record<string, string> = {};
+    if (currentStep === 0) {
+      if (!formData.enumerator_name) errs.enumerator_name = 'Auditor name is required';
+      if (!formData.district) errs.district = 'District is required';
+    }
+    if (currentStep === 1) {
+      if (!formData.stakeholder_type) errs.stakeholder_type = 'Stakeholder type is required';
+      if (!formData.business_name) errs.business_name = 'Business name is required';
+      if (!formData.owner_name) errs.owner_name = 'Owner name is required';
+      if (!formData.phone_primary) errs.phone_primary = 'Primary phone is required';
+      if (!formData.physical_address) errs.physical_address = 'Physical address is required';
+    }
+    if (currentStep === 7) {
+      if (!formData.data_confidence) errs.data_confidence = 'Data confidence is required';
+    }
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  }, [currentStep, formData]);
+
+  const completedSteps = Array.from({ length: currentStep }, (_, i) => i + 1);
+
+  const handleNext = useCallback(() => {
+    if (!validateCurrentStep()) return;
+    setErrors({});
+    saveDraft(formData as Record<string, unknown>);
+    if (currentStep < BUSINESS_TOTAL_STEPS - 1) {
+      setStep(currentStep + 1);
+    }
+  }, [currentStep, formData, saveDraft, setStep, validateCurrentStep]);
+
+  const handleBack = useCallback(() => {
+    setErrors({});
+    if (currentStep > 0) {
+      setStep(currentStep - 1);
+    } else {
+      navigate(-1);
+    }
+  }, [currentStep, setStep, navigate]);
+
+  const handleSubmit = useCallback(async () => {
+    if (!validateCurrentStep()) return;
+    setSubmitting(true);
+    try {
+      await onComplete?.({ ...formData, _audit_type: 'business' });
+      resetDraft();
+    } catch {
+      // handled by wrapper
+    } finally {
+      setSubmitting(false);
+    }
+  }, [formData, onComplete, resetDraft, validateCurrentStep]);
+
+  const handleSaveDraft = useCallback(() => {
+    saveDraft(formData as Record<string, unknown>);
+  }, [formData, saveDraft]);
+
+  const isLastStep = currentStep === BUSINESS_TOTAL_STEPS - 1;
+
+  const renderStep = () => {
+    const props = { data: formData, onChange: handleChange, errors };
+    switch (currentStep) {
+      case 0: return <Step0_AuditInfo {...props} />;
+      case 1: return <Step1_Stakeholder {...props} />;
+      case 2: return <Step2_Activities {...props} />;
+      case 3: return <Step3_InputStock {...props} />;
+      case 4: return <Step4_BuyingPrices {...props} />;
+      case 5: return <Step5_MarketPrices {...props} />;
+      case 6: return <Step6_ProductAudit {...props} />;
+      case 7: return <Step7_FinalNotes {...props} />;
+      default: return null;
     }
   };
 
+  const stepIconName = STEP_ICON_NAMES[currentStep] ?? 'description';
+
   return (
-    <div className="min-h-screen bg-bg-primary font-base px-6 pt-16 pb-40 overflow-x-hidden relative">
-      
-      {/* Top Header Section */}
-      <div className="flex items-center justify-between mb-10 mt-2 px-1 max-w-lg mx-auto">
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={() => navigate(-1)} 
-            className="w-[40px] h-[40px] rounded-[14px] bg-white/5 flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors cursor-pointer shrink-0"
-          >
-            <ChevronLeft size={20} className="text-white opacity-80 -ml-0.5" strokeWidth={2.5}/>
-          </button>
-          
-          <div className="w-[52px] h-[52px] rounded-[18px] bg-[#EAEAEA] flex items-center justify-center shrink-0 border border-white/5 shadow-inner">
-            <img src="https://flagcdn.com/w40/kr.png" className="w-[28px] object-contain drop-shadow-md" alt="South Korea" />
+    <div className="min-h-screen bg-bg-primary flex flex-col font-base">
+      <div className="sticky top-0 z-40 bg-bg-primary/95 backdrop-blur-sm border-b border-border-light px-4 pt-4 pb-2">
+        <div className="max-w-[800px] mx-auto">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <MaterialIcon name={stepIconName} size={20} className="text-accent" />
+              <div>
+                <h1 className="text-lg font-semibold text-white font-heading tracking-tight">
+                  Business Audit
+                </h1>
+                <p className="text-xs text-text-tertiary">
+                  Step {currentStep + 1} of {BUSINESS_TOTAL_STEPS} — {BUSINESS_STEP_LABELS[currentStep]}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleSaveDraft}
+              className="flex items-center gap-1.5 py-2 px-3 bg-border-glass border border-border rounded-full text-xs text-text-secondary font-medium cursor-pointer font-inherit"
+            >
+              <MaterialIcon name="save" size={14} />
+              Save Draft
+            </button>
           </div>
-          
-          <div className="flex flex-col ml-1">
-            <h1 className="text-[26px] font-medium text-white tracking-tight leading-[1.1] mb-1">
-              South<br/>Korea
-            </h1>
-            <p className="text-[#6D7A94] text-[11px] leading-tight flex items-center gap-1.5 whitespace-nowrap">
-              <span>12.06.2025</span>
-              <span>•</span>
-              <span>23.06.2025</span>
+
+          <AuditStepIndicator
+            totalSteps={BUSINESS_TOTAL_STEPS}
+            currentStep={currentStep + 1}
+            completedSteps={completedSteps}
+            stepLabels={BUSINESS_STEP_LABELS}
+          />
+        </div>
+      </div>
+
+      <div className="flex-1 px-4 py-6 pb-[140px] max-w-[800px] mx-auto w-full">
+        {renderStep()}
+      </div>
+
+      {Object.keys(errors).length > 0 && (
+        <div className="fixed bottom-[90px] left-4 right-4 max-w-[800px] mx-auto z-40">
+          <div className="flex items-center gap-2 py-2.5 px-4 bg-error/15 border border-error/30 rounded-[12px] backdrop-blur-sm">
+            <MaterialIcon name="warning" size={16} className="text-error shrink-0" />
+            <p className="text-xs text-error-light truncate">
+              Please fix {Object.keys(errors).length} error{Object.keys(errors).length > 1 ? 's' : ''} before continuing
             </p>
           </div>
         </div>
+      )}
 
-        <div className="flex items-center gap-3">
-          {/* Action Required Pill */}
-          <div className="bg-[#FFCC00] text-[#000000] text-[8px] font-extrabold tracking-[0.12em] uppercase px-3 py-1.5 rounded-full text-center leading-[1.2] shadow-[0_0_15px_rgba(255,204,0,0.2)]">
-            ACTION<br/>REQUIRED
-          </div>
-
-          {/* 30% Progress Cutoff */}
-          <div className="relative w-10 h-10 flex items-center justify-center -mr-4 opacity-80">
-            <svg className="w-full h-full transform -rotate-90 scale-125" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(190, 242, 100, 0.1)" strokeWidth="3" />
-              <circle 
-                cx="18" cy="18" r="16" fill="none" 
-                stroke="#BEF264" strokeWidth="3" 
-                strokeDasharray="100 100" strokeDashoffset="70" 
-                strokeLinecap="round" 
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center translate-x-1">
-              <span className="text-[9px] font-bold text-[#BEF264] tracking-tighter">30%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-lg mx-auto relative">
-        {/* Timeline Progress */}
-        <div className="flex flex-col relative mb-4">
-          {/* Connecting Vertical Line */}
-          <div className="absolute left-[15.5px] top-6 bottom-16 w-[1px] bg-gradient-to-b from-white/10 via-white/5 to-transparent z-0" />
-
-          {/* Step 1 Accordion Node */}
-          <div 
-             onClick={() => setActiveStep(1)}
-             className={`flex items-center justify-between relative z-10 mb-6 group select-none cursor-pointer transition-opacity ${activeStep !== 1 ? 'opacity-50 hover:opacity-100' : 'opacity-100'}`}
+      <div className="fixed bottom-0 left-0 w-full z-50 pointer-events-none">
+        <div className="max-w-[800px] mx-auto px-4 pb-6 pt-8 flex items-center justify-between bg-gradient-to-t from-bg-primary via-bg-primary/95 to-transparent pointer-events-auto">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="flex items-center gap-1.5 py-3 px-4 text-text-secondary text-sm font-semibold bg-transparent border-none cursor-pointer font-inherit"
           >
-            <div className="flex items-center gap-4">
-              <div className="w-[32px] h-[32px] rounded-full bg-[#BEF264] flex items-center justify-center shrink-0 border-[3px] border-[#070A0F]">
-                <Check size={16} strokeWidth={3} className="text-[#070A0F]" />
-              </div>
-              <div className="flex flex-col py-1">
-                <h3 className="text-[14px] text-white font-medium tracking-tight">Identity & Birth Details</h3>
-                <p className="text-[#6D7A94] text-[9px] font-bold tracking-[0.15em] uppercase mt-0.5">STEP 1 • COMPLETE</p>
-              </div>
-            </div>
-            <ChevronDown size={16} className={`text-[#6D7A94] transition-transform ${activeStep === 1 ? 'rotate-180 text-white' : ''}`} />
-          </div>
+            <MaterialIcon name="chevron_left" size={18} />
+            {currentStep === 0 ? 'Exit' : 'Back'}
+          </button>
 
-          {/* Conditionally Render Step 1 */}
-          {activeStep === 1 && (
-            <div className="bg-[#121623] border border-white/5 rounded-[32px] p-6 mb-8 relative z-10 ml-[2px] shadow-lg animate-in fade-in slide-in-from-top-4 duration-300">
-               <p className="text-[#6D7A94] text-[12px] leading-relaxed">
-                  Identity verification parameters have been successfully validated for this session. Expand Step 3 to resolve the active flags.
-               </p>
-            </div>
+          {isLastStep ? (
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={submitting}
+              className={cn(
+                'h-[52px] px-8 rounded-full text-sm font-bold tracking-wide flex items-center gap-2 cursor-pointer font-inherit transition-all border-none',
+                submitting
+                  ? 'bg-accent/50 text-black/50 cursor-wait'
+                  : 'bg-accent text-black shadow-[0_0_20px_rgba(190,242,100,0.3)] hover:scale-[1.02] active:scale-[0.98]',
+              )}
+            >
+              {submitting ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-black/20 border-t-black/60 rounded-full animate-spin" />
+                  Submitting...
+                </span>
+              ) : (
+                <>
+                  <MaterialIcon name="send" size={16} />
+                  Submit Audit
+                </>
+              )}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleNext}
+              className="h-[52px] px-8 rounded-full text-sm font-bold tracking-wide flex items-center gap-2 cursor-pointer font-inherit transition-all border-none bg-accent text-black shadow-[0_0_20px_rgba(190,242,100,0.3)] hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Next
+              <MaterialIcon name="chevron_right" size={18} />
+            </button>
           )}
-
-          {/* Step 2 Accordion Node */}
-          <div 
-             onClick={() => setActiveStep(2)}
-             className={`flex items-center justify-between relative z-10 mb-6 group select-none cursor-pointer transition-opacity ${activeStep !== 2 ? 'opacity-50 hover:opacity-100' : 'opacity-100'}`}
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-[32px] h-[32px] rounded-full bg-[#BEF264] flex items-center justify-center shrink-0 border-[3px] border-[#070A0F]">
-                <Check size={16} strokeWidth={3} className="text-[#070A0F]" />
-              </div>
-              <div className="flex flex-col py-1">
-                <h3 className="text-[14px] text-white font-medium tracking-tight">Personal Details</h3>
-                <p className="text-[#6D7A94] text-[9px] font-bold tracking-[0.15em] uppercase mt-0.5">STEP 2 • COMPLETE</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className={`relative ${activeStep === 2 ? 'text-white' : 'text-[#6D7A94]'}`}>
-                <FileText size={16} strokeWidth={2} />
-                <div className="absolute -top-1.5 -right-1.5 w-[14px] h-[14px] bg-[#BEF264] text-[#070A0F] text-[8px] font-extrabold rounded-full flex items-center justify-center border border-[#070A0F]">2</div>
-              </div>
-              <ChevronDown size={16} className={`text-[#6D7A94] transition-transform ml-1 ${activeStep === 2 ? 'rotate-180 text-white' : ''}`} />
-            </div>
-          </div>
-
-          {/* Conditionally Render Step 2 */}
-          {activeStep === 2 && (
-            <div className="bg-[#121623] border border-white/5 rounded-[32px] p-6 mb-8 relative z-10 ml-[2px] shadow-lg animate-in fade-in slide-in-from-top-4 duration-300">
-               <p className="text-[#6D7A94] text-[12px] leading-relaxed mb-4">
-                  Stored personnel records locally reconciled:
-               </p>
-               <div className="space-y-3">
-                 <div className="bg-[#1A1F2E] p-4 rounded-xl">
-                   <span className="text-white/40 block text-[9px] uppercase font-bold tracking-widest mb-1">Full Name</span>
-                   <span className="text-emerald-400 text-[13px]">{formData.fullName}</span>
-                 </div>
-                 <div className="bg-[#1A1F2E] p-4 rounded-xl">
-                   <span className="text-white/40 block text-[9px] uppercase font-bold tracking-widest mb-1">Nationality</span>
-                   <span className="text-white/90 text-[13px]">{formData.nationality}</span>
-                 </div>
-               </div>
-            </div>
-          )}
-
-          {/* Step 3 Active Error Node Placeholder */}
-          <div 
-            onClick={() => setActiveStep(3)}
-            className={`border rounded-full px-4 py-3.5 relative z-10 bg-transparent flex items-center justify-between mb-8 cursor-pointer transition-all ${activeStep === 3 ? 'border-[#FF4D4D]/20 shadow-[0_0_20px_rgba(255,77,77,0.05)] opacity-100' : 'border-[#FF4D4D]/10 opacity-50 hover:opacity-100'}`}
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-[32px] h-[32px] rounded-full bg-[#FF4D4D] flex items-center justify-center shrink-0 border-[3px] border-[#070A0F] shadow-[0_0_15px_rgba(255,77,77,0.4)]">
-                <AlertCircle size={16} strokeWidth={2.5} className="text-white" />
-              </div>
-              <div className="flex flex-col py-0.5">
-                <h3 className="text-[14px] text-white font-medium tracking-tight">Passport Information</h3>
-                <p className="text-[#FF4D4D] text-[9px] font-bold tracking-[0.15em] uppercase mt-0.5">STEP 3 • ERRORED</p>
-              </div>
-            </div>
-            {activeStep === 3 ? (
-               <EyeOff size={18} className="text-[#6D7A94] opacity-80" />
-            ) : (
-               <ChevronDown size={16} className="text-[#6D7A94]" />
-            )}
-          </div>
         </div>
-
-        {/* --- DYNAMIC STEP 3 FORM PAYLOAD --- */}
-        {activeStep === 3 && (
-        <div className="bg-[#121623] border border-white/5 rounded-[32px] p-6 pb-[90px] relative shadow-2xl overflow-hidden w-full animate-in fade-in slide-in-from-top-6 duration-300">
-          
-          <div className="flex items-start justify-between mb-8 pt-2">
-            <h2 className="text-[22px] font-medium text-white tracking-tight leading-snug">
-              Application<br/>Heading
-            </h2>
-            <div className="flex items-center gap-1.5 text-[#FF4D4D] bg-[#FF4D4D]/10 px-2 py-1 rounded-[6px]">
-              <span className="text-[9px] font-bold tracking-[0.15em] uppercase translate-y-[0.5px]">DECLINED</span>
-              <AlertCircle size={12} strokeWidth={2.5} />
-            </div>
-          </div>
-
-          {/* Form Fields bound to state mock data */}
-          {/* DOB */}
-          <div className="mb-5">
-            <label className="text-[#6D7A94] text-[9px] font-bold tracking-[0.15em] uppercase block mb-2.5 px-1">
-              Date of Birth
-            </label>
-            <div className="h-[52px] bg-[#1A1F2E] rounded-[16px] px-4 flex items-center justify-between border border-transparent">
-              <span className="text-[#E0E5F0] text-[14px]">{formData.dob}</span>
-              <Calendar size={18} className="text-[#6D7A94]" />
-            </div>
-          </div>
-
-          {/* Nationality */}
-          <div className="mb-5">
-            <label className="text-[#6D7A94] text-[9px] font-bold tracking-[0.15em] uppercase block mb-2.5 px-1">
-              Nationality
-            </label>
-            <div className="h-[52px] bg-[#1A1F2E] rounded-[16px] px-4 flex items-center justify-between border border-transparent">
-              <span className="text-[#E0E5F0] text-[14px]">{formData.nationality}</span>
-              <ChevronDown size={18} className="text-[#6D7A94]" />
-            </div>
-          </div>
-
-          {/* Home Address */}
-          <div className="mb-6">
-            <label className="text-[#6D7A94] text-[9px] font-bold tracking-[0.15em] uppercase block mb-2.5 px-1">
-              Home Address
-            </label>
-            <div className="bg-[#1A1F2E] rounded-[16px] px-4 pt-4 pb-5 border border-transparent">
-               {/* Multi-line address logic */}
-               <p className="text-[#E0E5F0] text-[14px] leading-relaxed whitespace-pre-wrap">
-                  {formData.address}
-               </p>
-            </div>
-          </div>
-
-          {/* Upload Document Section Bound to uploadError State */}
-          <div className="mb-7 mt-2" ref={uploadSectionRef}>
-            <label className="text-[#6D7A94] text-[9px] font-bold tracking-[0.15em] uppercase block mb-3 px-1">
-              Upload Scanned Passport (First Page)
-            </label>
-            
-            {uploadError ? (
-              <div className="animate-in fade-in duration-300">
-                {/* Errored Input Focus */}
-                <div className="h-[52px] border border-[#FF4D4D] rounded-[26px] px-5 flex items-center justify-between bg-transparent mb-5 shadow-[0_0_20px_rgba(255,77,77,0.08)]">
-                  <span className="text-[#E0E5F0] text-[13px] tracking-wide truncate pr-4">{formData.passportFile}</span>
-                  <div 
-                    onClick={() => {
-                       setUploadError(false);
-                    }}
-                    className="w-[22px] h-[22px] shrink-0 rounded-full bg-[#FF4D4D] flex items-center justify-center text-white shadow-md hover:bg-red-400 cursor-pointer transition-colors"
-                  >
-                    <X size={12} strokeWidth={3} />
-                  </div>
-                </div>
-
-                {/* Error Message Text */}
-                <div className="flex items-start gap-2.5 mb-7 px-1.5 animate-in slide-in-from-top-1">
-                  <AlertCircle size={14} className="text-[#FF4D4D] shrink-0 mt-[1.5px]" strokeWidth={2.5} />
-                  <p className="text-[#FF4D4D] text-[11px] leading-relaxed tracking-wide opacity-90 pr-2">
-                    Oops! We couldn't read your file. It might be blurry or missing some details. Please try again with a clearer image.
-                  </p>
-                </div>
-
-                {/* Declined File History Card */}
-                <div className="bg-[#1A1F2E] rounded-[16px] p-4 flex items-center gap-4 mx-1">
-                  <div className="w-[52px] h-[52px] rounded-[12px] bg-[#4A5570]/20 border border-white/5 flex items-center justify-center shrink-0">
-                    <div className="w-[20px] h-[26px] bg-[#421A20] rounded-sm flex items-center justify-center border border-[#FFCC00]/20 shadow-sm relative overflow-hidden">
-                        <div className="w-1.5 h-1.5 rounded-full border-[1.5px] border-[#FFCC00]/70 absolute top-[45%] left-1/2 -translate-x-1/2 -translate-y-1/2" />
-                        <div className="w-3 h-[1px] bg-[#FFCC00]/40 absolute bottom-2 left-1/2 -translate-x-1/2" />
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col justify-center gap-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#E0E5F0] text-[13px] font-medium tracking-tight truncate max-w-[110px]">passport_maria_kz</span>
-                      <span className="px-1.5 py-0.5 rounded-[4px] bg-white/10 flex items-center justify-center text-white/50 text-[7px] font-extrabold uppercase mt-[1px]">PDF</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#6D7A94] text-[10px]">12.10.2025 • 4.3MB</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-white mt-0.5">
-                      <span className="text-[9px] font-bold tracking-[0.1em] uppercase">DECLINED</span>
-                      <Triangle size={8} fill="currentColor" strokeWidth={0} className="text-white transform -translate-y-[0.5px]" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-                /* Clean Upload Dropzone replaces error items upon clear */
-                <div className="h-[120px] rounded-[24px] border border-dashed border-[#BEF264]/40 bg-[#BEF264]/5 hover:bg-[#BEF264]/10 transition-colors flex flex-col items-center justify-center cursor-pointer mb-5 animate-in zoom-in-95 duration-300">
-                  <UploadCloud size={28} className="text-[#BEF264] mb-3 opacity-90" strokeWidth={1.5} />
-                  <span className="text-white/90 text-[13px] font-medium tracking-tight mb-1">Tap to select a clearer document</span>
-                  <span className="text-white/40 text-[9px] uppercase tracking-widest font-bold">PDF or JPG • Max 10MB</span>
-                </div>
-            )}
-          </div>
-
-          {/* Full Name */}
-          <div className="mb-2">
-            <label className="text-[#4A5570] text-[9px] font-bold tracking-[0.15em] uppercase block mb-2.5 px-1">
-              Full Name (As In Passport)
-            </label>
-            <div className="h-[52px] bg-[#151924] rounded-[16px] px-4 flex items-center border border-white/5 opacity-60">
-              <span className="text-[#6D7A94] text-[14px]">{formData.fullName}</span>
-            </div>
-          </div>
-        </div>
-        )}
       </div>
-
-      {/* Floating Dynamic Bottom Overlay Action Button */}
-      <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 w-full max-w-lg px-8 flex justify-center pointer-events-none">
-        {uploadError ? (
-           <button 
-             onClick={scrollToUpload}
-             className="bg-[#BEF264] text-[#080B10] px-8 py-3.5 rounded-full flex items-center justify-center gap-3 font-extrabold text-[10px] tracking-[0.2em] shadow-[0_4px_40px_rgba(190,242,100,0.4)] pointer-events-auto cursor-pointer hover:bg-[#cbf478] transition-colors"
-           >
-             <span className="translate-y-[1px]">SCROLL DOWN</span>
-             <ArrowDown size={14} strokeWidth={2.5} />
-           </button>
-        ) : (
-           <button 
-             onClick={() => {
-               addToast({ message: 'Passport verification queued successfully!', type: 'success' });
-               navigate('/dashboard');
-             }}
-             className="bg-white text-[#080B10] px-8 py-3.5 rounded-full flex items-center justify-center gap-3 font-extrabold text-[10px] tracking-[0.2em] shadow-[0_4px_40px_rgba(255,255,255,0.4)] pointer-events-auto cursor-pointer hover:bg-gray-100 transition-colors animate-in slide-in-from-bottom-2 fade-in duration-300"
-           >
-             <span className="translate-y-[1px]">SUBMIT PASSPORT</span>
-             <Check size={14} strokeWidth={2.5} />
-           </button>
-        )}
-      </div>
-
     </div>
   );
 };

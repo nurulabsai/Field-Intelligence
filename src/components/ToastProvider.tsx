@@ -1,5 +1,5 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import MaterialIcon from './MaterialIcon';
 import { create } from 'zustand';
 
 // --- Toast Store ---
@@ -88,7 +88,7 @@ const ToastItem: React.FC<{ toast: Toast; onDismiss: () => void }> = ({
         }}
         className="bg-transparent border-none text-text-tertiary cursor-pointer p-1 flex items-center rounded shrink-0"
       >
-        <X size={14} />
+        <MaterialIcon name="close" size={14} />
       </button>
     </div>
   );

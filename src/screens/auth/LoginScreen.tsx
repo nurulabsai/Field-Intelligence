@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Mail, Lock } from 'lucide-react';
+import MaterialIcon from '../../components/MaterialIcon';
 import NuruLogo from '../../components/NuruLogo';
 
 interface LoginScreenProps {
@@ -96,7 +96,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
                   className="w-full bg-bg-primary border border-white/10 rounded-[16px] px-5 py-4 text-white text-sm outline-none transition-all focus:border-cyan focus:ring-1 focus:ring-cyan/30 placeholder:text-white/20 font-base"
                 />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none">
-                  <Mail size={18} />
+                  <MaterialIcon name="mail" size={18} />
                 </div>
               </div>
             </div>
@@ -117,7 +117,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
                   className="w-full bg-bg-primary border border-white/10 rounded-[16px] px-5 py-4 text-white text-sm outline-none transition-all focus:border-cyan focus:ring-1 focus:ring-cyan/30 placeholder:text-white/20 font-base"
                 />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none">
-                  <Lock size={18} />
+                  <MaterialIcon name="lock" size={18} />
                 </div>
               </div>
             </div>
@@ -147,7 +147,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
             className="w-full bg-accent text-black py-4 rounded-full font-bold text-sm uppercase tracking-[0.2em] nuru-glow-lime active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 border-none cursor-pointer"
           >
             {loading ? 'Entering\u2026' : 'Login'}
-            <ArrowRight size={18} strokeWidth={2.5} />
+            <MaterialIcon name="arrow_forward" size={18} />
           </button>
 
           {/* Social Separator — Stitch spec */}

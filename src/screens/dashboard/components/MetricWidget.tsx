@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
 
 type MetricVariant = 'default' | 'success' | 'warning' | 'error';
@@ -58,7 +58,11 @@ const MetricWidget: React.FC<MetricWidgetProps> = ({
             trendPositive ? 'text-success' : 'text-error',
           )}
         >
-          {trendPositive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+          {trendPositive ? (
+            <MaterialIcon name="trending_up" size={14} />
+          ) : (
+            <MaterialIcon name="trending_down" size={14} />
+          )}
           <span>{trendPositive ? '+' : ''}{trend}%</span>
           <span className="text-text-tertiary font-normal ml-1">vs last week</span>
         </div>
