@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
+import { registerServiceWorker } from './lib/swRegistration';
+import { initOffline } from './store/index';
 import './styles/main.css';
 
 const rootElement = document.getElementById('root');
@@ -17,3 +19,6 @@ root.render(
     </BrowserRouter>
   </React.StrictMode>
 );
+
+registerServiceWorker();
+initOffline();

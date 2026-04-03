@@ -10,6 +10,8 @@
 import { create } from 'zustand';
 import { auth as authApi, audits as auditsApi, type FarmAuditRow } from '../lib/supabase';
 import type { FullAuditData } from '../lib/validations';
+import { saveDraftToDb, loadDraftFromDb, clearDraftFromDb } from '../lib/offlineDb';
+import { onPendingCountChange, refreshPendingCount } from '../lib/syncService';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -165,9 +167,11 @@ interface AuditState {
   currentDraft: Partial<FullAuditData> | null;
   currentStep: number;
   isLoading: boolean;
+  draftRestored: boolean;
   setStep: (step: number) => void;
   saveDraft: (data: Partial<FullAuditData>) => void;
   resetDraft: () => void;
+  restoreDraft: () => Promise<void>;
   submitAudit: (auditId: string) => Promise<void>;
   loadAudits: (userId: string) => Promise<void>;
   createAudit: (audit: Omit<FarmAuditRow, 'id' | 'created_at' | 'updated_at'>) => Promise<FarmAuditRow>;
@@ -178,18 +182,46 @@ export const useAuditStore = create<AuditState>((set, get) => ({
   currentDraft: null,
   currentStep: 0,
   isLoading: false,
+  draftRestored: false,
 
   setStep(step: number) {
     set({ currentStep: step });
+    const draft = get().currentDraft;
+    if (draft) {
+      saveDraftToDb(step, draft as Record<string, unknown>).catch(() => {});
+    }
   },
 
   saveDraft(data: Partial<FullAuditData>) {
     const existing = get().currentDraft ?? {};
-    set({ currentDraft: { ...existing, ...data } });
+    const merged = { ...existing, ...data };
+    set({ currentDraft: merged });
+    saveDraftToDb(
+      get().currentStep,
+      merged as Record<string, unknown>,
+    ).catch(() => {});
   },
 
   resetDraft() {
     set({ currentDraft: null, currentStep: 0 });
+    clearDraftFromDb().catch(() => {});
+  },
+
+  async restoreDraft() {
+    try {
+      const saved = await loadDraftFromDb();
+      if (saved) {
+        set({
+          currentDraft: saved.formData as Partial<FullAuditData>,
+          currentStep: saved.currentStep,
+          draftRestored: true,
+        });
+      } else {
+        set({ draftRestored: true });
+      }
+    } catch {
+      set({ draftRestored: true });
+    }
   },
 
   async submitAudit(auditId: string) {
@@ -339,4 +371,29 @@ if (typeof window !== 'undefined') {
     (window as any).__auditStore = useAuditStore;
     (window as any).__uiStore = useUIStore;
   }
+}
+
+// ---------------------------------------------------------------------------
+// Offline infrastructure initialisation
+// ---------------------------------------------------------------------------
+
+let offlineInitDone = false;
+
+/**
+ * Called once from main.tsx after React mounts.
+ * - Restores any persisted audit draft from IndexedDB
+ * - Seeds pendingSyncCount from the real queue length
+ * - Subscribes the UI store to future count changes
+ */
+export async function initOffline(): Promise<void> {
+  if (offlineInitDone) return;
+  offlineInitDone = true;
+
+  await useAuditStore.getState().restoreDraft();
+
+  onPendingCountChange((count) => {
+    useUIStore.getState().setPendingSyncCount(count);
+  });
+
+  await refreshPendingCount();
 }

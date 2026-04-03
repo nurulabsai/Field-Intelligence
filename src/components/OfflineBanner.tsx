@@ -1,44 +1,64 @@
 import React from 'react';
-import { WifiOff } from 'lucide-react';
+import { WifiOff, RefreshCw } from 'lucide-react';
+import { useUIStore } from '../store/index';
+import { drainSyncQueue } from '../lib/syncService';
 
-interface OfflineBannerProps {
-  pendingCount?: number;
-}
+const OfflineBanner: React.FC = () => {
+  const isOnline = useUIStore((s) => s.isOnline);
+  const pendingCount = useUIStore((s) => s.pendingSyncCount);
+  const [syncing, setSyncing] = React.useState(false);
 
-const OfflineBanner: React.FC<OfflineBannerProps> = ({ pendingCount = 0 }) => {
-  const [isOnline, setIsOnline] = React.useState(
-    typeof navigator !== 'undefined' ? navigator.onLine : true
-  );
+  const handleRetrySync = React.useCallback(async () => {
+    if (syncing || !isOnline) return;
+    setSyncing(true);
+    try {
+      await drainSyncQueue();
+    } finally {
+      setSyncing(false);
+    }
+  }, [syncing, isOnline]);
 
-  React.useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
+  const showBanner = !isOnline || pendingCount > 0;
 
   return (
     <div
       className="fixed top-0 left-0 right-0 z-[100] transition-transform duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
       style={{
-        transform: isOnline ? 'translateY(-100%)' : 'translateY(0)',
+        transform: showBanner ? 'translateY(0)' : 'translateY(-100%)',
       }}
     >
-      <div className="bg-[rgba(245,158,11,0.95)] backdrop-blur-[8px] py-2.5 px-4 flex items-center justify-center gap-2.5 font-[Inter,sans-serif]">
-        <WifiOff size={16} color="#000000" />
+      <div
+        className="backdrop-blur-[8px] py-2.5 px-4 flex items-center justify-center gap-2.5 font-[Inter,sans-serif]"
+        style={{
+          backgroundColor: isOnline
+            ? 'rgba(59, 130, 246, 0.95)'
+            : 'rgba(245, 158, 11, 0.95)',
+        }}
+      >
+        {!isOnline && <WifiOff size={16} color="#000000" />}
         <span className="text-[13px] font-semibold text-black">
-          You are offline
+          {isOnline ? 'Back online' : 'You are offline'}
         </span>
         {pendingCount > 0 && (
-          <span className="text-xs font-medium text-[rgba(0,0,0,0.7)] bg-[rgba(0,0,0,0.15)] py-0.5 px-2 rounded-full">
-            {pendingCount} pending
-          </span>
+          <>
+            <span className="text-xs font-medium text-[rgba(0,0,0,0.7)] bg-[rgba(0,0,0,0.15)] py-0.5 px-2 rounded-full">
+              {pendingCount} pending
+            </span>
+            {isOnline && (
+              <button
+                type="button"
+                onClick={handleRetrySync}
+                disabled={syncing}
+                className="text-xs font-semibold text-black bg-[rgba(0,0,0,0.15)] py-0.5 px-2.5 rounded-full border-none cursor-pointer flex items-center gap-1"
+              >
+                <RefreshCw
+                  size={12}
+                  className={syncing ? 'animate-spin' : ''}
+                />
+                {syncing ? 'Syncing…' : 'Sync now'}
+              </button>
+            )}
+          </>
         )}
       </div>
     </div>

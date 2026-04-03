@@ -1,289 +1,489 @@
-import React, { useState } from 'react';
-import { Flag, AlertTriangle, ChevronUp, ChevronDown, Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, Send, Save, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../design-system';
+import { useAuditStore } from '../../store/index';
+import { validateStep, TOTAL_STEPS } from '../../lib/validations';
+import {
+  createFarmProfile,
+  createFarmBoundary,
+  createPlot,
+  createPlotObservation,
+} from '../../lib/audit-types';
+import type {
+  FarmProfile,
+  FarmBoundary,
+  Plot,
+  PlotObservation,
+  AuditSubmissionPayload,
+} from '../../lib/audit-types';
+
+import AuditStepIndicator from '../../components/AuditStepIndicator';
+import Step1_Identity from './steps/Step1_Identity';
+import Step2_Location from './steps/Step2_Location';
+import StepFarmProfile from './steps/StepFarmProfile';
+import StepFarmBoundary from './steps/StepFarmBoundary';
+import StepPlotStructure from './steps/StepPlotStructure';
+import StepPlotObservations from './steps/StepPlotObservations';
+import Step3_FarmChar from './steps/Step3_FarmChar';
+import Step4_Crops from './steps/Step4_Crops';
+import Step5_Inputs from './steps/Step5_Inputs';
+import Step6_Yield from './steps/Step6_Yield';
 
 interface AuditWizardProps {
   auditId?: string;
   onComplete?: (data: Record<string, unknown>) => void;
 }
 
-const DESTINATIONS = ['Sydney, NSW', 'Melbourne, VIC', 'Brisbane, QLD'];
-const PURPOSES = ['Conference', 'Visiting relatives', 'Tourism', 'Study'];
+const STEP_LABELS = [
+  'Identity',
+  'Location',
+  'Farm Profile',
+  'Boundary',
+  'Plots',
+  'Observations',
+  'Farm Details',
+  'Crops',
+  'Inputs',
+  'Yield',
+];
 
-const AuditWizard: React.FC<AuditWizardProps> = ({ onComplete }) => {
+const STEPS_WITH_INLINE_VALIDATION = new Set([2, 3, 4, 5]);
+
+function buildSubmissionPayload(
+  data: Record<string, unknown>,
+  auditId: string,
+): AuditSubmissionPayload {
+  const farm = data.farm_profile as FarmProfile;
+  const boundary = data.farm_boundary as FarmBoundary;
+  const plots = (data.plots as Plot[]) || [];
+  const observations = (data.plot_observations as PlotObservation[]) || [];
+
+  return {
+    audit_id: auditId,
+    farm: {
+      local_id: farm.id,
+      farm_name: farm.farm_name,
+      farmer_name: farm.farmer_name,
+      farmer_phone: farm.farmer_phone,
+      village: farm.village,
+      ward: farm.ward,
+      district: farm.district,
+      region: farm.region,
+      total_area_ha: typeof farm.total_area_ha === 'number'
+        ? farm.total_area_ha
+        : parseFloat(String(farm.total_area_ha)) || 0,
+      tenure_type: farm.tenure_type as string,
+      farming_system: farm.farming_system as string,
+      contact_number: farm.contact_number || undefined,
+      water_source: farm.water_source || undefined,
+      notes: farm.notes || undefined,
+    },
+    farm_boundary: {
+      local_id: boundary.id,
+      farm_local_id: farm.id,
+      capture_method: boundary.capture_method as string,
+      points: boundary.points,
+      status: boundary.status,
+      confidence: boundary.confidence as string,
+      captured_at: boundary.captured_at,
+      captured_by: boundary.captured_by,
+      gps_accuracy_summary: boundary.gps_accuracy_summary,
+      area_ha: boundary.area_ha,
+      notes: boundary.notes || undefined,
+      skip_reason: boundary.skip_reason || undefined,
+    },
+    plots: plots.map(p => ({
+      local_id: p.id,
+      farm_local_id: farm.id,
+      name: p.name,
+      area_ha: typeof p.area_ha === 'number'
+        ? p.area_ha
+        : parseFloat(String(p.area_ha)) || 0,
+      status: p.status as string,
+      current_crop: p.current_crop,
+      variety: p.variety || undefined,
+      growth_stage: p.growth_stage as string,
+      irrigation_status: p.irrigation_status as string,
+      center_gps: p.center_gps,
+      planting_season: p.planting_season || undefined,
+      notes: p.notes || undefined,
+    })),
+    plot_observations: observations.map(o => ({
+      local_id: o.id,
+      plot_local_id: o.plot_id,
+      crop_condition: o.crop_condition as string,
+      pest_present: o.pest_present ?? false,
+      disease_present: o.disease_present ?? false,
+      pest_type: o.pest_type || undefined,
+      pest_severity: (o.pest_severity as string) || undefined,
+      disease_type: o.disease_type || undefined,
+      disease_severity: (o.disease_severity as string) || undefined,
+      stress_level: (o.stress_level as string) || undefined,
+      plant_vigor: (o.plant_vigor as string) || undefined,
+      soil_moisture: (o.soil_moisture as string) || undefined,
+      weed_pressure: (o.weed_pressure as string) || undefined,
+      yield_outlook: (o.yield_outlook as string) || undefined,
+      notes: o.notes || undefined,
+    })),
+  };
+}
+
+function validateInlineStep(
+  stepIndex: number,
+  data: Record<string, unknown>,
+): Record<string, string> {
+  const errors: Record<string, string> = {};
+
+  if (stepIndex === 2) {
+    const profile = data.farm_profile as FarmProfile | undefined;
+    if (!profile) return { 'farm_profile': 'Farm profile is required' };
+    if (!profile.farm_name) errors['farm_profile.farm_name'] = 'Farm name is required';
+    if (!profile.farmer_name) errors['farm_profile.farmer_name'] = 'Farmer name is required';
+    if (!profile.farmer_phone) errors['farm_profile.farmer_phone'] = 'Phone is required';
+    if (!profile.village) errors['farm_profile.village'] = 'Village is required';
+    if (!profile.ward) errors['farm_profile.ward'] = 'Ward is required';
+    if (!profile.district) errors['farm_profile.district'] = 'District is required';
+    if (!profile.region) errors['farm_profile.region'] = 'Region is required';
+    const area = parseFloat(String(profile.total_area_ha));
+    if (!area || area <= 0) errors['farm_profile.total_area_ha'] = 'Farm area must be > 0';
+    if (!profile.tenure_type) errors['farm_profile.tenure_type'] = 'Tenure type is required';
+    if (!profile.farming_system) errors['farm_profile.farming_system'] = 'Farming system is required';
+  }
+
+  if (stepIndex === 3) {
+    const boundary = data.farm_boundary as FarmBoundary | undefined;
+    if (!boundary) return { 'farm_boundary': 'Boundary data is missing' };
+    if (boundary.status !== 'complete' && boundary.status !== 'skipped') {
+      errors['farm_boundary'] = 'Please capture boundary or provide skip reason';
+    }
+    if (boundary.status === 'skipped' && !boundary.skip_reason) {
+      errors['farm_boundary'] = 'Please provide a reason for skipping';
+    }
+  }
+
+  if (stepIndex === 4) {
+    const plots = data.plots as Plot[] | undefined;
+    if (!plots || plots.length === 0) {
+      errors['plots'] = 'At least one plot is required';
+      return errors;
+    }
+    plots.forEach((p, i) => {
+      if (!p.name) errors[`plots.${i}`] = `Plot ${i + 1}: name is required`;
+      const area = parseFloat(String(p.area_ha));
+      if (!area || area <= 0) errors[`plots.${i}`] = `Plot ${i + 1}: area must be > 0`;
+      if (!p.status) errors[`plots.${i}`] = `Plot ${i + 1}: status is required`;
+      if (!p.current_crop) errors[`plots.${i}`] = `Plot ${i + 1}: crop is required`;
+      if (!p.growth_stage) errors[`plots.${i}`] = `Plot ${i + 1}: growth stage is required`;
+      if (!p.irrigation_status) errors[`plots.${i}`] = `Plot ${i + 1}: irrigation status is required`;
+    });
+  }
+
+  if (stepIndex === 5) {
+    const observations = data.plot_observations as PlotObservation[] | undefined;
+    const plots = data.plots as Plot[] | undefined;
+    if (!observations || observations.length === 0) {
+      errors['plot_observations'] = 'At least one observation is required';
+      return errors;
+    }
+    observations.forEach((o, i) => {
+      if (!o.plot_id) errors[`plot_observations.${i}`] = 'Observation must link to a plot';
+      if (!o.crop_condition) errors[`plot_observations.${i}`] = `${plots?.[i]?.name || `Plot ${i + 1}`}: crop condition is required`;
+      if (o.pest_present === null) errors[`plot_observations.${i}`] = `${plots?.[i]?.name || `Plot ${i + 1}`}: pest status required`;
+      if (o.disease_present === null) errors[`plot_observations.${i}`] = `${plots?.[i]?.name || `Plot ${i + 1}`}: disease status required`;
+    });
+  }
+
+  return errors;
+}
+
+const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
   const navigate = useNavigate();
+  const { currentStep, setStep, currentDraft, saveDraft, resetDraft } = useAuditStore();
 
-  // -- Fully Wired Form State --
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [primaryDestination, setPrimaryDestination] = useState<string | null>(null);
-  const [purpose, setPurpose] = useState<string | null>(null);
-  const [hasInvitation, setHasInvitation] = useState<string | null>(null);
-  const [additionalNotes, setAdditionalNotes] = useState('');
+  const [formData, setFormData] = useState<Record<string, unknown>>(() => {
+    const initial: Record<string, unknown> = { ...(currentDraft ?? {}) };
+    if (!initial.farm_profile) {
+      initial.farm_profile = createFarmProfile();
+    }
+    return initial;
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
-  const handleSelectDestination = (dest: string) => {
-    setPrimaryDestination(dest);
-    setDropdownOpen(false);
-  };
+  useEffect(() => {
+    sessionStorage.setItem('nuru_audit_dirty', 'true');
+    return () => {
+      sessionStorage.removeItem('nuru_audit_dirty');
+    };
+  }, []);
 
-  const handleNext = async () => {
-    if (!primaryDestination || !purpose) return;
+  useEffect(() => {
+    const farmProfile = formData.farm_profile as FarmProfile | undefined;
+    if (farmProfile && !formData.farm_boundary) {
+      setFormData(prev => ({
+        ...prev,
+        farm_boundary: createFarmBoundary(farmProfile.id),
+      }));
+    }
+  }, [formData.farm_profile, formData.farm_boundary]);
+
+  useEffect(() => {
+    const farmProfile = formData.farm_profile as FarmProfile | undefined;
+    const plots = formData.plots as Plot[] | undefined;
+    if (farmProfile && (!plots || plots.length === 0)) {
+      setFormData(prev => ({
+        ...prev,
+        plots: [createPlot(farmProfile.id, 0)],
+      }));
+    }
+  }, [formData.farm_profile, formData.plots]);
+
+  const handleChange = useCallback((patch: Record<string, unknown>) => {
+    setFormData(prev => {
+      const next = { ...prev, ...patch };
+      saveDraft(next as Record<string, unknown>);
+      return next;
+    });
+    if (Object.keys(errors).length > 0) {
+      setErrors({});
+    }
+  }, [errors, saveDraft]);
+
+  const syncPlotObservations = useCallback((data: Record<string, unknown>): Record<string, unknown> => {
+    const plots = (data.plots as Plot[]) || [];
+    const existing = (data.plot_observations as PlotObservation[]) || [];
+
+    const synced = plots.map(p => {
+      const found = existing.find(o => o.plot_id === p.id);
+      if (found) {
+        return { ...found, plot_name: p.name };
+      }
+      return createPlotObservation(p);
+    });
+
+    return { ...data, plot_observations: synced };
+  }, []);
+
+  const completedSteps = useMemo(() => {
+    const completed: number[] = [];
+    for (let i = 0; i < currentStep; i++) {
+      completed.push(i + 1);
+    }
+    return completed;
+  }, [currentStep]);
+
+  const handleNext = useCallback(() => {
+    if (STEPS_WITH_INLINE_VALIDATION.has(currentStep)) {
+      const inlineErrors = validateInlineStep(currentStep, formData);
+      if (Object.keys(inlineErrors).length > 0) {
+        setErrors(inlineErrors);
+        return;
+      }
+    } else {
+      const result = validateStep(currentStep, formData);
+      if (!result.success) {
+        const zodErrors: Record<string, string> = {};
+        for (const issue of result.error.issues) {
+          const path = issue.path.join('.');
+          zodErrors[path] = issue.message;
+        }
+        setErrors(zodErrors);
+        return;
+      }
+    }
+
+    setErrors({});
+
+    let nextData = formData;
+
+    if (currentStep === 4) {
+      nextData = syncPlotObservations(formData);
+      setFormData(nextData);
+    }
+
+    if (currentStep === 2) {
+      const profile = nextData.farm_profile as FarmProfile;
+      const boundary = nextData.farm_boundary as FarmBoundary | undefined;
+      if (boundary && boundary.farm_id !== profile.id) {
+        const updated = { ...boundary, farm_id: profile.id };
+        nextData = { ...nextData, farm_boundary: updated };
+        setFormData(nextData);
+      }
+      const plots = (nextData.plots as Plot[]) || [];
+      const updatedPlots = plots.map(p => ({ ...p, farm_id: profile.id }));
+      if (plots.some((p, i) => p.farm_id !== updatedPlots[i]!.farm_id)) {
+        nextData = { ...nextData, plots: updatedPlots };
+        setFormData(nextData);
+      }
+    }
+
+    saveDraft(nextData as Record<string, unknown>);
+
+    if (currentStep < TOTAL_STEPS - 1) {
+      setStep(currentStep + 1);
+    }
+  }, [currentStep, formData, saveDraft, setStep, syncPlotObservations]);
+
+  const handleBack = useCallback(() => {
+    setErrors({});
+    if (currentStep > 0) {
+      setStep(currentStep - 1);
+    } else {
+      navigate(-1);
+    }
+  }, [currentStep, setStep, navigate]);
+
+  const handleSubmit = useCallback(async () => {
+    if (STEPS_WITH_INLINE_VALIDATION.has(currentStep)) {
+      const inlineErrors = validateInlineStep(currentStep, formData);
+      if (Object.keys(inlineErrors).length > 0) {
+        setErrors(inlineErrors);
+        return;
+      }
+    }
+
     setSubmitting(true);
     try {
+      const id = auditId || crypto.randomUUID();
+      const payload = buildSubmissionPayload(formData, id);
       await onComplete?.({
-        primaryDestination,
-        purpose,
-        hasInvitation: hasInvitation === 'Yes',
-        additionalNotes,
+        ...formData,
+        _payload: payload,
+        farm_id: (formData.farm_profile as FarmProfile)?.id,
+        latitude: (formData as Record<string, unknown>).latitude ?? (formData as Record<string, unknown>).gps_lat,
+        longitude: (formData as Record<string, unknown>).longitude ?? (formData as Record<string, unknown>).gps_lng,
+        gps_accuracy: (formData as Record<string, unknown>).gps_accuracy,
       });
+      resetDraft();
     } catch {
       // Error handled by wrapper
     } finally {
       setSubmitting(false);
     }
+  }, [currentStep, formData, auditId, onComplete, resetDraft]);
+
+  const handleSaveDraft = useCallback(() => {
+    saveDraft(formData as Record<string, unknown>);
+  }, [formData, saveDraft]);
+
+  const isLastStep = currentStep === TOTAL_STEPS - 1;
+
+  const renderStep = () => {
+    const props = { data: formData, onChange: handleChange, errors };
+    switch (currentStep) {
+      case 0: return <Step1_Identity {...props} />;
+      case 1: return <Step2_Location {...props} />;
+      case 2: return <StepFarmProfile {...props} />;
+      case 3: return <StepFarmBoundary {...props} />;
+      case 4: return <StepPlotStructure {...props} />;
+      case 5: return <StepPlotObservations {...props} />;
+      case 6: return <Step3_FarmChar {...props} />;
+      case 7: return <Step4_Crops {...props} />;
+      case 8: return <Step5_Inputs {...props} />;
+      case 9: return <Step6_Yield {...props} />;
+      default: return null;
+    }
   };
 
-  const isFormValid = !!primaryDestination && !!purpose;
-
   return (
-    <div className="min-h-screen bg-[#0B0F19] flex flex-col p-5 pb-8 font-base overflow-x-hidden relative">
-      
-      {/* Top Header Section */}
-      <div className="flex items-center justify-between mb-8 mt-2">
-        <div className="flex items-center gap-4">
-          <div className="w-[52px] h-[52px] rounded-[16px] bg-[#151924] flex items-center justify-center shrink-0 border border-white/5">
-            <Flag size={20} className="text-[#67E8F9]" />
-          </div>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-3">
-              <h1 className="text-[28px] font-bold text-white font-heading tracking-tight leading-none m-0">Australia</h1>
-              <div className="px-2.5 py-1 rounded-[6px] bg-accent text-black text-[9px] font-bold tracking-widest uppercase flex items-center gap-1.5 shrink-0">
-                <div className="w-1.5 h-1.5 rounded-full bg-black/50" />
-                In Progress
-              </div>
+    <div className="min-h-screen bg-bg-primary flex flex-col font-base">
+      {/* Header */}
+      <div className="sticky top-0 z-40 bg-bg-primary/95 backdrop-blur-sm border-b border-border-light px-4 pt-4 pb-2">
+        <div className="max-w-[800px] mx-auto">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h1 className="text-lg font-semibold text-white font-heading tracking-tight">
+                Farm Audit
+              </h1>
+              <p className="text-xs text-text-tertiary">
+                Step {currentStep + 1} of {TOTAL_STEPS} — {STEP_LABELS[currentStep]}
+              </p>
             </div>
-            <p className="text-white/40 text-[11px] mt-1.5 leading-tight">
-              06.12.2025 →<br />24.01.2026
+            <button
+              type="button"
+              onClick={handleSaveDraft}
+              className="flex items-center gap-1.5 py-2 px-3 bg-border-glass border border-border rounded-full text-xs text-text-secondary font-medium cursor-pointer font-inherit"
+            >
+              <Save size={14} />
+              Save Draft
+            </button>
+          </div>
+
+          <AuditStepIndicator
+            totalSteps={TOTAL_STEPS}
+            currentStep={currentStep + 1}
+            completedSteps={completedSteps}
+          />
+        </div>
+      </div>
+
+      {/* Form Content */}
+      <div className="flex-1 px-4 py-6 pb-[140px] max-w-[800px] mx-auto w-full">
+        {renderStep()}
+      </div>
+
+      {/* Error summary */}
+      {Object.keys(errors).length > 0 && (
+        <div className="fixed bottom-[90px] left-4 right-4 max-w-[800px] mx-auto z-40">
+          <div className="flex items-center gap-2 py-2.5 px-4 bg-error/15 border border-error/30 rounded-[12px] backdrop-blur-sm">
+            <AlertTriangle size={16} className="text-error shrink-0" />
+            <p className="text-xs text-error-light truncate">
+              Please fix {Object.keys(errors).length} error{Object.keys(errors).length > 1 ? 's' : ''} before continuing
             </p>
           </div>
         </div>
+      )}
 
-        {/* 85% Circular Progress */}
-        <div className="relative w-[46px] h-[46px] shrink-0 flex items-center justify-center">
-          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(190, 242, 100, 0.15)" strokeWidth="3" />
-            <circle 
-              cx="18" cy="18" r="16" fill="none" 
-              stroke="#BEF264" strokeWidth="3" 
-              strokeDasharray="100 100" strokeDashoffset="15" 
-              strokeLinecap="round" 
-            />
-          </svg>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-[10px] font-bold text-accent">85%</span>
-          </div>
-        </div>
-      </div>
+      {/* Navigation Footer */}
+      <div className="fixed bottom-0 left-0 w-full z-50 pointer-events-none">
+        <div className="max-w-[800px] mx-auto px-4 pb-6 pt-8 flex items-center justify-between bg-gradient-to-t from-bg-primary via-bg-primary/95 to-transparent pointer-events-auto">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="flex items-center gap-1.5 py-3 px-4 text-text-secondary text-sm font-semibold bg-transparent border-none cursor-pointer font-inherit"
+          >
+            <ChevronLeft size={18} strokeWidth={2.5} />
+            {currentStep === 0 ? 'Exit' : 'Back'}
+          </button>
 
-      {/* Progress Node Bar */}
-      <div className="flex items-center justify-between gap-1 mb-8">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <React.Fragment key={i}>
-            <div className="w-[16px] h-[16px] rounded-full bg-accent flex items-center justify-center shrink-0">
-              <Check size={10} strokeWidth={4} className="text-black" />
-            </div>
-            <div className="h-0.5 flex-1 bg-accent min-w-[12px]" />
-          </React.Fragment>
-        ))}
-        {/* Active Node */}
-        <div className="w-[20px] h-[20px] rounded-full border-[2px] border-accent flex items-center justify-center shrink-0 p-1 bg-[#0B0F19]">
-          <div className="w-full h-full rounded-full bg-accent" />
-        </div>
-        <div className="h-0.5 flex-1 bg-white/10 min-w-[12px]" />
-        {/* Inactive Node */}
-        <div className="w-[16px] h-[16px] rounded-full bg-white/10 shrink-0" />
-      </div>
-
-      {/* Section Title */}
-      <div className="mb-4 pl-1">
-        <h3 className="text-[10px] font-bold text-white/45 tracking-[0.15em] uppercase mb-1">Travel Details</h3>
-        <h2 className="text-[10px] font-bold text-accent tracking-[0.15em] uppercase mb-4">Step 6 - Primary Destination</h2>
-      </div>
-
-      {/* Main Form Card */}
-      <div className="bg-[#121623]/60 backdrop-blur-xl rounded-[32px] p-5 pt-7 pb-8 border border-white/[0.03] shadow-lg flex-1 mb-[100px]">
-        
-        {/* Form Title & Required Tag */}
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-[26px] font-bold text-white font-heading tracking-tight">Purpose of Visit</h2>
-          <div className="flex items-center gap-1.5 text-[#EAB308]">
-            <span className="text-[10px] font-bold tracking-[0.1em] uppercase">Required</span>
-            <AlertTriangle size={14} strokeWidth={2.5} />
-          </div>
-        </div>
-
-        {/* Primary Destination Dropdown */}
-        <div className="mb-8">
-          <h3 className="text-[10px] font-bold text-white/40 tracking-[0.1em] uppercase mb-3 pl-1">Primary Destination</h3>
-          
-          <div className="flex flex-col gap-2 relative">
-            {/* Select Button */}
+          {isLastStep ? (
             <button
               type="button"
-              onClick={() => setDropdownOpen(!dropdownOpen)}
+              onClick={handleSubmit}
+              disabled={submitting}
               className={cn(
-                "w-full bg-[#0B0F19] rounded-[16px] px-5 py-4 flex items-center justify-between transition-all cursor-pointer border-none text-left",
-                dropdownOpen
-                  ? "border border-[#67E8F9] shadow-[0_0_15px_rgba(103,232,249,0.1)]"
-                  : primaryDestination
-                    ? "border border-accent/30 shadow-[0_0_10px_rgba(190,242,100,0.05)]"
-                    : "border border-white/5"
+                "h-[52px] px-8 rounded-full text-sm font-bold tracking-wide flex items-center gap-2 cursor-pointer font-inherit transition-all border-none",
+                submitting
+                  ? "bg-accent/50 text-black/50 cursor-wait"
+                  : "bg-accent text-black shadow-[0_0_20px_rgba(190,242,100,0.3)] hover:scale-[1.02] active:scale-[0.98]",
               )}
-              style={{ border: dropdownOpen ? '1px solid #67E8F9' : primaryDestination ? '1px solid rgba(190,242,100,0.3)' : '1px solid rgba(255,255,255,0.05)' }}
             >
-              <span className={cn("text-[14px]", primaryDestination ? "text-white" : "text-white/50")}>
-                {primaryDestination || 'Select your primary destination'}
-              </span>
-              {dropdownOpen ? (
-                <ChevronUp size={20} className="text-[#67E8F9]" />
+              {submitting ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-black/20 border-t-black/60 rounded-full animate-spin" />
+                  Submitting...
+                </span>
               ) : (
-                <ChevronDown size={20} className="text-white/30" />
+                <>
+                  <Send size={16} />
+                  Submit Audit
+                </>
               )}
             </button>
-            
-            {/* Dropdown Options */}
-            {dropdownOpen && (
-              <div className="w-full bg-[#0B0F19] border border-white/5 rounded-[16px] flex flex-col overflow-hidden shadow-2xl animate-in fade-in slide-in-from-top-1 duration-200 z-20">
-                {DESTINATIONS.map((dest) => {
-                  const isActive = primaryDestination === dest;
-                  return (
-                    <div 
-                      key={dest}
-                      onClick={() => handleSelectDestination(dest)}
-                      className={cn(
-                        "px-5 py-[18px] text-[14px] cursor-pointer border-b border-white/[0.03] transition-colors",
-                        isActive
-                          ? "bg-[#67E8F9]/10 text-white font-medium"
-                          : "text-white/40 hover:bg-white/5"
-                      )}
-                    >
-                      {dest}
-                      {isActive && (
-                        <span className="float-right">
-                          <Check size={16} className="text-[#67E8F9]" />
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Purpose Radio Group — FULLY WIRED */}
-        <div className="flex flex-col gap-[22px] px-1 mb-8">
-          {PURPOSES.map(opt => {
-            const isSelected = purpose === opt;
-            return (
-              <label 
-                key={opt} 
-                className="flex items-center gap-4 cursor-pointer group"
-                onClick={() => setPurpose(opt)}
-              >
-                <div className={cn(
-                  "w-[22px] h-[22px] rounded-[6px] flex items-center justify-center border transition-colors shrink-0",
-                  isSelected ? "bg-accent border-accent shadow-[0_0_12px_rgba(190,242,100,0.3)]" : "border-white/10 bg-transparent group-hover:border-white/20"
-                )}>
-                  {isSelected && <Check size={14} strokeWidth={3.5} className="text-[#121623]" />}
-                </div>
-                <span className={cn(
-                  "text-[15px] transition-colors",
-                  isSelected ? "text-accent font-medium mt-0.5" : "text-white/60 mt-0.5"
-                )}>
-                  {opt}
-                </span>
-              </label>
-            );
-          })}
-        </div>
-
-        {/* Faded Dashed Separator */}
-        <div className="border-t border-dashed border-white/5 mx-1 mb-7" />
-
-        {/* Invitation Letter Question — FULLY WIRED */}
-        <div className="px-1 mb-8">
-          <p className="text-white/90 text-[14px] leading-relaxed mb-5 pr-8">
-            Do you have an invitation letter from a company or organization?
-          </p>
-          <div className="flex items-center gap-6">
-            {['Yes', 'No'].map(opt => {
-              const isSelected = hasInvitation === opt;
-              return (
-                <label 
-                  key={opt} 
-                  className="flex items-center gap-3 cursor-pointer group"
-                  onClick={() => setHasInvitation(opt)}
-                >
-                  <div className={cn(
-                    "w-5 h-5 rounded-full flex items-center justify-center border-[2px] transition-all p-1 box-border",
-                    isSelected ? "border-accent" : "border-white/10 group-hover:border-white/20"
-                  )}>
-                    {isSelected && <div className="w-full h-full rounded-full bg-accent" />}
-                  </div>
-                  <span className={cn(
-                    "text-[14px] transition-colors font-medium",
-                    isSelected ? "text-white" : "text-white/40"
-                  )}>
-                    {opt}
-                  </span>
-                </label>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Additional Notes Textarea — WIRED TO STATE */}
-        <div className="px-1 flex flex-col">
-          <h3 className="text-[10px] font-bold text-white/40 tracking-[0.1em] uppercase mb-3">Any Additional Notes (Optional)</h3>
-          <textarea
-            value={additionalNotes}
-            onChange={(e) => setAdditionalNotes(e.target.value)}
-            className="w-full min-h-[120px] bg-[#0B0F19] border border-white/[0.03] rounded-[16px] p-5 text-white/60 text-[14px] outline-none focus:border-white/10 transition-colors resize-none placeholder:text-white/20 placeholder:italic font-light leading-relaxed"
-            placeholder="Provide any details that may support your application..."
-          />
-        </div>
-
-      </div>
-
-      {/* Floating Action Buttons — WIRED */}
-      <div className="fixed bottom-0 left-0 w-full px-5 pb-8 pt-10 flex items-center justify-between bg-gradient-to-t from-[#0B0F19] via-[#0B0F19]/90 to-transparent pointer-events-none z-50 max-w-[800px] mx-auto right-0">
-        
-        <button 
-          onClick={() => navigate(-1)}
-          className="text-white/40 text-[12px] font-bold tracking-widest uppercase flex items-center gap-1.5 hover:text-white transition-colors pointer-events-auto bg-transparent border-none cursor-pointer p-2"
-        >
-          <ChevronLeft size={16} strokeWidth={2.5} />
-          Back
-        </button>
-        
-        <button 
-          onClick={handleNext}
-          disabled={!isFormValid || submitting}
-          className={cn(
-            "h-[52px] px-8 rounded-full text-[13px] font-bold tracking-[0.1em] uppercase flex items-center gap-1.5 cursor-pointer transition-all pointer-events-auto border-none",
-            isFormValid 
-              ? "bg-accent text-black shadow-[0_0_20px_rgba(190,242,100,0.3)] hover:scale-105 active:scale-95" 
-              : "bg-white/10 text-white/30 cursor-not-allowed"
+          ) : (
+            <button
+              type="button"
+              onClick={handleNext}
+              className="h-[52px] px-8 rounded-full text-sm font-bold tracking-wide flex items-center gap-2 cursor-pointer font-inherit transition-all border-none bg-accent text-black shadow-[0_0_20px_rgba(190,242,100,0.3)] hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Next
+              <ChevronRight size={18} strokeWidth={2.5} />
+            </button>
           )}
-        >
-          {submitting ? 'Submitting...' : 'Next'}
-          <ChevronRight size={18} strokeWidth={3} className="ml-1" />
-        </button>
-
+        </div>
       </div>
-
     </div>
   );
 };

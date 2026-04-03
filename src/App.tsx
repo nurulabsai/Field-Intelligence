@@ -4,6 +4,7 @@ import { useAuthStore } from './store/index';
 import { useUIStore } from './store/index';
 import { useAuditStore } from './store/index';
 import { schedule, dashboard } from './lib/supabase';
+import { enqueueAuditSync } from './lib/syncService';
 import LoadingScreen from './screens/LoadingScreen';
 import OfflineBanner from './components/OfflineBanner';
 import NuruSideNav from './components/NuruSideNav';
@@ -59,8 +60,6 @@ const PublicOnly: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const user = useAuthStore((s) => s.user);
   const signOut = useAuthStore((s) => s.signOut);
-  const isOnline = useUIStore((s) => s.isOnline);
-  const pendingSyncCount = useUIStore((s) => s.pendingSyncCount);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -95,7 +94,7 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
       {/* Main Content — offset by sidebar width on desktop */}
       <div className="flex-1 flex flex-col min-h-screen pb-[100px] md:pb-0 md:ml-[260px]">
-        {!isOnline && <OfflineBanner pendingCount={pendingSyncCount} />}
+        <OfflineBanner />
         <main className="flex-1 overflow-auto">
           {children}
         </main>
@@ -460,15 +459,17 @@ const AuditWizardWrapper: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const addToast = useUIStore((s) => s.addToast);
+  const isOnline = useUIStore((s) => s.isOnline);
   const user = useAuthStore((s) => s.user);
   const createAudit = useAuditStore((s) => s.createAudit);
   const submitAudit = useAuditStore((s) => s.submitAudit);
+  const resetDraft = useAuditStore((s) => s.resetDraft);
 
   return (
     <AuditWizard
       auditId={id}
       onComplete={async (data) => {
-        const location =
+        const loc =
           typeof data.latitude === 'number' && typeof data.longitude === 'number'
             ? { latitude: data.latitude, longitude: data.longitude }
             : null;
@@ -479,28 +480,48 @@ const AuditWizardWrapper: React.FC = () => {
               ? data.yield_gps_accuracy
               : null;
 
+        const farmLocalId = typeof data.farm_id === 'string' && data.farm_id
+          ? data.farm_id
+          : crypto.randomUUID();
+
+        const auditRow = {
+          campaign_id: null,
+          farm_id: farmLocalId,
+          assigned_to: user?.id ?? null,
+          status: 'submitted' as const,
+          audit_location: loc,
+          gps_accuracy_m: gpsAccuracy,
+          started_at: new Date().toISOString(),
+          completed_at: new Date().toISOString(),
+        };
+
         try {
           if (id) {
             await submitAudit(id);
           } else {
-            const created = await createAudit({
-              campaign_id: null,
-              farm_id: (typeof data.farm_id === 'string' && data.farm_id) || crypto.randomUUID(),
-              assigned_to: user?.id ?? null,
-              status: 'submitted',
-              audit_location: location,
-              gps_accuracy_m: gpsAccuracy,
-              started_at: new Date().toISOString(),
-              completed_at: new Date().toISOString(),
-            });
+            const created = await createAudit(auditRow);
             await submitAudit(created.id);
           }
 
           addToast({ type: 'success', message: 'Audit submitted successfully.' });
           navigate('/audits');
         } catch {
-          addToast({ type: 'error', message: 'Failed to submit audit. Please try again.' });
-          throw new Error('Submit failed');
+          if (!isOnline || !navigator.onLine) {
+            await enqueueAuditSync({
+              auditRow,
+              existingAuditId: id,
+              formData: data,
+            });
+            resetDraft();
+            addToast({
+              type: 'warning',
+              message: 'You\'re offline — audit queued and will sync automatically.',
+            });
+            navigate('/audits');
+          } else {
+            addToast({ type: 'error', message: 'Failed to submit audit. Please try again.' });
+            throw new Error('Submit failed');
+          }
         }
       }}
     />

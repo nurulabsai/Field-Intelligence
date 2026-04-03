@@ -8,64 +8,69 @@ interface AuditStepIndicatorProps {
   completedSteps: number[];
 }
 
-const STEP_LABELS = ['Identity', 'Location', 'Farm', 'Crops', 'Inputs', 'Yield'];
+const STEP_LABELS = [
+  'Identity',
+  'Location',
+  'Farm',
+  'Boundary',
+  'Plots',
+  'Observe',
+  'Details',
+  'Crops',
+  'Inputs',
+  'Yield',
+];
 
 const AuditStepIndicator: React.FC<AuditStepIndicatorProps> = ({
-  totalSteps = 6,
+  totalSteps = 10,
   currentStep,
   completedSteps,
 }) => {
   const steps = STEP_LABELS.slice(0, totalSteps);
 
   return (
-    <div className="flex items-start justify-center w-full py-4 px-2 font-base overflow-x-auto">
+    <div className="flex items-center w-full py-2 font-base overflow-x-auto scrollbar-none">
       {steps.map((label, index) => {
         const stepNum = index + 1;
         const isCompleted = completedSteps.includes(stepNum);
         const isCurrent = currentStep === stepNum;
+        const isPast = stepNum < currentStep;
 
         return (
-          <div
-            key={stepNum}
-            className="flex items-center"
-            style={{
-              flex: index < steps.length - 1 ? 1 : 'none',
-            }}
-          >
-            {/* Step circle + label column */}
-            <div className="flex flex-col items-center min-w-[44px] py-1">
+          <React.Fragment key={stepNum}>
+            <div className="flex flex-col items-center shrink-0" style={{ minWidth: '28px' }}>
               <div
                 className={cn(
-                  'w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-semibold transition-all duration-[var(--transition-slow)]',
-                  isCurrent && 'bg-accent text-white shadow-[0_0_0_3px_rgba(190,242,100,0.25)]',
+                  'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-200',
+                  isCurrent && 'bg-accent text-black shadow-[0_0_0_3px_rgba(190,242,100,0.25)] scale-110',
                   isCompleted && !isCurrent && 'bg-success text-white',
                   !isCurrent && !isCompleted && 'bg-bg-input text-text-tertiary',
                 )}
               >
-                {isCompleted ? <Check size={16} /> : stepNum}
+                {isCompleted && !isCurrent ? <Check size={12} strokeWidth={3} /> : stepNum}
               </div>
-              <span
-                className={cn(
-                  'text-xs mt-1.5 whitespace-nowrap',
-                  isCurrent && 'text-white font-semibold',
-                  isCompleted && !isCurrent && 'text-success font-normal',
-                  !isCurrent && !isCompleted && 'text-text-tertiary font-normal',
-                )}
-              >
-                {label}
-              </span>
+              {(isCurrent || isCompleted) && (
+                <span
+                  className={cn(
+                    'text-[8px] mt-1 whitespace-nowrap font-semibold',
+                    isCurrent && 'text-accent',
+                    isCompleted && !isCurrent && 'text-success/70',
+                  )}
+                >
+                  {label}
+                </span>
+              )}
             </div>
 
-            {/* Connecting line */}
             {index < steps.length - 1 && (
               <div
                 className={cn(
-                  'flex-1 h-0.5 -mt-4 mx-1 transition-colors duration-[var(--transition-slow)]',
-                  isCompleted ? 'bg-success' : 'bg-border',
+                  'flex-1 h-[2px] mx-0.5 min-w-[8px] transition-colors duration-200',
+                  isPast || isCompleted ? 'bg-success/50' : 'bg-border',
                 )}
               />
             )}
-          </div>
+          </React.Fragment>
         );
       })}
     </div>
