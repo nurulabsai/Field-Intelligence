@@ -148,7 +148,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
   return (
     <div className="w-full min-h-screen relative flex flex-col bg-bg-primary font-base overflow-x-hidden">
 
-      <div className="px-8 pt-14 pb-6 flex justify-between items-center">
+      <div className="px-8 md:px-10 pt-14 pb-6 flex justify-between items-center w-full md:max-w-5xl md:mx-auto">
         <h2 className="font-heading text-[32px] font-light tracking-tight text-white leading-tight">
           My Schedule
         </h2>
@@ -173,7 +173,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col w-full md:max-w-5xl md:mx-auto">
         {/* Horizontal Calendar Scroller */}
         <div className="px-8 pb-4">
           <div className="flex items-center text-text-secondary text-xs font-semibold tracking-widest uppercase">

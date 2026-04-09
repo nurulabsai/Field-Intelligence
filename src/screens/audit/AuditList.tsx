@@ -50,7 +50,7 @@ const AuditList: React.FC<AuditListProps> = ({
   return (
     <div className="flex-1 pb-40 overflow-x-hidden min-w-0">
       {/* Header — Stitch: px-6 pt-12 pb-6 */}
-      <header className="px-6 pt-12 pb-6 flex flex-col gap-6 min-w-0">
+      <header className="px-6 md:px-10 pt-12 pb-6 flex flex-col gap-6 min-w-0 w-full md:max-w-5xl md:mx-auto">
         <div className="flex items-center justify-between min-w-0 gap-3">
           <h1 className="font-heading font-light text-[24px] tracking-tight leading-none text-white truncate">
             Audits
@@ -87,7 +87,7 @@ const AuditList: React.FC<AuditListProps> = ({
       </header>
 
       {/* Main Content — Stitch: px-6 flex flex-col gap-8 */}
-      <main className="px-6 flex flex-col gap-8">
+      <main className="px-6 md:px-10 flex flex-col gap-8 w-full md:max-w-5xl md:mx-auto">
         {isLoading && (
           <div className="flex items-center justify-center py-20">
             <MaterialIcon name="progress_activity" size={32} className="text-accent animate-spin" />
