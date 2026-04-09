@@ -6,8 +6,6 @@ interface SignUpFormData {
   email: string;
   password: string;
   confirm_password: string;
-  role: string;
-  organization: string;
 }
 
 interface SignUpScreenProps {
@@ -48,8 +46,6 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
         email: email.trim(),
         password,
         confirm_password: confirmPassword,
-        role: 'Field Agent',        // Dummy value since this mockup removes it
-        organization: 'NuruOS'      // Dummy value
       });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Unable to create account. Please try again.';

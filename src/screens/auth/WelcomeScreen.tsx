@@ -10,15 +10,10 @@ interface WelcomeScreenProps {
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNavigateToLogin, onNavigateToSignUp }) => {
   const [loading, setLoading] = useState(false);
 
-  const handleSignIn = async () => {
+  const handleSignIn = () => {
     setLoading(true);
-    try {
-      onNavigateToLogin?.();
-    } catch (e) {
-      console.warn('Navigation failed:', e);
-    } finally {
-      setLoading(false);
-    }
+    onNavigateToLogin?.();
+    setLoading(false);
   };
 
   return (
