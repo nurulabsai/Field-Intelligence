@@ -9,8 +9,8 @@ interface LoginScreenProps {
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, onForgotPassword }) => {
-  const [email, setEmail] = useState('admin@nurulabs.io');
-  const [password, setPassword] = useState('••••••••••••');
+  const [email, setEmail] = useState(import.meta.env.DEV ? 'admin@nurulabs.io' : '');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,8 +25,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
     setLoading(true);
     try {
       if (onLogin) {
-        const finalPassword = password === '••••••••••••' ? 'password' : password;
-        await onLogin({ email, password: finalPassword, rememberMe: false });
+        await onLogin({ email, password, rememberMe: false });
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Invalid credentials. Please try again.';

@@ -117,10 +117,10 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       />
 
       {/* Main Content — offset by sidebar width on desktop */}
-      <div className="flex-1 flex flex-col min-h-screen pb-[100px] md:pb-0 md:ml-[260px]">
+      <div className="flex-1 min-w-0 flex flex-col min-h-screen pb-[100px] md:pb-0 md:ml-[260px]">
         <OfflineBanner />
-        <main className="flex-1 overflow-auto">
-          <div className="w-full max-w-screen-2xl mx-auto">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto min-w-0">
+          <div className="w-full max-w-screen-2xl mx-auto min-w-0">
             {children}
           </div>
         </main>

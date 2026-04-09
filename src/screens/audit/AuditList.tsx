@@ -48,12 +48,12 @@ const AuditList: React.FC<AuditListProps> = ({
     hasPropData && audits ? audits.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) : [];
 
   return (
-    <div className="flex-1 pb-40 overflow-x-hidden">
+    <div className="flex-1 pb-40 overflow-x-hidden min-w-0">
       {/* Header — Stitch: px-6 pt-12 pb-6 */}
-      <header className="px-6 pt-12 pb-6 flex flex-col gap-6">
-        <div className="flex items-center justify-between">
-          <h1 className="font-heading font-light text-[24px] tracking-tight leading-none text-white">
-            System Tracking &amp; Sync
+      <header className="px-6 pt-12 pb-6 flex flex-col gap-6 min-w-0">
+        <div className="flex items-center justify-between min-w-0 gap-3">
+          <h1 className="font-heading font-light text-[24px] tracking-tight leading-none text-white truncate">
+            Audits
           </h1>
           <button
             type="button"
@@ -66,7 +66,7 @@ const AuditList: React.FC<AuditListProps> = ({
         </div>
 
         {/* Action Buttons — Stitch: two equal pills (Export CSV + Filter Dates) */}
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 min-w-0">
           <button
             type="button"
             onClick={() => onExportCsv?.()}

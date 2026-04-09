@@ -161,6 +161,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
                 />
                 <button
                   type="button"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-pressed={showPassword}
                   onClick={() => setShowPassword(p => !p)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors p-1 bg-transparent border-none cursor-pointer"
                 >
@@ -184,6 +186,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
                 />
                 <button
                   type="button"
+                  aria-label={showConfirm ? 'Hide confirm password' : 'Show confirm password'}
+                  aria-pressed={showConfirm}
                   onClick={() => setShowConfirm(p => !p)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors p-1 bg-transparent border-none cursor-pointer"
                 >

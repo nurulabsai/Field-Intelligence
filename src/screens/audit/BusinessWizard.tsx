@@ -700,10 +700,10 @@ const BusinessWizard: React.FC<BusinessWizardProps> = ({ onComplete }) => {
   const stepIconName = STEP_ICON_NAMES[currentStep] ?? 'description';
 
   return (
-    <div className="min-h-screen bg-bg-primary flex flex-col font-base">
-      <div className="sticky top-0 z-40 bg-bg-primary/95 backdrop-blur-sm border-b border-border-light px-4 pt-4 pb-2">
-        <div className="max-w-[800px] mx-auto">
-          <div className="flex items-center justify-between mb-3">
+    <div className="min-h-screen bg-bg-primary flex flex-col font-base min-w-0 overflow-x-hidden">
+      <div className="sticky top-0 z-40 bg-bg-primary/95 backdrop-blur-sm border-b border-border-light px-4 pt-4 pb-2 min-w-0">
+        <div className="max-w-[800px] mx-auto min-w-0">
+          <div className="flex items-center justify-between mb-3 min-w-0 gap-3">
             <div className="flex items-center gap-3">
               <MaterialIcon name={stepIconName} size={20} className="text-accent" />
               <div>

@@ -256,6 +256,32 @@
     margin: 0;
     padding: 0;
   }
+
+  /* Accessibility: visible focus ring for keyboard users (WCAG 2.4.7) */
+  :focus-visible {
+    outline: 2px solid #BEF264;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /* Touch-target floor (WCAG 2.5.5 AA = 44x44). Opt out with .is-compact on inline chips. */
+  button,
+  a[role="button"],
+  [role="tab"] {
+    min-height: 44px;
+  }
+  button.is-compact,
+  a[role="button"].is-compact,
+  [role="tab"].is-compact {
+    min-height: auto;
+  }
 }
 
 html {
