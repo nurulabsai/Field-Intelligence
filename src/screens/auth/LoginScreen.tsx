@@ -5,7 +5,7 @@ import NuruLogo from '../../components/NuruLogo';
 interface LoginScreenProps {
   onLogin?: (data: { email: string; password: string; rememberMe: boolean }) => Promise<void>;
   onNavigateToSignUp?: () => void;
-  onForgotPassword?: () => void;
+  onForgotPassword?: (email: string) => void | Promise<void>;
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, onForgotPassword }) => {
@@ -126,7 +126,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
           <div className="flex justify-end">
             <button
               type="button"
-              onClick={onForgotPassword}
+              onClick={() => onForgotPassword?.(email)}
               className="text-xs font-semibold text-cyan tracking-wide hover:opacity-80 transition-opacity font-base bg-transparent border-none cursor-pointer min-h-11 px-2 -mx-2"
             >
               Forgot Password?

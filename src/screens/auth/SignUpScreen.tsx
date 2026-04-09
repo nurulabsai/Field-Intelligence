@@ -5,7 +5,6 @@ interface SignUpFormData {
   full_name: string;
   email: string;
   password: string;
-  confirm_password: string;
 }
 
 interface SignUpScreenProps {
@@ -25,6 +24,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
   
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,17 +36,17 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
       setSubmitError('Passwords do not match.');
       return;
     }
-    
+
     setSubmitError(null);
     setLoading(true);
-    
+
     try {
       await onSignUp?.({
         full_name: `${firstName.trim()} ${lastName.trim()}`.trim(),
         email: email.trim(),
         password,
-        confirm_password: confirmPassword,
       });
+      setSubmittedEmail(email.trim());
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Unable to create account. Please try again.';
       setSubmitError(msg);
@@ -54,6 +54,33 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
       setLoading(false);
     }
   }, [firstName, lastName, email, password, confirmPassword, onSignUp]);
+
+  if (submittedEmail) {
+    return (
+      <div className="min-h-screen bg-[#0B0F19] flex flex-col items-center justify-center font-base overflow-x-hidden relative text-white px-6">
+        <div className="w-full max-w-[420px] text-center">
+          <div className="w-16 h-16 rounded-full bg-accent/10 border border-accent/20 mx-auto mb-6 flex items-center justify-center">
+            <MaterialIcon name="mark_email_read" size={32} className="text-accent" />
+          </div>
+          <h1 className="font-heading text-[32px] font-light tracking-tight text-white mb-3">
+            Check your inbox
+          </h1>
+          <p className="text-white/60 text-[15px] mb-8">
+            We sent a confirmation link to{' '}
+            <span className="text-white font-medium">{submittedEmail}</span>. Click it to activate
+            your account, then sign in.
+          </p>
+          <button
+            type="button"
+            onClick={onNavigateToLogin}
+            className="w-full bg-accent text-black py-4 rounded-full font-bold text-sm uppercase tracking-[0.2em] cursor-pointer border-none active:scale-[0.98] transition-all"
+          >
+            Back to Sign In
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0B0F19] flex flex-col font-base overflow-x-hidden relative text-white">

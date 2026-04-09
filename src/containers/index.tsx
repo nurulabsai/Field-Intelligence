@@ -1,7 +1,7 @@
 import React, { useEffect, useState, lazy } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore, useUIStore, useAuditStore } from '../store/index';
-import { schedule, dashboard, uploadYieldPhotosFromFormData } from '../lib/supabase';
+import { schedule, dashboard, uploadYieldPhotosFromFormData, auth } from '../lib/supabase';
 import { enqueueAuditSync, drainSyncQueue } from '../lib/syncService';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 
@@ -29,6 +29,7 @@ export const WelcomeWrapper: React.FC = () => {
 export const LoginWrapper: React.FC = () => {
   const navigate = useNavigate();
   const signIn = useAuthStore((s) => s.signIn);
+  const addToast = useUIStore((s) => s.addToast);
 
   return (
     <LoginScreen
@@ -37,7 +38,19 @@ export const LoginWrapper: React.FC = () => {
         navigate('/dashboard');
       }}
       onNavigateToSignUp={() => navigate('/auth/signup')}
-      onForgotPassword={() => alert('Contact admin to reset password')}
+      onForgotPassword={async (email) => {
+        if (!email) {
+          addToast({ type: 'warning', message: 'Enter your email first, then tap Forgot Password.' });
+          return;
+        }
+        try {
+          await auth.resetPassword(email);
+          addToast({ type: 'success', message: 'Password reset email sent. Check your inbox.' });
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : 'Could not send reset email.';
+          addToast({ type: 'error', message: msg });
+        }
+      }}
     />
   );
 };
@@ -49,8 +62,11 @@ export const SignUpWrapper: React.FC = () => {
   return (
     <SignUpScreen
       onSignUp={async (data) => {
+        // Don't auto-navigate — SignUpScreen shows a "check inbox" confirmation
+        // because Supabase email confirmation may be required. If confirmation
+        // is disabled, the session is already live and the user can tap
+        // "Back to Sign In" (which PublicOnly will redirect to /dashboard).
         await signUp(data.email, data.password, data.full_name);
-        navigate('/dashboard');
       }}
       onNavigateToLogin={() => navigate('/auth/login')}
     />
@@ -501,13 +517,42 @@ export const SplashRedirect: React.FC = () => {
 };
 
 // ─── Settings ───────────────────────────────────────────────────────────────
-export const SettingsPlaceholder: React.FC = () => {
+export const SettingsScreen: React.FC = () => {
   const user = useAuthStore((s) => s.user);
   const signOut = useAuthStore((s) => s.signOut);
+  const pendingSync = useUIStore((s) => s.pendingSyncCount);
+  const addToast = useUIStore((s) => s.addToast);
   const navigate = useNavigate();
+  const [draining, setDraining] = useState(false);
+
+  const handleDrain = async () => {
+    setDraining(true);
+    try {
+      await drainSyncQueue();
+      addToast({ type: 'success', message: 'Sync queue processed.' });
+    } catch {
+      addToast({ type: 'error', message: 'Could not run sync.' });
+    } finally {
+      setDraining(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!user?.email) {
+      addToast({ type: 'warning', message: 'No email on file for your account.' });
+      return;
+    }
+    try {
+      await auth.resetPassword(user.email);
+      addToast({ type: 'success', message: 'Password reset email sent.' });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Could not send reset email.';
+      addToast({ type: 'error', message: msg });
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-bg-primary font-base px-6 pt-12 pb-40">
+    <div className="min-h-screen bg-bg-primary font-base px-6 md:px-10 pt-12 pb-40">
       <div className="max-w-[760px] mx-auto">
         <button
           type="button"
@@ -520,7 +565,10 @@ export const SettingsPlaceholder: React.FC = () => {
           Settings
         </h1>
 
-        <div className="nuru-glassmorphism rounded-[32px] p-8 mb-6 space-y-6">
+        <section aria-label="Account" className="nuru-glassmorphism rounded-[32px] p-8 mb-6 space-y-6">
+          <h2 className="text-[11px] font-bold text-text-tertiary uppercase tracking-[0.15em]">
+            Account
+          </h2>
           <div>
             <div className="text-[10px] font-bold text-text-tertiary uppercase tracking-[0.15em] mb-2">Name</div>
             <div className="text-[15px] text-white font-medium">{user?.fullName || 'N/A'}</div>
@@ -535,7 +583,46 @@ export const SettingsPlaceholder: React.FC = () => {
             <div className="text-[10px] font-bold text-text-tertiary uppercase tracking-[0.15em] mb-2">Role</div>
             <div className="text-[15px] text-white font-medium capitalize">{user?.role || 'N/A'}</div>
           </div>
-        </div>
+        </section>
+
+        <section aria-label="Sync" className="nuru-glassmorphism rounded-[32px] p-8 mb-6 space-y-5">
+          <h2 className="text-[11px] font-bold text-text-tertiary uppercase tracking-[0.15em]">
+            Offline Sync
+          </h2>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-[13px] text-white font-medium">Pending audits</div>
+              <div className="text-xs text-text-secondary">
+                {pendingSync === 0 ? 'All synced' : `${pendingSync} waiting to upload`}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleDrain}
+              disabled={draining || pendingSync === 0}
+              className="bg-white/5 border border-white/10 text-white text-xs font-bold uppercase tracking-widest rounded-full px-5 py-3 cursor-pointer disabled:opacity-40 active:scale-[0.98] transition-all"
+            >
+              {draining ? 'Syncing…' : 'Sync now'}
+            </button>
+          </div>
+        </section>
+
+        <section aria-label="Security" className="nuru-glassmorphism rounded-[32px] p-8 mb-6 space-y-5">
+          <h2 className="text-[11px] font-bold text-text-tertiary uppercase tracking-[0.15em]">
+            Security
+          </h2>
+          <button
+            type="button"
+            onClick={handleResetPassword}
+            className="w-full text-left flex items-center justify-between bg-transparent border-none cursor-pointer font-inherit text-white hover:text-accent transition-colors"
+          >
+            <div>
+              <div className="text-[13px] font-medium">Reset password</div>
+              <div className="text-xs text-text-secondary">We'll email you a secure reset link</div>
+            </div>
+            <span aria-hidden className="text-text-tertiary">→</span>
+          </button>
+        </section>
 
         <button
           onClick={async () => {

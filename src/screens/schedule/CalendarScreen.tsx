@@ -55,42 +55,34 @@ const TYPE_ICONS: Record<EventType, string> = {
   deadline: 'flag',
 };
 
-// Fallback mock data when no real events are provided
-const FALLBACK_ACTIVITIES: DisplayActivity[] = [
-  {
-    id: 'mock-1',
-    title: 'Green Valley Farm Audit',
-    type: 'audit',
-    date: '12',
-    time: '10:00 AM',
-    location: 'California, US',
-    progress: 100,
-    color: '#BEF264',
-    icon: TYPE_ICONS.audit,
-    status: 'completed',
-    category: 'Farm',
-  },
-  {
-    id: 'mock-2',
-    title: 'Retail Store Inspection',
-    type: 'audit',
-    date: '12',
-    time: '02:00 PM',
-    location: 'Downtown Branch',
-    progress: 72,
-    color: '#67E8F9',
-    icon: TYPE_ICONS.training,
-    status: 'pending',
-    category: 'Store',
-  },
-];
+// No fallback activities — real empty state renders instead of mock data.
+const FALLBACK_ACTIVITIES: DisplayActivity[] = [];
 
-const DATES = [
-  { day: '10', label: 'MON' },
-  { day: '11', label: 'TUE' },
-  { day: '12', label: 'WED' },
-  { day: '13', label: 'THU' },
-  { day: '14', label: 'FRI' },
+const WEEKDAY_LABELS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+function buildCurrentWeek(): Array<{ day: string; label: string; iso: string }> {
+  // Monday-Friday of the current week (skip weekends for field ops).
+  const now = new Date();
+  const dayOfWeek = now.getDay(); // 0=Sun .. 6=Sat
+  const monday = new Date(now);
+  const daysFromMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  monday.setDate(now.getDate() + daysFromMonday);
+  const out: Array<{ day: string; label: string; iso: string }> = [];
+  for (let i = 0; i < 5; i += 1) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    out.push({
+      day: String(d.getDate()),
+      label: WEEKDAY_LABELS[d.getDay()] ?? '',
+      iso: d.toISOString().slice(0, 10),
+    });
+  }
+  return out;
+}
+
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
 const FILTERS = ['All', 'Completed', 'Pending'];
@@ -104,7 +96,10 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const [selectedDate, setSelectedDate] = useState<string>('12');
+  const currentWeek = useMemo(() => buildCurrentWeek(), []);
+  const todayDay = useMemo(() => String(new Date().getDate()), []);
+  const monthName = useMemo(() => MONTH_NAMES[new Date().getMonth()], []);
+  const [selectedDate, setSelectedDate] = useState<string>(todayDay);
   const [selectedFilter, setSelectedFilter] = useState<string>('All');
 
   // Convert real events into display activities, or fall back to mock data
@@ -177,13 +172,13 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
         {/* Horizontal Calendar Scroller */}
         <div className="px-8 pb-4">
           <div className="flex items-center text-text-secondary text-xs font-semibold tracking-widest uppercase">
-            <span className="text-white">February</span>
+            <span className="text-white">{monthName}</span>
           </div>
         </div>
 
         <div className="px-8 pb-10">
           <div className="flex gap-3 items-center">
-            {DATES.map((item, idx) => {
+            {currentWeek.map((item, idx) => {
               const isActive = item.day === selectedDate;
               return (
                 <button 

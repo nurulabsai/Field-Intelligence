@@ -9,6 +9,7 @@ import NuruBottomNav from './components/NuruBottomNav';
 import MobileNavDrawer from './components/MobileNavDrawer';
 import ToastProvider from './components/ToastProvider';
 import LoadingSkeleton from './components/LoadingSkeleton';
+import ErrorBoundary from './components/ErrorBoundary';
 import {
   WelcomeWrapper,
   LoginWrapper,
@@ -19,7 +20,7 @@ import {
   BusinessWizardWrapper,
   CalendarWrapper,
   SplashRedirect,
-  SettingsPlaceholder,
+  SettingsScreen,
 } from './containers';
 
 // Route-only lazy screens (no container wrapper)
@@ -153,7 +154,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <>
+    <ErrorBoundary>
       <ToastProvider />
       <Suspense fallback={<PageLoader />}>
         <Routes>
@@ -272,7 +273,7 @@ const App: React.FC = () => {
             element={
               <RequireAuth>
                 <AppShell>
-                  <SettingsPlaceholder />
+                  <SettingsScreen />
                 </AppShell>
               </RequireAuth>
             }
@@ -292,7 +293,7 @@ const App: React.FC = () => {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
-    </>
+    </ErrorBoundary>
   );
 };
 

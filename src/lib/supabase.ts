@@ -176,6 +176,14 @@ export const auth = {
     if (error) throw error;
   },
 
+  async resetPassword(email: string) {
+    const redirectTo = typeof window !== 'undefined'
+      ? `${window.location.origin}/auth/login`
+      : undefined;
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+    if (error) throw error;
+  },
+
   async getSession() {
     const { data, error } = await supabase.auth.getSession();
     if (error) throw error;

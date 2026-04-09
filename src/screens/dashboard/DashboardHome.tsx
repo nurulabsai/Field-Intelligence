@@ -162,47 +162,19 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
               {/* Stitch: glass-card rounded-vital p-6 with progress bars */}
               <div className="flex flex-col gap-4" role="list" aria-label="Ongoing audits">
                 {(!audits || audits.length === 0) && !isLoading && (
-                  <>
-                    <div className="nuru-glass-card rounded-[32px] p-6 flex items-center gap-4 active:scale-[0.98] transition-transform">
-                      <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
-                        <MaterialIcon name="devices" size={24} style={{ color: STITCH_DASH_CYAN }} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-end mb-3">
-                          <div>
-                            <h5 className="font-bold text-sm text-white truncate">Green Valley Farm</h5>
-                            <p className="text-xs text-text-secondary">Field Inspection</p>
-                          </div>
-                          <span className="text-sm font-light tracking-tight" style={{ color: STITCH_DASH_CYAN }}>
-                            50%
-                          </span>
-                        </div>
-                        <div className="w-full h-[6px] bg-white/[0.08] rounded-full overflow-hidden">
-                          <div className="h-full rounded-full w-1/2" style={{ backgroundColor: STITCH_DASH_CYAN }} />
-                        </div>
-                      </div>
+                  <div className="nuru-glass-card rounded-[32px] p-10 flex flex-col items-center gap-4 text-center">
+                    <div className="w-14 h-14 rounded-full bg-white/5 border border-white/5 flex items-center justify-center">
+                      <MaterialIcon name="inbox" size={28} className="text-text-tertiary" />
                     </div>
-
-                    <div className="nuru-glass-card rounded-[32px] p-6 flex items-center gap-4 active:scale-[0.98] transition-transform">
-                      <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
-                        <MaterialIcon name="dashboard" size={24} style={{ color: STITCH_DASH_PURPLE }} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-end mb-3">
-                          <div>
-                            <h5 className="font-bold text-sm text-white truncate">Downtown Retail</h5>
-                            <p className="text-xs text-text-secondary">Compliance Check</p>
-                          </div>
-                          <span className="text-sm font-light tracking-tight" style={{ color: STITCH_DASH_PURPLE }}>
-                            80%
-                          </span>
-                        </div>
-                        <div className="w-full h-[6px] bg-white/[0.08] rounded-full overflow-hidden">
-                          <div className="h-full rounded-full w-4/5" style={{ backgroundColor: STITCH_DASH_PURPLE }} />
-                        </div>
-                      </div>
+                    <div>
+                      <h5 className="font-heading font-light text-lg text-white tracking-tight mb-1">
+                        No audits yet
+                      </h5>
+                      <p className="text-xs text-text-secondary max-w-[260px]">
+                        Start your first audit from the <span className="text-accent font-medium">+</span> button below.
+                      </p>
                     </div>
-                  </>
+                  </div>
                 )}
 
                 {audits && audits.slice(0, 5).map((audit, index) => {
