@@ -53,7 +53,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
   return (
     <div className="min-h-screen bg-bg-primary font-base overflow-x-hidden">
 
-      <header className="flex items-center justify-between px-6 pt-12 pb-6">
+      <header className="flex items-center justify-between px-6 md:px-10 pt-12 pb-6 w-full md:max-w-5xl md:mx-auto">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -75,7 +75,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
         </button>
       </header>
 
-      <main className="flex-1 px-6 flex flex-col gap-8 pb-40">
+      <main className="flex-1 px-6 md:px-10 flex flex-col gap-8 pb-40 w-full md:max-w-5xl md:mx-auto">
 
         {stressAlert && (
           <div className="bg-amber-500/10 border border-amber-500/20 rounded-[20px] px-5 py-3.5 flex items-center gap-3" role="alert">
@@ -98,11 +98,11 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
               </h2>
             </section>
 
-            {/* Stitch: grid grid-cols-2 gap-4 h-80 */}
-            <section className="grid grid-cols-2 gap-4 h-80" aria-label="Audit statistics">
+            {/* Stitch: grid grid-cols-2 gap-4 h-80; on md+ becomes 4 equal cards */}
+            <section className="grid grid-cols-2 md:grid-cols-4 gap-4 h-80 md:h-56" aria-label="Audit statistics">
               {/* Stitch home_2: bg-primary #d1fa7d (display lime), icon text-primary on black */}
               <div
-                className="rounded-[32px] p-8 flex flex-col justify-between items-center text-center text-slate-900 nuru-soft-shadow relative overflow-hidden active:scale-95 transition-transform border border-white/5"
+                className="md:col-span-2 rounded-[32px] p-8 flex flex-col justify-between items-center text-center text-slate-900 nuru-soft-shadow relative overflow-hidden active:scale-95 transition-transform border border-white/5"
                 style={{ backgroundColor: STITCH_DASH_LIME }}
               >
                 <div className="w-14 h-14 bg-black rounded-full flex items-center justify-center nuru-soft-shadow shrink-0">
@@ -117,8 +117,8 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                 </div>
               </div>
 
-              {/* Stitch: flex flex-col gap-4 h-full */}
-              <div className="flex flex-col gap-4 h-full">
+              {/* Stitch: flex flex-col gap-4 h-full; md:contents hoists children into grid row */}
+              <div className="flex flex-col gap-4 h-full md:contents">
                 <div
                   className="flex-1 rounded-[32px] p-6 flex flex-col justify-between items-center text-center text-slate-900 nuru-soft-shadow active:scale-95 transition-transform border border-white/5"
                   style={{ backgroundColor: STITCH_DASH_CYAN }}
