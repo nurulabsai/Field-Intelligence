@@ -239,14 +239,18 @@
 
 /* =========================================================================
    Global Resets
+   Wrapped in @layer base so Tailwind utilities (@layer utilities) win.
+   Unlayered `margin: 0` on `*` defeats every md:/lg: responsive margin class.
    ========================================================================= */
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 html {

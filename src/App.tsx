@@ -120,7 +120,9 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <div className="flex-1 flex flex-col min-h-screen pb-[100px] md:pb-0 md:ml-[260px]">
         <OfflineBanner />
         <main className="flex-1 overflow-auto">
-          {children}
+          <div className="w-full max-w-screen-2xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
 

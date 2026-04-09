@@ -7,7 +7,7 @@ const TypeSelectionScreen: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-bg-primary font-base px-6 pt-16 pb-32">
-      <div className="w-full max-w-lg mx-auto">
+      <div className="w-full max-w-2xl mx-auto">
         
         {/* Header Section */}
         <div className="flex justify-between items-center mb-8 px-2">
