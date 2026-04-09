@@ -63,14 +63,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
         <div className="bg-white/5 p-1 rounded-full flex mb-8">
           <button
             type="button"
-            className="flex-1 py-3 text-sm font-bold rounded-full bg-accent text-black transition-all border-none cursor-pointer uppercase"
+            className="flex-1 min-h-11 py-3 text-sm font-bold rounded-full bg-accent text-black transition-all border-none cursor-pointer uppercase"
           >
             Sign In
           </button>
           <button
             type="button"
             onClick={onNavigateToSignUp}
-            className="flex-1 py-3 text-sm font-bold rounded-full text-text-tertiary transition-all cursor-pointer bg-transparent border-none uppercase"
+            className="flex-1 min-h-11 py-3 text-sm font-bold rounded-full text-text-tertiary transition-all cursor-pointer bg-transparent border-none uppercase"
           >
             Sign Up
           </button>
@@ -128,7 +128,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
             <button
               type="button"
               onClick={onForgotPassword}
-              className="text-xs font-semibold text-cyan tracking-wide hover:opacity-80 transition-opacity font-base bg-transparent border-none cursor-pointer"
+              className="text-xs font-semibold text-cyan tracking-wide hover:opacity-80 transition-opacity font-base bg-transparent border-none cursor-pointer min-h-11 px-2 -mx-2"
             >
               Forgot Password?
             </button>
@@ -188,7 +188,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
         <div className="mt-8 mb-8 text-center">
           <p className="text-xs text-text-tertiary font-medium font-base">
             Don&apos;t have an account?{' '}
-            <button type="button" onClick={onNavigateToSignUp} className="text-cyan font-bold ml-1 hover:underline transition-all bg-transparent border-none cursor-pointer">
+            <button type="button" onClick={onNavigateToSignUp} className="text-cyan font-bold ml-1 hover:underline transition-all bg-transparent border-none cursor-pointer inline-flex items-center min-h-11 px-2">
               Sign Up
             </button>
           </p>

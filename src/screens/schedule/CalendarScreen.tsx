@@ -264,9 +264,9 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
             )}
 
             {error && !isLoading && (
-              <div className="text-center py-10 bg-red-500/5 border border-red-500/10 rounded-[32px]">
-                <p className="text-red-400 text-[14px] tracking-wide mb-2">{error}</p>
-                <p className="text-text-secondary text-[12px]">Showing offline data</p>
+              <div className="text-center py-6 bg-warning/5 border border-warning/15 rounded-[32px]">
+                <p className="text-warning text-[14px] tracking-wide mb-1">Can't reach the server</p>
+                <p className="text-text-secondary text-[12px]">Showing your last synced schedule.</p>
               </div>
             )}
 

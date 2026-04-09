@@ -54,7 +54,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNavigateToLogin, onNavi
         </div>
 
         {/* Title — Stitch spec: text-[44px] font-sora font-light */}
-        <h1 className="text-[44px] font-heading font-light tracking-tight mb-6 text-center leading-none text-white">
+        <h1 className="text-[44px] font-heading font-normal md:font-light tracking-tight mb-6 text-center leading-none text-white">
           Nuru<span className="text-accent" style={{ textShadow: '0 0 12px rgba(190,242,100,0.5)' }}>OS</span>
         </h1>
 

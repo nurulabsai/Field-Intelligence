@@ -126,12 +126,14 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </main>
       </div>
 
-      {/* Mobile Bottom Nav */}
-      <NuruBottomNav
-        currentPath={location.pathname}
-        onNavigate={handleNavigate}
-        onFabPress={() => handleNavigate('/audit/new')}
-      />
+      {/* Mobile Bottom Nav — hidden mid-audit to avoid FAB/Next-button collisions */}
+      {!location.pathname.startsWith('/audit/wizard') && (
+        <NuruBottomNav
+          currentPath={location.pathname}
+          onNavigate={handleNavigate}
+          onFabPress={() => handleNavigate('/audit/new')}
+        />
+      )}
     </div>
   );
 };
@@ -402,11 +404,10 @@ const DashboardWrapper: React.FC = () => {
         })));
       })
       .catch(() => {
-        setStressAlert('Live dashboard data is currently unavailable. Showing fallback content.');
+        setStressAlert("Can't reach the server. Showing your last synced data.");
         setAudits(undefined);
         setPrices(undefined);
         setStats(undefined);
-        addToast({ type: 'warning', message: 'Failed to load live dashboard data.' });
       })
       .finally(() => setIsLoading(false));
   }, [user?.id, addToast]);
@@ -827,7 +828,7 @@ const SettingsPlaceholder: React.FC = () => {
             await signOut();
             navigate('/auth/login');
           }}
-          className="w-full py-4 px-6 bg-error/10 text-error border border-error/20 rounded-full text-sm font-bold uppercase tracking-[0.1em] cursor-pointer font-base active:scale-[0.98] transition-all"
+          className="w-full py-4 px-6 bg-transparent text-white/70 hover:text-white hover:bg-white/5 border border-white/10 rounded-full text-sm font-bold uppercase tracking-[0.1em] cursor-pointer font-base active:scale-[0.98] transition-all"
         >
           Sign Out
         </button>

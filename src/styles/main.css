@@ -68,6 +68,11 @@
   --font-heading: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-base: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+  /* Override Tailwind's default ui-sans-serif stack so any element without an
+     explicit font class inherits Manrope instead of the browser default. */
+  --default-font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
 /* =========================================================================

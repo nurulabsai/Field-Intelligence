@@ -64,19 +64,21 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
       
       {/* Top Header Section */}
       <div className="pt-10 px-6 pb-8 shrink-0">
-        <button 
-          onClick={onNavigateToLogin}
-          className="w-10 h-10 rounded-full bg-[#1A1F2E] flex items-center justify-center border border-white/5 cursor-pointer hover:bg-white/5 transition-colors text-white"
-        >
-          <MaterialIcon name="chevron_left" size={18} className="ml-[-1px]" />
-        </button>
+        <div className="w-full max-w-[480px] mx-auto">
+          <button
+            onClick={onNavigateToLogin}
+            className="w-10 h-10 rounded-full bg-[#1A1F2E] flex items-center justify-center border border-white/5 cursor-pointer hover:bg-white/5 transition-colors text-white"
+          >
+            <MaterialIcon name="chevron_left" size={18} className="ml-[-1px]" />
+          </button>
 
-        <h1 className="text-[36px] font-medium text-white font-heading tracking-tight mt-8 mb-2 leading-tight">
-          Create an Account
-        </h1>
-        <p className="text-white/45 text-[15px] font-medium pr-10">
-          Sign up to access NuruOS Field Intelligence tools.
-        </p>
+          <h1 className="text-[36px] font-medium text-white font-heading tracking-tight mt-8 mb-2 leading-tight">
+            Create an Account
+          </h1>
+          <p className="text-white/45 text-[15px] font-medium pr-10">
+            Sign up to access NuruOS Field Intelligence tools.
+          </p>
+        </div>
       </div>
 
       {/* Main Form Card */}
@@ -87,13 +89,13 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
           <button 
             type="button" 
             onClick={onNavigateToLogin}
-            className="flex-1 py-3.5 rounded-full text-[14px] font-medium tracking-wide text-white/50 transition-colors cursor-pointer hover:text-white bg-transparent border-none"
+            className="flex-1 min-h-11 py-3.5 rounded-full text-[14px] font-medium tracking-wide text-white/50 transition-colors cursor-pointer hover:text-white bg-transparent border-none"
           >
             Sign In
           </button>
-          <button 
-            type="button" 
-            className="flex-1 py-3.5 rounded-full text-[14px] font-semibold tracking-wide text-[#121623] transition-colors cursor-pointer bg-accent shadow-[0_0_15px_rgba(190,242,100,0.1)] border-none"
+          <button
+            type="button"
+            className="flex-1 min-h-11 py-3.5 rounded-full text-[14px] font-semibold tracking-wide text-[#121623] transition-colors cursor-pointer bg-accent shadow-[0_0_15px_rgba(190,242,100,0.1)] border-none"
           >
             Sign Up
           </button>

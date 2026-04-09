@@ -27,9 +27,9 @@ const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
   onNavigate,
 }) => {
   return (
-    <nav className="nuru-bottom-nav">
+    <nav className="nuru-bottom-nav md:hidden">
       <div
-        className="fixed bottom-8 left-6 right-6 z-[100] bg-black rounded-full p-2 shadow-2xl shadow-black/20 flex items-center justify-between"
+        className="fixed bottom-8 left-6 right-6 z-[100] bg-black rounded-full p-2 shadow-2xl shadow-black/20 flex items-center justify-between md:hidden"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0)' }}
       >
         {navItems.map((item) => {
