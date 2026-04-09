@@ -25,7 +25,7 @@ interface DisplayActivity {
   location: string;
   progress: number;
   color: string;
-  imageUrl: string;
+  icon: string;
   status: 'completed' | 'pending';
   category: string;
 }
@@ -47,11 +47,12 @@ const TYPE_COLORS: Record<EventType, string> = {
   deadline: '#FBBF24',
 };
 
-const TYPE_IMAGES: Record<EventType, string> = {
-  audit: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD89wQuvoLzpExUZevyZsMgZx7IUaVmO0wH6ukF0PjBPl2lNgL1_zwpTkQQU5TgiLVUPjX69H-8pxBSY4flCkfeu3BPZJKnHmGJ8a65Y_0YWKWqCF5oGiHBrVkTAchQJ_HnqjjoqPqHLzj3nsruOzckDhWomkL_JwxKU2DPYVn47qe6Ndi33arHSuDX72KOlVrBMzB_lf62HnaP4kkNDgvqVa6k4dZt428Nq0iUuk-SFQ4ggq6CKrh4Q8PhEW_RUoW9iZWAgk_8qvuW',
-  training: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDcGErLNv0-42J33KKgOm8k2KtmUvcmUufl7U9ZSucXIsKv_DvEGes4HfF3xW6lf-adjl6hBvmcZrTtMmyUftfZBfWwjG6bNHZK7YKUcqKFHgqXfaW5AQKQ-W7KoJWiZYcHPrOkjIB5ylnm6ScbJ-VqAn2ls0s3Z3NsddaAIx9AHikPnXAkw30tkpmbFiFycLzFf6cBE3HJbaWXEGnMeRRLpfqapWPZ8Xt3PFyg1TdaSnV2su3f5XkCyTYa6aNjW7N9n6wxtV958cNY',
-  meeting: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDgzG3aOGeeO_xElNR0xwi3nB5064c1LuPKV68jILXcXK-lg0ldPkwJZKhCUVu-NfEhuybJKX2XYRzPSMAKyPyEbKt-uYXYhYjSDZ9h-La8YpIM4mY5vy0MsJLC3T_LEUgDsO7r3g8CGG1RjlnKsTHwYKi1a5CvVH-f2U76gGC5VOW_d-ou1Cc16fnoIIbT5JhnWhx8_ofSqQSxDWtdTKQ4b-B4IddbE5kO4S5pOaHM0smRrx58FyefvXzgEpWXCErbqJ8WkNwAtKUb',
-  deadline: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD89wQuvoLzpExUZevyZsMgZx7IUaVmO0wH6ukF0PjBPl2lNgL1_zwpTkQQU5TgiLVUPjX69H-8pxBSY4flCkfeu3BPZJKnHmGJ8a65Y_0YWKWqCF5oGiHBrVkTAchQJ_HnqjjoqPqHLzj3nsruOzckDhWomkL_JwxKU2DPYVn47qe6Ndi33arHSuDX72KOlVrBMzB_lf62HnaP4kkNDgvqVa6k4dZt428Nq0iUuk-SFQ4ggq6CKrh4Q8PhEW_RUoW9iZWAgk_8qvuW',
+// Offline-safe: use Material icons (already bundled) instead of CDN thumbnails.
+const TYPE_ICONS: Record<EventType, string> = {
+  audit: 'fact_check',
+  training: 'school',
+  meeting: 'groups',
+  deadline: 'flag',
 };
 
 // Fallback mock data when no real events are provided
@@ -65,7 +66,7 @@ const FALLBACK_ACTIVITIES: DisplayActivity[] = [
     location: 'California, US',
     progress: 100,
     color: '#BEF264',
-    imageUrl: TYPE_IMAGES.audit,
+    icon: TYPE_ICONS.audit,
     status: 'completed',
     category: 'Farm',
   },
@@ -78,7 +79,7 @@ const FALLBACK_ACTIVITIES: DisplayActivity[] = [
     location: 'Downtown Branch',
     progress: 72,
     color: '#67E8F9',
-    imageUrl: TYPE_IMAGES.training,
+    icon: TYPE_ICONS.training,
     status: 'pending',
     category: 'Store',
   },
@@ -113,7 +114,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
         const evDate = new Date(ev.date);
         const dayStr = String(evDate.getDate());
         const color = TYPE_COLORS[ev.type] || '#BEF264';
-        const image = TYPE_IMAGES[ev.type] || TYPE_IMAGES.audit;
+        const icon = TYPE_ICONS[ev.type] || TYPE_ICONS.audit;
         return {
           id: ev.id,
           title: ev.title,
@@ -123,7 +124,7 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
           location: ev.location || ev.notes || '',
           progress: ev.type === 'deadline' ? 0 : 50,
           color,
-          imageUrl: image,
+          icon,
           status: 'pending' as const,
           category: ev.type.charAt(0).toUpperCase() + ev.type.slice(1),
         };
@@ -283,12 +284,15 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
                 className="nuru-vital-card rounded-[32px] p-8 flex flex-col relative overflow-hidden cursor-pointer group"
               >
                 <div className="flex gap-6">
-                  <div className="w-20 h-20 rounded-[24px] bg-zinc-900/50 overflow-hidden shrink-0 flex items-center justify-center border border-white/5">
-                    <img 
-                      alt="Audit Thumbnail" 
-                      className="w-full h-full object-cover opacity-70" 
-                      src={activity.imageUrl} 
-                    />
+                  <div
+                    className="w-20 h-20 rounded-[24px] overflow-hidden shrink-0 flex items-center justify-center border"
+                    style={{
+                      backgroundColor: `${activity.color}1A`,
+                      borderColor: `${activity.color}33`,
+                    }}
+                    aria-hidden="true"
+                  >
+                    <MaterialIcon name={activity.icon} size={32} style={{ color: activity.color }} />
                   </div>
                   <div className="flex-1 flex flex-col justify-center">
                     <h4 className="font-heading font-semibold text-[20px] text-white leading-snug">
