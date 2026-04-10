@@ -45,7 +45,7 @@ const NuruAvatar: React.FC<NuruAvatarProps> = ({
     overflow: 'hidden',
     backgroundColor: 'var(--color-bg-input, #252525)',
     color: '#FFFFFF',
-    fontFamily: 'Inter, sans-serif',
+    fontFamily: "var(--font-family-base, 'Manrope', sans-serif)",
     fontWeight: 600,
     fontSize: `${fontSizeMap[size]}px`,
     flexShrink: 0,

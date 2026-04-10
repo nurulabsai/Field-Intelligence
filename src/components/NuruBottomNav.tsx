@@ -27,7 +27,7 @@ const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
   onNavigate,
 }) => {
   return (
-    <nav className="nuru-bottom-nav md:hidden">
+    <nav className="md:hidden">
       <div
         className="fixed bottom-8 left-6 right-6 z-[100] bg-black rounded-full p-2 shadow-2xl shadow-black/20 flex items-center justify-between md:hidden"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0)' }}
@@ -40,7 +40,7 @@ const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
               <button
                 key={item.id}
                 onClick={() => onNavigate(item.path)}
-                className="w-12 h-12 flex items-center justify-center bg-accent rounded-full text-white border-none cursor-pointer active:scale-95 transition-transform outline-none shadow-lg shadow-accent/20"
+                className="w-12 h-12 flex items-center justify-center bg-accent rounded-full text-black border-none cursor-pointer active:scale-95 transition-transform outline-none shadow-lg shadow-accent/20"
               >
                 <MaterialIcon name={item.iconName} size={24} />
               </button>
@@ -61,13 +61,6 @@ const NuruBottomNav: React.FC<NuruBottomNavProps> = ({
         })}
       </div>
 
-      <style>{`
-        @media (min-width: 768px) {
-          .nuru-bottom-nav {
-            display: none !important;
-          }
-        }
-      `}</style>
     </nav>
   );
 };

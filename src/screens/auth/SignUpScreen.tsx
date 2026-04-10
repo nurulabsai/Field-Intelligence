@@ -57,7 +57,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
 
   if (submittedEmail) {
     return (
-      <div className="min-h-screen bg-[#0B0F19] flex flex-col items-center justify-center font-base overflow-x-hidden relative text-white px-6">
+      <div className="min-h-screen bg-bg-primary flex flex-col items-center justify-center font-base overflow-x-hidden relative text-white px-6">
         <div className="w-full max-w-[420px] text-center">
           <div className="w-16 h-16 rounded-full bg-accent/10 border border-accent/20 mx-auto mb-6 flex items-center justify-center">
             <MaterialIcon name="mark_email_read" size={32} className="text-accent" />
@@ -83,14 +83,14 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] flex flex-col font-base overflow-x-hidden relative text-white">
+    <div className="min-h-screen bg-bg-primary flex flex-col font-base overflow-x-hidden relative text-white">
       
       {/* Top Header Section */}
       <div className="pt-10 px-6 pb-8 shrink-0">
         <div className="w-full max-w-[480px] mx-auto">
           <button
             onClick={onNavigateToLogin}
-            className="w-10 h-10 rounded-full bg-[#1A1F2E] flex items-center justify-center border border-white/5 cursor-pointer hover:bg-white/5 transition-colors text-white"
+            className="w-10 h-10 rounded-full bg-bg-tertiary flex items-center justify-center border border-white/5 cursor-pointer hover:bg-white/5 transition-colors text-white"
           >
             <MaterialIcon name="chevron_left" size={18} className="ml-[-1px]" />
           </button>
@@ -105,10 +105,10 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
       </div>
 
       {/* Main Form Card */}
-      <div className="bg-[#121623]/60 backdrop-blur-xl rounded-t-[36px] flex-1 border-t border-white/[0.04] p-6 pt-8 pb-10 flex flex-col items-center">
+      <div className="bg-bg-card/60 backdrop-blur-xl rounded-t-[36px] flex-1 border-t border-white/[0.04] p-6 pt-8 pb-10 flex flex-col items-center">
         
         {/* Animated Segmented Controller */}
-        <div className="bg-[#070A0F] rounded-full flex items-center p-1.5 w-full max-w-[340px] mb-10 shadow-inner">
+        <div className="bg-bg-dark rounded-full flex items-center p-1.5 w-full max-w-[340px] mb-10 shadow-inner">
           <button 
             type="button" 
             onClick={onNavigateToLogin}
@@ -118,13 +118,13 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
           </button>
           <button
             type="button"
-            className="flex-1 min-h-11 py-3.5 rounded-full text-[14px] font-semibold tracking-wide text-[#121623] transition-colors cursor-pointer bg-accent shadow-[0_0_15px_rgba(190,242,100,0.1)] border-none"
+            className="flex-1 min-h-11 py-3.5 rounded-full text-[14px] font-semibold tracking-wide text-bg-primary transition-colors cursor-pointer bg-accent shadow-[0_0_15px_rgba(190,242,100,0.1)] border-none"
           >
             Sign Up
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="w-full flex justify-center w-full">
+        <form onSubmit={handleSubmit} className="w-full flex justify-center">
           <div className="w-full max-w-[340px]">
             
             {/* Split Name Fields */}
@@ -138,7 +138,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
                   value={firstName}
                   onChange={e => setFirstName(e.target.value)}
                   placeholder="Jonathan"
-                  className="w-full bg-[#0B0F19] border border-white/[0.04] rounded-[16px] px-5 py-4 text-white text-[15px] outline-none transition-colors focus:border-white/20 placeholder:text-white/20 font-light"
+                  className="w-full bg-bg-primary border border-white/[0.04] rounded-[16px] px-5 py-4 text-white text-[15px] outline-none transition-colors focus:border-white/20 placeholder:text-white/20 font-light"
                 />
               </div>
               <div>
@@ -150,7 +150,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
                   value={lastName}
                   onChange={e => setLastName(e.target.value)}
                   placeholder="Smith"
-                  className="w-full bg-[#0B0F19] border border-white/[0.04] rounded-[16px] px-5 py-4 text-white text-[15px] outline-none transition-colors focus:border-white/20 placeholder:text-white/20 font-light"
+                  className="w-full bg-bg-primary border border-white/[0.04] rounded-[16px] px-5 py-4 text-white text-[15px] outline-none transition-colors focus:border-white/20 placeholder:text-white/20 font-light"
                 />
               </div>
             </div>
@@ -165,7 +165,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="jonathansmith76@gmail.com"
-                className="w-full bg-[#0B0F19] border border-white/[0.04] rounded-[16px] px-5 py-4 text-white text-[15px] outline-none transition-colors focus:border-white/20 placeholder:text-white/20 font-light"
+                className="w-full bg-bg-primary border border-white/[0.04] rounded-[16px] px-5 py-4 text-white text-[15px] outline-none transition-colors focus:border-white/20 placeholder:text-white/20 font-light"
               />
             </div>
 
@@ -180,7 +180,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full bg-[#0B0F19] border border-white/[0.04] rounded-[16px] px-5 py-4 pr-12 text-white text-[15px] outline-none transition-colors focus:border-white/20 placeholder:text-white/20 tracking-[0.2em]"
+                  className="w-full bg-bg-primary border border-white/[0.04] rounded-[16px] px-5 py-4 pr-12 text-white text-[15px] outline-none transition-colors focus:border-white/20 placeholder:text-white/20 tracking-[0.2em]"
                 />
                 <button
                   type="button"
@@ -205,7 +205,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
                   value={confirmPassword}
                   onChange={e => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter password"
-                  className="w-full bg-[#0B0F19] border border-white/[0.04] rounded-[16px] px-5 py-4 pr-12 text-white text-[15px] outline-none transition-colors focus:border-white/20 placeholder:text-white/20 font-light placeholder:font-light"
+                  className="w-full bg-bg-primary border border-white/[0.04] rounded-[16px] px-5 py-4 pr-12 text-white text-[15px] outline-none transition-colors focus:border-white/20 placeholder:text-white/20 font-light placeholder:font-light"
                 />
                 <button
                   type="button"
@@ -220,7 +220,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
             </div>
 
             {submitError && (
-              <div className="mb-6 bg-red-500/10 border border-red-500/20 text-red-500 rounded-[12px] px-4 py-3 text-sm text-center">
+              <div className="mb-6 bg-error/10 border border-error/20 text-error rounded-2xl px-4 py-3 text-sm text-center">
                 {submitError}
               </div>
             )}
@@ -229,7 +229,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-[58px] rounded-full bg-accent text-[#0B0F19] text-[13px] font-bold tracking-[0.1em] uppercase flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_30px_rgba(190,242,100,0.2)] transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 border-none mb-10"
+              className="w-full h-[58px] rounded-full bg-accent text-black text-[13px] font-bold tracking-[0.1em] uppercase flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_30px_rgba(190,242,100,0.2)] transition-transform active:scale-95 disabled:opacity-50 border-none mb-10"
             >
               {loading ? 'Creating...' : 'Register'}
               <MaterialIcon name="arrow_forward" size={18} className="ml-0.5" />
@@ -237,21 +237,20 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
 
             {/* Social Separator */}
             <div className="flex items-center gap-4 mb-8">
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent to-[#181F30]" />
-              <span className="text-[10px] font-bold tracking-[0.15em] text-[#344160] uppercase">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent to-border" />
+              <span className="text-[10px] font-bold tracking-[0.15em] text-text-tertiary uppercase">
                 Or Register With
               </span>
-              <div className="flex-1 h-px bg-gradient-to-l from-transparent to-[#181F30]" />
+              <div className="flex-1 h-px bg-gradient-to-l from-transparent to-border" />
             </div>
 
             {/* Social Buttons */}
             <div className="grid grid-cols-2 gap-4 mb-10">
-              <button type="button" className="flex items-center justify-center gap-2.5 h-[50px] rounded-full border border-white/[0.04] bg-[#0B0F19] hover:bg-white/5 transition-colors cursor-pointer disabled:opacity-50">
-                <div className="w-[18px] h-[18px] bg-[#67718A] rounded-[3px] opacity-70" />
+              <button type="button" disabled className="flex items-center justify-center gap-2.5 h-[50px] rounded-full border border-white/[0.04] bg-bg-primary transition-colors cursor-not-allowed opacity-50">
+                <div className="w-[18px] h-[18px] bg-text-tertiary rounded-[3px] opacity-70" />
                 <span className="text-white text-[13px] font-medium pr-1">Google</span>
               </button>
-              <button type="button" className="flex items-center justify-center gap-2.5 h-[50px] rounded-full border border-white/[0.04] bg-[#0B0F19] hover:bg-white/5 transition-colors cursor-pointer disabled:opacity-50">
-                {/* Mock Apple glow logo using divs */}
+              <button type="button" disabled className="flex items-center justify-center gap-2.5 h-[50px] rounded-full border border-white/[0.04] bg-bg-primary transition-colors cursor-not-allowed opacity-50">
                 <div className="w-[18px] h-[18px] bg-gradient-to-tl from-purple-500 to-[#0B0F19] rounded-full flex items-center justify-center p-0.5 opacity-80 shadow-[0_0_8px_rgba(168,85,247,0.4)]">
                   <div className="w-full h-full bg-[#121623] rounded-full flex items-center justify-center">
                     <div className="w-1.5 h-1.5 bg-white/70 rounded-full" />
@@ -260,6 +259,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
                 <span className="text-white text-[13px] font-medium pr-1">Apple</span>
               </button>
             </div>
+            <p className="text-center text-[10px] text-white/30 -mt-6 mb-6">Social login coming soon</p>
 
             {/* Bottom Login Link */}
             <p className="text-center text-[13px] text-white/40 mb-2">
@@ -267,7 +267,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
               <button 
                 type="button"
                 onClick={onNavigateToLogin}
-                className="bg-transparent border-none p-0 ml-1 text-[#67E8F9] font-medium hover:underline cursor-pointer"
+                className="bg-transparent border-none p-0 ml-1 text-cyan font-medium hover:underline cursor-pointer"
               >
                 Sign In
               </button>

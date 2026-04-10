@@ -64,7 +64,7 @@ const TypeSelectionScreen: React.FC = () => {
             {/* Action Button */}
             <button 
               onClick={() => navigate('/audit/wizard/farm')}
-              className="w-full bg-accent hover:bg-accent-light text-text-inverse font-bold text-[16px] py-[18px] rounded-full shadow-glow-accent transition-all active:scale-[0.98] cursor-pointer"
+              className="w-full bg-accent hover:bg-accent-light text-black font-bold text-[16px] py-[18px] rounded-full shadow-glow-accent transition-all active:scale-[0.98] cursor-pointer border-none"
             >
               Start Farm Audit
             </button>
@@ -95,8 +95,8 @@ const TypeSelectionScreen: React.FC = () => {
             {/* Avatars & Stats */}
             <div className="flex items-center gap-3 mb-8">
               <div className="flex -space-x-2 shrink-0">
-                <div className="w-8 h-8 rounded-full border-2 border-bg-card bg-gradient-to-tr from-orange-200 to-amber-400 overflow-hidden z-20">
-                   <img src="https://i.pravatar.cc/100?img=11" alt="avatar" className="w-full h-full object-cover" />
+                <div className="w-8 h-8 rounded-full border-2 border-bg-card bg-gradient-to-tr from-orange-200 to-amber-400 overflow-hidden z-20 flex items-center justify-center">
+                   <MaterialIcon name="person" size={14} className="text-black/50" />
                 </div>
                 <div className="w-8 h-8 rounded-full border-2 border-bg-card bg-bg-tertiary flex items-center justify-center z-10">
                   <span className="text-cyan text-[10px] font-bold">AJ</span>
@@ -110,7 +110,7 @@ const TypeSelectionScreen: React.FC = () => {
             {/* Action Button */}
             <button 
               onClick={() => navigate('/audit/wizard/business')}
-              className="w-full bg-cyan hover:bg-cyan-light text-text-inverse font-bold text-[16px] py-[18px] rounded-full nuru-glow-cyan transition-all active:scale-[0.98] cursor-pointer"
+              className="w-full bg-cyan hover:bg-cyan-light text-black font-bold text-[16px] py-[18px] rounded-full nuru-glow-cyan transition-all active:scale-[0.98] cursor-pointer border-none"
             >
               Start Business Audit
             </button>

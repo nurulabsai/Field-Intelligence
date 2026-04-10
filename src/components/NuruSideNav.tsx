@@ -31,7 +31,7 @@ const NuruSideNav: React.FC<NuruSideNavProps> = ({
 }) => {
   return (
     <aside
-      className="nuru-side-nav w-[260px] h-screen fixed left-0 top-0 nuru-glass-card border-r border-border-glass flex flex-col font-base z-40"
+      className="hidden md:flex w-[260px] h-screen fixed left-0 top-0 nuru-glass-card border-r border-border-glass flex-col font-base z-40"
     >
       {/* Logo */}
       <div className="py-6 px-5 border-b border-border-glass">
@@ -87,13 +87,6 @@ const NuruSideNav: React.FC<NuruSideNavProps> = ({
         </button>
       </div>
 
-      <style>{`
-        @media (max-width: 767px) {
-          .nuru-side-nav {
-            display: none !important;
-          }
-        }
-      `}</style>
     </aside>
   );
 };

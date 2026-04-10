@@ -50,7 +50,7 @@ const ToastItem: React.FC<{ toast: Toast; onDismiss: () => void }> = ({
 
   return (
     <div
-      className="bg-[rgba(30,30,30,0.95)] backdrop-blur-[12px] rounded-xl py-3 px-4 flex items-center justify-between gap-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] max-w-[420px] w-full font-[Inter,sans-serif] transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+      className="bg-bg-glass backdrop-blur-[12px] rounded-2xl py-3 px-4 flex items-center justify-between gap-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] max-w-[420px] w-full font-base transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] border border-border-glass"
       style={{
         borderLeft: `4px solid ${borderColors[t.type]}`,
         transform: isVisible && !isExiting ? 'translateY(0)' : 'translateY(-20px)',

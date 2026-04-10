@@ -16,13 +16,13 @@ const STEPS: StepItem[] = [
 const AuditErrorState: React.FC = () => {
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] flex flex-col font-base overflow-x-hidden relative">
+    <div className="min-h-screen bg-bg-primary flex flex-col font-base overflow-x-hidden relative">
       <div className="flex-1 overflow-y-auto px-6 pt-14 pb-40">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl overflow-hidden ring-1 ring-white/5 shadow-2xl bg-[#151924] flex items-center justify-center shrink-0">
+              <div className="w-14 h-14 rounded-2xl overflow-hidden ring-1 ring-white/5 shadow-2xl bg-bg-card flex items-center justify-center shrink-0">
               <span className="text-2xl">🇰🇷</span>
             </div>
             <div>
@@ -31,8 +31,8 @@ const AuditErrorState: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="bg-[#FFBF00] px-4 py-1.5 rounded-full">
-              <span className="text-[9px] font-bold text-[#0B0F19] uppercase tracking-[0.1em] block leading-none">
+            <div className="bg-warning px-4 py-1.5 rounded-full">
+              <span className="text-[9px] font-bold text-black uppercase tracking-[0.1em] block leading-none">
                 Action Required
               </span>
             </div>
@@ -61,16 +61,16 @@ const AuditErrorState: React.FC = () => {
               return (
                 <div
                   key={step.label}
-                  className="flex items-start gap-5 p-6 bg-[#FF4B4B]/5 rounded-[32px] border border-[#FF4B4B]/10"
+                  className="flex items-start gap-5 p-6 bg-error/5 rounded-[32px] border border-error/10"
                 >
-                  <div className="w-6 h-6 rounded-full bg-[#FF4B4B] flex items-center justify-center z-10 shrink-0 mt-0.5">
+                  <div className="w-6 h-6 rounded-full bg-error flex items-center justify-center z-10 shrink-0 mt-0.5">
                     <MaterialIcon name="warning" size={14} className="text-white" />
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-center">
                       <div>
                         <h3 className="text-sm font-medium text-white">{step.label}</h3>
-                        <p className="text-[10px] text-[#FF4B4B] uppercase font-bold tracking-widest">{step.subtitle}</p>
+                        <p className="text-[10px] text-error uppercase font-bold tracking-widest">{step.subtitle}</p>
                       </div>
                       <MaterialIcon name="visibility_off" size={16} className="text-white/30" />
                     </div>
@@ -110,7 +110,7 @@ const AuditErrorState: React.FC = () => {
         <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/5 rounded-[32px] p-8 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.4)] space-y-8">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-light text-white tracking-tight font-heading">Passport Information</h2>
-            <div className="flex items-center text-[#FF4B4B] gap-1.5">
+            <div className="flex items-center text-error gap-1.5">
               <span className="text-[9px] font-bold uppercase tracking-[0.15em]">Declined</span>
               <MaterialIcon name="error" size={16} />
             </div>
@@ -168,15 +168,15 @@ const AuditErrorState: React.FC = () => {
               </label>
 
               {/* Errored file pill */}
-              <div className="flex items-center justify-between bg-[#FF4B4B]/5 border border-[#FF4B4B]/20 rounded-full py-4 px-6">
+              <div className="flex items-center justify-between bg-error/5 border border-error/20 rounded-full py-4 px-6">
                 <span className="text-sm font-medium text-white/90">passport_maria_kz.pdf</span>
-                <MaterialIcon name="cancel" size={20} className="text-[#FF4B4B] cursor-pointer" />
+                <MaterialIcon name="cancel" size={20} className="text-error cursor-pointer" />
               </div>
 
               {/* Error message box */}
-              <div className="flex items-start gap-3 bg-[#FF4B4B]/10 p-5 rounded-3xl">
-                <MaterialIcon name="error" size={18} className="text-[#FF4B4B] mt-0.5 shrink-0" />
-                <p className="text-[11px] leading-relaxed text-[#FF4B4B] font-medium">
+              <div className="flex items-start gap-3 bg-error/10 p-5 rounded-3xl">
+                <MaterialIcon name="error" size={18} className="text-error mt-0.5 shrink-0" />
+                <p className="text-[11px] leading-relaxed text-error font-medium">
                   Oops! We couldn&apos;t read your file. It might be blurry or missing some details. Please try again with a clearer image.
                 </p>
               </div>
@@ -194,7 +194,7 @@ const AuditErrorState: React.FC = () => {
                     </span>
                   </div>
                   <p className="text-[10px] text-white/20 font-medium mt-0.5">12.10.2025 • 4.3MB</p>
-                  <div className="flex items-center gap-1 text-[#FF4B4B]/60 mt-1">
+                  <div className="flex items-center gap-1 text-error/60 mt-1">
                     <span className="text-[8px] font-bold uppercase tracking-widest">Declined</span>
                     <MaterialIcon name="warning" size={10} />
                   </div>
@@ -222,7 +222,7 @@ const AuditErrorState: React.FC = () => {
       <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-30">
         <button
           onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
-          className="bg-accent text-[#0B0F19] py-4 px-10 rounded-full flex items-center gap-4 shadow-[0_12px_40px_-10px_rgba(190,242,100,0.4)] active:scale-95 transition-all cursor-pointer border-none"
+          className="bg-accent text-black py-4 px-10 rounded-full flex items-center gap-4 shadow-[0_12px_40px_-10px_rgba(190,242,100,0.4)] active:scale-95 transition-all cursor-pointer border-none"
         >
           <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Scroll down</span>
           <MaterialIcon name="arrow_downward" size={16} />

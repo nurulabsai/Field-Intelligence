@@ -81,7 +81,7 @@ export const tokens = {
     },
     text: {
       primary: '#FFFFFF',
-      secondary: '#9CA3AF',
+      secondary: 'rgba(255,255,255,0.72)',
       tertiary: '#6B7280',
       inverse: '#0B0F19',
       onPrimary: '#FFFFFF',

@@ -162,7 +162,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
           <div className="grid grid-cols-2 gap-4">
             <button
               type="button"
-              className="nuru-glassmorphism flex items-center justify-center gap-3 py-3.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+              disabled
+              className="nuru-glassmorphism flex items-center justify-center gap-3 py-3.5 rounded-full transition-colors cursor-not-allowed opacity-50"
             >
               <svg className="w-5 h-5" viewBox="0 0 48 48" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
                 <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/>
@@ -174,7 +175,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
             </button>
             <button
               type="button"
-              className="nuru-glassmorphism flex items-center justify-center gap-3 py-3.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+              disabled
+              className="nuru-glassmorphism flex items-center justify-center gap-3 py-3.5 rounded-full transition-colors cursor-not-allowed opacity-50"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
@@ -182,6 +184,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
               <span className="text-sm font-bold text-white font-base">Apple ID</span>
             </button>
           </div>
+          <p className="text-[10px] text-text-tertiary text-center mt-2">Social login coming soon</p>
         </form>
 
         {/* Bottom link */}

@@ -26,7 +26,7 @@ const CropPriceTable: React.FC<CropPriceTableProps> = ({ data }) => {
       </div>
 
       {/* Desktop table */}
-      <div className="nuru-crop-table-desktop overflow-x-auto">
+      <div className="hidden sm:block overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr>
@@ -85,7 +85,7 @@ const CropPriceTable: React.FC<CropPriceTableProps> = ({ data }) => {
       </div>
 
       {/* Mobile cards */}
-      <div className="nuru-crop-table-mobile hidden">
+      <div className="block sm:hidden">
         {data.map((row, i) => (
           <div
             key={row.id}
@@ -116,12 +116,6 @@ const CropPriceTable: React.FC<CropPriceTableProps> = ({ data }) => {
         ))}
       </div>
 
-      <style>{`
-        @media (max-width: 640px) {
-          .nuru-crop-table-desktop { display: none !important; }
-          .nuru-crop-table-mobile { display: block !important; }
-        }
-      `}</style>
     </div>
   );
 };

@@ -187,8 +187,8 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
                   className={cn(
                     "flex-1 flex flex-col items-center justify-center h-[84px] rounded-full cursor-pointer transition-all border",
                     isActive 
-                    ? "bg-accent border-accent text-bg-primary nuru-glow-lime-soft" 
-                    : "nuru-vital-card text-white/80 hover:bg-white/10"
+                    ? "bg-accent border-accent text-black nuru-glow-lime-soft" 
+                    : "nuru-vital-card text-white/80 hover:bg-white/10 border-border"
                   )}
                 >
                   <span className={cn("text-[18px] mb-0.5 nuru-tabular-nums", isActive ? "font-extrabold" : "font-semibold opacity-80")}>
@@ -241,8 +241,8 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
                   className={cn(
                     "flex-1 py-3 rounded-full text-[14px] tracking-wide cursor-pointer transition-all whitespace-nowrap",
                     isActive 
-                    ? "bg-accent text-bg-primary font-bold nuru-glow-lime-soft" 
-                    : "nuru-vital-card text-text-secondary font-semibold hover:text-white hover:bg-white/10"
+                    ? "bg-accent text-black font-bold nuru-glow-lime-soft border-none" 
+                    : "nuru-vital-card text-text-secondary font-semibold hover:text-white hover:bg-white/10 border-none"
                   )}
                 >
                   {filter}

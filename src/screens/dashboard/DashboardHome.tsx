@@ -104,14 +104,14 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
 
         {!isLoading && (
           <>
-            <section>
+            <section className="nuru-animate-in nuru-stagger-1">
               <h2 className="font-heading text-4xl font-light tracking-tight text-white text-center leading-tight">
                 {userName ? `${userName.split(' ')[0]}'s` : 'Your'} Field<br />Audit Plan
               </h2>
             </section>
 
             {/* Stitch: grid grid-cols-2 gap-4 h-80; on md+ becomes 4 equal cards */}
-            <section className="grid grid-cols-2 md:grid-cols-4 gap-4 h-80 md:h-56" aria-label="Audit statistics">
+            <section className="grid grid-cols-2 md:grid-cols-4 gap-4 min-h-[260px] md:h-56 nuru-animate-in nuru-stagger-2" aria-label="Audit statistics">
               {/* Stitch home_2: bg-primary #d1fa7d (display lime), icon text-primary on black */}
               <div
                 className="md:col-span-2 rounded-[32px] p-8 flex flex-col justify-between items-center text-center text-slate-900 nuru-soft-shadow relative overflow-hidden active:scale-95 transition-transform border border-white/5"
@@ -159,7 +159,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
               </div>
             </section>
 
-            <section className="mt-2">
+            <section className="mt-2 nuru-animate-in nuru-stagger-3">
               <div className="flex justify-between items-center mb-6">
                 <h4 className="text-xl font-heading font-light tracking-tight text-white">Ongoing Audits</h4>
                 <button
@@ -198,7 +198,18 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                     : audit.status === 'failed' ? 30
                     : 50;
 
-                  const iconName = index % 2 === 0 ? 'devices' : 'dashboard';
+                  const AUDIT_TYPE_ICON: Record<string, string> = {
+                    farm: 'eco',
+                    business: 'business_center',
+                    verified: 'verified',
+                    submitted: 'upload_file',
+                    failed: 'error_outline',
+                    draft: 'edit_document',
+                    synced: 'cloud_done',
+                  };
+                  const iconName = AUDIT_TYPE_ICON[audit.auditType?.toLowerCase() ?? '']
+                    ?? AUDIT_TYPE_ICON[audit.status]
+                    ?? 'assignment';
 
                   return (
                     <div
