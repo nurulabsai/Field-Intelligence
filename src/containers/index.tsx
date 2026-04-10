@@ -552,7 +552,7 @@ export const SettingsScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-bg-primary font-base px-6 md:px-10 pt-12 pb-40">
+    <div className="min-h-screen bg-bg-primary font-base px-6 md:px-10 pt-12 pb-48 md:pb-16">
       <div className="max-w-[760px] mx-auto">
         <button
           type="button"
