@@ -15,7 +15,7 @@ const STATUS_ICON: Record<string, { iconName: string; color: string; bg: string;
   synced: { iconName: 'description', color: 'text-accent', bg: 'bg-accent/10', badgeBg: 'bg-accent/10', badgeBorder: 'border-accent/20', badgeText: 'text-accent', label: 'Completed' },
   submitted: { iconName: 'folder', color: 'text-cyan', bg: 'bg-cyan/10', badgeBg: 'bg-cyan/10', badgeBorder: 'border-cyan/30', badgeText: 'text-cyan', label: 'Syncing' },
   verified: { iconName: 'description', color: 'text-accent', bg: 'bg-accent/10', badgeBg: 'bg-accent/10', badgeBorder: 'border-accent/20', badgeText: 'text-accent', label: 'Verified' },
-  failed: { iconName: 'description', color: 'text-[#F87171]', bg: 'bg-[#FF4D4D]/10', badgeBg: 'bg-[#FF4D4D]/10', badgeBorder: 'border-[#FF4D4D]/20', badgeText: 'text-[#FF4D4D]', label: 'Failed' },
+  failed: { iconName: 'description', color: 'text-error', bg: 'bg-error/10', badgeBg: 'bg-error/10', badgeBorder: 'border-error/20', badgeText: 'text-error', label: 'Failed' },
   draft: { iconName: 'folder', color: 'text-white/50', bg: 'bg-white/5', badgeBg: 'bg-white/5', badgeBorder: 'border-white/10', badgeText: 'text-white/50', label: 'Draft' },
 };
 
@@ -141,8 +141,8 @@ const AuditList: React.FC<AuditListProps> = ({
                   {/* Failed card — Stitch: glass-material rounded-[32px] p-8 */}
                   <div className="nuru-glassmorphism rounded-[32px] p-5 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-[#FF4D4D]/10 rounded-2xl flex items-center justify-center shrink-0">
-                        <MaterialIcon name="description" size={24} className="text-[#F87171]" />
+                      <div className="w-12 h-12 bg-error/10 rounded-2xl flex items-center justify-center shrink-0">
+                        <MaterialIcon name="description" size={24} className="text-error" />
                       </div>
                       <div>
                         <h3 className="font-bold text-sm text-white">Soil_Data.csv</h3>
@@ -150,7 +150,7 @@ const AuditList: React.FC<AuditListProps> = ({
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="px-4 py-1.5 bg-[#FF4D4D]/10 text-[#FF4D4D] text-[10px] font-bold rounded-full border border-[#FF4D4D]/30 shrink-0">
+                      <div className="px-4 py-1.5 bg-error/10 text-error text-[10px] font-bold rounded-full border border-error/30 shrink-0">
                         Failed
                       </div>
                       <button
@@ -291,7 +291,7 @@ const AuditList: React.FC<AuditListProps> = ({
                           <td className="px-4 py-4 text-text-secondary">Export</td>
                           <td className="px-4 py-4 text-text-tertiary">Yesterday</td>
                           <td className="px-4 py-4">
-                            <span className="px-3 py-1 bg-[#FF4D4D]/10 text-[#FF4D4D] text-[10px] font-bold rounded-full border border-[#FF4D4D]/20">Failed</span>
+                            <span className="px-3 py-1 bg-error/10 text-error text-[10px] font-bold rounded-full border border-error/20">Failed</span>
                           </td>
                         </tr>
                         <tr className="nuru-table-row-alt">
