@@ -30,7 +30,7 @@ const OfflineBanner: React.FC = () => {
       }}
     >
       <div
-        className="backdrop-blur-[8px] py-2.5 px-4 flex items-center justify-center gap-2.5 font-[Inter,sans-serif]"
+        className="backdrop-blur-[8px] py-2.5 px-4 flex items-center justify-center gap-2.5 font-base"
         style={{
           backgroundColor: isOnline
             ? 'rgba(59, 130, 246, 0.95)'
