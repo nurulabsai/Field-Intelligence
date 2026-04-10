@@ -532,6 +532,8 @@ export const SettingsScreen: React.FC = () => {
   const user = useAuthStore((s) => s.user);
   const signOut = useAuthStore((s) => s.signOut);
   const pendingSync = useUIStore((s) => s.pendingSyncCount);
+  const language = useUIStore((s) => s.language);
+  const setLanguage = useUIStore((s) => s.setLanguage);
   const addToast = useUIStore((s) => s.addToast);
   const navigate = useNavigate();
   const [draining, setDraining] = useState(false);
@@ -575,6 +577,36 @@ export const SettingsScreen: React.FC = () => {
         <h1 className="text-[24px] font-light text-white font-heading tracking-tight mb-8">
           Settings
         </h1>
+
+        <section aria-label="Language" className="nuru-glassmorphism rounded-[32px] p-8 mb-6 space-y-4">
+          <h2 className="text-[11px] font-bold text-text-tertiary uppercase tracking-[0.15em]">
+            Language / Lugha
+          </h2>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setLanguage('en')}
+              className={`flex-1 py-3 rounded-full text-sm font-semibold border cursor-pointer font-inherit transition-colors ${
+                language === 'en'
+                  ? 'bg-accent text-black border-accent'
+                  : 'bg-transparent text-text-secondary border-white/10 hover:border-white/20'
+              }`}
+            >
+              English
+            </button>
+            <button
+              type="button"
+              onClick={() => setLanguage('sw')}
+              className={`flex-1 py-3 rounded-full text-sm font-semibold border cursor-pointer font-inherit transition-colors ${
+                language === 'sw'
+                  ? 'bg-accent text-black border-accent'
+                  : 'bg-transparent text-text-secondary border-white/10 hover:border-white/20'
+              }`}
+            >
+              Kiswahili
+            </button>
+          </div>
+        </section>
 
         <section aria-label="Account" className="nuru-glassmorphism rounded-[32px] p-8 mb-6 space-y-6">
           <h2 className="text-[11px] font-bold text-text-tertiary uppercase tracking-[0.15em]">

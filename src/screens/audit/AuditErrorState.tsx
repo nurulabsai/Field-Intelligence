@@ -23,7 +23,7 @@ const AuditErrorState: React.FC = () => {
         <div className="flex items-center justify-between mb-10">
           <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl overflow-hidden ring-1 ring-white/5 shadow-2xl bg-bg-card flex items-center justify-center shrink-0">
-              <span className="text-2xl">🇰🇷</span>
+              <MaterialIcon name="flag" size={28} className="text-text-secondary" />
             </div>
             <div>
               <h1 className="text-2xl font-light text-white tracking-tight font-heading">South Korea</h1>

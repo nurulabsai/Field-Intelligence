@@ -43,9 +43,13 @@ const Step1_Identity: React.FC<Step1Props> = ({ data, onChange, errors }) => {
           const value = (data[field.key] as string) || '';
           const error = errors[field.key];
 
+          const inputId = `identity-${field.key}`;
           return (
             <div key={field.key}>
-              <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
+              <label
+                htmlFor={inputId}
+                className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5"
+              >
                 {field.label}
                 {field.required && <span className="text-text-accent ml-1">*</span>}
               </label>
@@ -59,6 +63,7 @@ const Step1_Identity: React.FC<Step1Props> = ({ data, onChange, errors }) => {
                   </span>
                 )}
                 <input
+                  id={inputId}
                   type={field.type}
                   value={value}
                   onChange={e => handleChange(field.key, e.target.value)}

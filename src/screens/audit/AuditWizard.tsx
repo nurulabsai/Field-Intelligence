@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import MaterialIcon from '../../components/MaterialIcon';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../design-system';
-import { useAuditStore } from '../../store/index';
+import { useAuditStore, useUIStore } from '../../store/index';
 import { validateStep, TOTAL_STEPS } from '../../lib/validations';
 import {
   createFarmProfile,
@@ -343,6 +343,14 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
         return;
       }
     }
+
+    const lang = useUIStore.getState().language;
+    const confirmed = window.confirm(
+      lang === 'sw'
+        ? 'Wasilisha ukaguzi huu sasa? Huwezi kutengua baada ya kuwasilisha.'
+        : 'Submit this audit now? You cannot undo after submission.',
+    );
+    if (!confirmed) return;
 
     setSubmitting(true);
     try {

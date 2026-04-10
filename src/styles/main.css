@@ -366,6 +366,13 @@ h6 {
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
 }
 
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .nuru-glass-card {
+    background: rgba(28, 35, 51, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}
+
 .nuru-pill {
   border-radius: var(--radius-full);
 }
@@ -389,6 +396,13 @@ h6 {
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .nuru-glassmorphism {
+    background: rgba(28, 35, 51, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
 }
 
 /* Lighter glass variant for schedule/list views */

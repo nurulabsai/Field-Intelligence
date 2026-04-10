@@ -68,15 +68,20 @@ const StepFarmProfile: React.FC<StepFarmProfileProps> = ({ data, onChange, error
     const value = (profile[field] as string) || '';
     const isOpen = openDropdown === field;
     const error = errors[`farm_profile.${field}`];
+    const ddId = `farm-profile-dd-${String(field)}`;
 
     return (
       <div>
-        <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
+        <label
+          htmlFor={ddId}
+          className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5"
+        >
           {label}
           {required && <span className="text-text-accent ml-1">*</span>}
         </label>
         <div className="relative">
           <button
+            id={ddId}
             type="button"
             onClick={() => setOpenDropdown(isOpen ? null : field)}
             className={cn(
@@ -122,10 +127,14 @@ const StepFarmProfile: React.FC<StepFarmProfileProps> = ({ data, onChange, error
     const value = (profile[field] as string | number) ?? '';
     const error = errors[`farm_profile.${field}`];
     const { type = 'text', placeholder, required = false, icon, prefix, suffix } = opts;
+    const inputId = `farm-profile-${String(field)}`;
 
     return (
       <div>
-        <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
+        <label
+          htmlFor={inputId}
+          className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5"
+        >
           {label}
           {required && <span className="text-text-accent ml-1">*</span>}
         </label>
@@ -141,6 +150,7 @@ const StepFarmProfile: React.FC<StepFarmProfileProps> = ({ data, onChange, error
             </span>
           )}
           <input
+            id={inputId}
             type={type}
             value={value}
             onChange={e => {
@@ -267,10 +277,14 @@ const StepFarmProfile: React.FC<StepFarmProfileProps> = ({ data, onChange, error
         )}
 
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
+          <label
+            htmlFor="farm-profile-notes"
+            className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5"
+          >
             General Farm Notes
           </label>
           <textarea
+            id="farm-profile-notes"
             value={profile.notes}
             onChange={e => update('notes', e.target.value)}
             placeholder="Any additional context about this farm..."

@@ -128,13 +128,14 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
     required: boolean,
   ) => {
     const value = activeObs[field] as string;
+    const labelId = `obs-pill-${String(field)}-${activePlotIndex}`;
 
     return (
       <div>
-        <label className="block text-xs font-medium text-text-tertiary mb-2">
+        <p id={labelId} className="block text-xs font-medium text-text-tertiary mb-2">
           {label}{required && <span className="text-text-accent ml-0.5">*</span>}
-        </label>
-        <div className="flex flex-wrap gap-2">
+        </p>
+        <div role="group" aria-labelledby={labelId} className="flex flex-wrap gap-2">
           {options.map(opt => {
             const isSelected = value === opt.value;
             return (
@@ -166,13 +167,14 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
     icon: React.ReactNode,
   ) => {
     const value = activeObs[field];
+    const groupId = `obs-yn-${field}-${activePlotIndex}`;
 
     return (
       <div>
-        <label className="flex items-center gap-2 text-xs font-medium text-text-tertiary mb-2">
+        <p id={groupId} className="flex items-center gap-2 text-xs font-medium text-text-tertiary mb-2">
           {icon} {label}<span className="text-text-accent ml-0.5">*</span>
-        </label>
-        <div className="flex gap-3">
+        </p>
+        <div role="group" aria-labelledby={groupId} className="flex gap-3">
           <button
             type="button"
             onClick={() => updateObservation(field, true)}
@@ -208,14 +210,16 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
     options: string[],
   ) => {
     const value = activeObs[field] as string;
-    const ddKey = `obs_${field}`;
+    const ddKey = `obs_${activePlotIndex}_${String(field)}`;
+    const ddId = `obs-dd-${activePlotIndex}-${String(field)}`;
     const isOpen = !!openDropdowns[ddKey];
 
     return (
       <div>
-        <label className="block text-xs font-medium text-text-tertiary mb-1">{label}</label>
+        <label htmlFor={ddId} className="block text-xs font-medium text-text-tertiary mb-1">{label}</label>
         <div className="relative">
           <button
+            id={ddId}
             type="button"
             onClick={() => setOpenDropdowns(p => ({ ...p, [ddKey]: !p[ddKey] }))}
             className={cn(inputClasses, 'text-left cursor-pointer flex items-center justify-between')}
@@ -390,8 +394,13 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
           {/* Photo */}
           <div className="mb-4">
             {activeObs.photo ? (
+              <p className="block text-xs font-medium text-text-tertiary mb-1">Plot photo</p>
+            ) : (
+              <label htmlFor={`obs-photo-btn-${activePlotIndex}`} className="block text-xs font-medium text-text-tertiary mb-1">Plot photo</label>
+            )}
+            {activeObs.photo ? (
               <div className="relative w-full h-32 rounded-[12px] overflow-hidden border border-border">
-                <img src={activeObs.photo} alt="Observation" className="w-full h-full object-cover" />
+                <img src={activeObs.photo} alt="Observation" className="w-full h-full object-cover" loading="lazy" decoding="async" />
                 <button
                   type="button"
                   onClick={() => updateObservation('photo', '')}
@@ -402,6 +411,7 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
               </div>
             ) : (
               <button
+                id={`obs-photo-btn-${activePlotIndex}`}
                 type="button"
                 onClick={() => photoRef.current?.click()}
                 className="w-full py-3 flex items-center justify-center gap-2 bg-border-light border border-dashed border-white/10 rounded-full text-text-secondary text-sm cursor-pointer font-inherit"
@@ -411,11 +421,13 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
             )}
             <input
               ref={photoRef}
+              id={`obs-photo-file-${activePlotIndex}`}
               type="file"
               accept="image/*"
               capture="environment"
               onChange={handlePhoto}
               className="hidden"
+              aria-label="Plot observation photo"
             />
           </div>
 
@@ -437,7 +449,9 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
           )}
 
           {/* Notes */}
+          <label htmlFor={`obs-notes-${activePlotIndex}`} className="block text-xs font-medium text-text-tertiary mb-1">Notes</label>
           <textarea
+            id={`obs-notes-${activePlotIndex}`}
             value={activeObs.notes}
             onChange={e => updateObservation('notes', e.target.value)}
             placeholder="Additional observations about this plot..."

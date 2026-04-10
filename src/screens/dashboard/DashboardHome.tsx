@@ -88,7 +88,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                 type="button"
                 aria-label="Dismiss alert"
                 onClick={onDismissAlert}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-amber-400/60 hover:text-amber-300 hover:bg-amber-500/10 transition-colors cursor-pointer shrink-0"
+                className="min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-amber-400/60 hover:text-amber-300 hover:bg-amber-500/10 transition-colors cursor-pointer shrink-0"
               >
                 <MaterialIcon name="close" size={16} />
               </button>

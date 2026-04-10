@@ -135,14 +135,16 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
     const value = plot[field] as string;
     const ddKey = `${plotId}_${field}`;
     const isOpen = !!openDropdowns[ddKey];
+    const ddId = `plot-dd-${plotId}-${String(field)}`;
 
     return (
       <div>
-        <label className="block text-xs font-medium text-text-tertiary mb-1">
+        <label htmlFor={ddId} className="block text-xs font-medium text-text-tertiary mb-1">
           {label}{required && <span className="text-text-accent ml-0.5">*</span>}
         </label>
         <div className="relative">
           <button
+            id={ddId}
             type="button"
             onClick={() => setOpenDropdowns(p => ({ ...p, [ddKey]: !p[ddKey] }))}
             className={cn(inputClasses, 'text-left cursor-pointer flex items-center justify-between')}
@@ -273,10 +275,11 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
 
                   {/* Plot Name */}
                   <div>
-                    <label className="block text-xs font-medium text-text-tertiary mb-1">
+                    <label htmlFor={`plot-${plot.id}-name`} className="block text-xs font-medium text-text-tertiary mb-1">
                       Plot Name<span className="text-text-accent ml-0.5">*</span>
                     </label>
                     <input
+                      id={`plot-${plot.id}-name`}
                       type="text"
                       value={plot.name}
                       onChange={e => updatePlot(plot.id, 'name', e.target.value)}
@@ -288,10 +291,11 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
                   {/* Area + Status row */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-text-tertiary mb-1">
+                      <label htmlFor={`plot-${plot.id}-area`} className="block text-xs font-medium text-text-tertiary mb-1">
                         Area (ha)<span className="text-text-accent ml-0.5">*</span>
                       </label>
                       <input
+                        id={`plot-${plot.id}-area`}
                         type="number"
                         step="0.01"
                         min="0"
@@ -308,8 +312,9 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
                   <div className="grid grid-cols-2 gap-3">
                     {renderDropdown(plot.id, 'current_crop', 'Current Crop', CROP_OPTIONS.map(c => ({ value: c.toLowerCase().replace(/\s+/g, '_'), label: c })), true)}
                     <div>
-                      <label className="block text-xs font-medium text-text-tertiary mb-1">Variety</label>
+                      <label htmlFor={`plot-${plot.id}-variety`} className="block text-xs font-medium text-text-tertiary mb-1">Variety</label>
                       <input
+                        id={`plot-${plot.id}-variety`}
                         type="text"
                         value={plot.variety}
                         onChange={e => updatePlot(plot.id, 'variety', e.target.value)}
@@ -330,11 +335,12 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
 
                   {/* GPS Center Point */}
                   <div>
-                    <label className="block text-xs font-medium text-text-tertiary mb-1">
+                    <label htmlFor={`plot-${plot.id}-gps`} className="block text-xs font-medium text-text-tertiary mb-1">
                       Plot Center GPS<span className="text-text-accent ml-0.5">*</span>
                     </label>
                     <p className="text-[10px] text-text-tertiary mb-2">Approximate center point (not boundary)</p>
                     <button
+                      id={`plot-${plot.id}-gps`}
                       type="button"
                       onClick={() => captureGPS(plot.id)}
                       disabled={isLoading}
@@ -374,10 +380,14 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
 
                   {/* Photo */}
                   <div>
-                    <label className="block text-xs font-medium text-text-tertiary mb-1">Plot Photo</label>
+                    {plot.photo ? (
+                      <p className="block text-xs font-medium text-text-tertiary mb-1">Plot Photo</p>
+                    ) : (
+                      <label htmlFor={`plot-photo-btn-${plot.id}`} className="block text-xs font-medium text-text-tertiary mb-1">Plot Photo</label>
+                    )}
                     {plot.photo ? (
                       <div className="relative w-full h-32 rounded-[12px] overflow-hidden border border-border">
-                        <img src={plot.photo} alt="Plot" className="w-full h-full object-cover" />
+                        <img src={plot.photo} alt="Plot" className="w-full h-full object-cover" loading="lazy" decoding="async" />
                         <button
                           type="button"
                           onClick={() => updatePlot(plot.id, 'photo', '')}
@@ -388,6 +398,7 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
                       </div>
                     ) : (
                       <button
+                        id={`plot-photo-btn-${plot.id}`}
                         type="button"
                         onClick={() => photoInputRefs.current[plot.id]?.click()}
                         className="w-full py-3 flex items-center justify-center gap-2 bg-border-light border border-dashed border-white/10 rounded-full text-text-secondary text-sm cursor-pointer font-inherit"
@@ -407,8 +418,9 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
 
                   {/* Notes */}
                   <div>
-                    <label className="block text-xs font-medium text-text-tertiary mb-1">Notes</label>
+                    <label htmlFor={`plot-notes-${plot.id}`} className="block text-xs font-medium text-text-tertiary mb-1">Notes</label>
                     <textarea
+                      id={`plot-notes-${plot.id}`}
                       value={plot.notes}
                       onChange={e => updatePlot(plot.id, 'notes', e.target.value)}
                       placeholder="Optional notes about this plot..."

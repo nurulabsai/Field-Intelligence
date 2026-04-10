@@ -143,9 +143,10 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
           </h3>
           <div className="nuru-yield-grid grid grid-cols-3 gap-3.5">
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">Yield Estimate</label>
+              <label htmlFor="yield-estimate" className="block text-sm font-medium text-text-secondary mb-1.5">Yield Estimate</label>
               <div className="relative">
                 <input
+                  id="yield-estimate"
                   type="number"
                   min="0"
                   step="0.1"
@@ -160,9 +161,10 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">Actual Yield <span className="text-text-accent">*</span></label>
+              <label htmlFor="yield-actual" className="block text-sm font-medium text-text-secondary mb-1.5">Actual Yield <span className="text-text-accent">*</span></label>
               <div className="relative">
                 <input
+                  id="yield-actual"
                   type="number"
                   min="0"
                   step="0.1"
@@ -177,8 +179,9 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">Yield Loss %</label>
+              <label htmlFor="yield-loss" className="block text-sm font-medium text-text-secondary mb-1.5">Yield Loss %</label>
               <input
+                id="yield-loss"
                 type="number"
                 min="0"
                 max="100"
@@ -198,8 +201,8 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
             Market Information
           </h3>
 
-          <label className="block text-sm font-medium text-text-secondary mb-1.5">Market Channel <span className="text-text-accent">*</span></label>
-          <div className="flex flex-wrap gap-2.5 mb-4">
+          <p id="yield-market-channel-label" className="block text-sm font-medium text-text-secondary mb-1.5">Market Channel <span className="text-text-accent">*</span></p>
+          <div role="group" aria-labelledby="yield-market-channel-label" className="flex flex-wrap gap-2.5 mb-4">
             {MARKET_CHANNELS.map(ch => {
               const selected = (data.market_channel as string) === ch.value;
               return (
@@ -222,8 +225,9 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
 
           <div className="nuru-market-grid grid grid-cols-2 gap-3.5">
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">Price per kg (TZS) <span className="text-text-accent">*</span></label>
+              <label htmlFor="yield-price-per-kg" className="block text-sm font-medium text-text-secondary mb-1.5">Price per kg (TZS) <span className="text-text-accent">*</span></label>
               <input
+                id="yield-price-per-kg"
                 type="number"
                 min="0"
                 step="1"
@@ -234,8 +238,8 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">Gross Revenue</label>
-              <div className="py-3 px-4 bg-success/[0.08] border border-success/20 rounded-[16px] text-[0.938rem] font-bold text-success">
+              <p id="yield-gross-revenue-label" className="block text-sm font-medium text-text-secondary mb-1.5">Gross Revenue</p>
+              <div role="region" aria-labelledby="yield-gross-revenue-label" className="py-3 px-4 bg-success/[0.08] border border-success/20 rounded-[16px] text-[0.938rem] font-bold text-success">
                 {formatTZS(grossRevenue)}
               </div>
             </div>
@@ -253,8 +257,8 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
               const selected = (data[row.key] as number) ?? -1;
               return (
                 <div key={row.key}>
-                  <label className="block text-sm font-medium text-text-secondary mb-2">{row.label}</label>
-                  <div className="flex gap-1.5 flex-wrap">
+                  <p id={`yield-constraint-${row.key}`} className="block text-sm font-medium text-text-secondary mb-2">{row.label}</p>
+                  <div role="group" aria-labelledby={`yield-constraint-${row.key}`} className="flex gap-1.5 flex-wrap">
                     {SEVERITY_LEVELS.map(level => {
                       const isSelected = selected === level.value;
                       return (
@@ -302,11 +306,14 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
                   src={photo}
                   alt={`Photo ${i + 1}`}
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <button
                   type="button"
+                  aria-label={`Remove photo ${i + 1}`}
                   onClick={() => removePhoto(i)}
-                  className="absolute top-1 right-1 w-[22px] h-[22px] rounded-full bg-overlay border-none text-white cursor-pointer flex items-center justify-center"
+                  className="absolute top-0.5 right-0.5 min-w-[44px] min-h-[44px] rounded-full bg-overlay border-none text-white cursor-pointer flex items-center justify-center"
                 >
                   <MaterialIcon name="close" size={12} />
                 </button>
@@ -315,7 +322,10 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
           </div>
 
           {photos.length < 5 && (
+            <>
+            <label htmlFor="yield-photo-upload" className="sr-only">Upload photos</label>
             <button
+              id="yield-photo-upload"
               type="button"
               onClick={() => fileInputRef.current?.click()}
               className="flex items-center justify-center gap-2 w-full py-3.5 bg-border-light border border-dashed border-white/[0.15] rounded-full text-text-secondary text-sm font-medium cursor-pointer font-inherit"
@@ -323,20 +333,24 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
               <MaterialIcon name="photo_camera" size={16} />
               Upload Photo
             </button>
+            </>
           )}
           <input
+            id="yield-photo-file"
             ref={fileInputRef}
             type="file"
             accept="image/*"
             multiple
             onChange={handlePhotoUpload}
             className="hidden"
+            aria-label="Upload yield photos"
           />
         </div>
 
         {/* GPS Capture */}
         <div className="flex gap-3 flex-wrap">
           <button
+            id="yield-gps-capture"
             type="button"
             onClick={captureGPS}
             disabled={gpsLoading}
@@ -384,8 +398,9 @@ const Step6_Yield: React.FC<Step6Props> = ({ data, onChange }) => {
 
         {/* Notes */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-1.5">Additional Notes</label>
+          <label htmlFor="yield-notes" className="block text-sm font-medium text-text-secondary mb-1.5">Additional Notes</label>
           <textarea
+            id="yield-notes"
             value={(data.notes as string) || ''}
             onChange={e => handleChange('notes', e.target.value)}
             placeholder="Any additional observations or comments..."

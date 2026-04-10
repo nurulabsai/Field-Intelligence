@@ -1,7 +1,8 @@
 import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from './store/index';
-import { useUIStore } from './store/index';
+import { useAuthStore, useUIStore } from './store/index';
+import { registerSyncPermanentFailureHandler } from './lib/syncService';
+import { registerQuotaExceededHandler } from './lib/offlineDb';
 import LoadingScreen from './screens/LoadingScreen';
 import OfflineBanner from './components/OfflineBanner';
 import NuruSideNav from './components/NuruSideNav';
@@ -53,7 +54,13 @@ const PublicOnly: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const user = useAuthStore((s) => s.user);
   const isLoading = useAuthStore((s) => s.isLoading);
 
-  if (isLoading) return null;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
+        <LoadingSkeleton variant="card" count={1} />
+      </div>
+    );
+  }
   if (user) return <Navigate to="/dashboard" replace />;
 
   return <>{children}</>;
@@ -67,6 +74,9 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const sideNavOpen = useUIStore((s) => s.sideNavOpen);
   const setSideNavOpen = useUIStore((s) => s.setSideNavOpen);
+  const isOnline = useUIStore((s) => s.isOnline);
+  const pendingSyncCount = useUIStore((s) => s.pendingSyncCount);
+  const showOfflineBanner = !isOnline || pendingSyncCount > 0;
 
   const handleNavigate = (path: string) => {
     const leavingAudit = location.pathname.startsWith('/audit') && !path.startsWith('/audit');
@@ -113,7 +123,13 @@ const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       {/* Main Content — offset by sidebar width on desktop */}
       <div className="flex-1 min-w-0 flex flex-col min-h-screen pb-[100px] md:pb-0 md:ml-[260px]">
         <OfflineBanner />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto min-w-0">
+        <main
+          className={
+            showOfflineBanner
+              ? 'flex-1 overflow-x-hidden overflow-y-auto min-w-0 pt-[calc(2.75rem+env(safe-area-inset-top,0px))]'
+              : 'flex-1 overflow-x-hidden overflow-y-auto min-w-0'
+          }
+        >
           <div className="w-full max-w-screen-2xl mx-auto min-w-0">
             {children}
           </div>
@@ -148,6 +164,33 @@ const App: React.FC = () => {
   useEffect(() => {
     restoreSession();
   }, [restoreSession]);
+
+  useEffect(() => {
+    registerSyncPermanentFailureHandler(() => {
+      const { language, addToast } = useUIStore.getState();
+      addToast({
+        type: 'error',
+        message:
+          language === 'sw'
+            ? 'Haiwezekani kusawazisha ukaguzi baada ya majaribio kadhaa. Fungua Mipangilio → Usawazishaji nje ya mtandao.'
+            : 'Could not sync an audit after several tries. Open Settings → Offline Sync, or try again when the network is stable.',
+      });
+    });
+    registerQuotaExceededHandler(() => {
+      const { language, addToast } = useUIStore.getState();
+      addToast({
+        type: 'warning',
+        message:
+          language === 'sw'
+            ? 'Hifadhi ya kifaa imejaa. Futa nafasi ili kuhifadhi rasimu na kusawazisha.'
+            : 'Device storage is full. Free space to save drafts and sync.',
+      });
+    });
+    return () => {
+      registerSyncPermanentFailureHandler(null);
+      registerQuotaExceededHandler(null);
+    };
+  }, []);
 
   if (showSplash) {
     return <LoadingScreen onComplete={() => setShowSplash(false)} />;

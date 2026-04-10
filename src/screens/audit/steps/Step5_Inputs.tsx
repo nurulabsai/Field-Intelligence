@@ -56,12 +56,14 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
   const renderDropdown = (key: string, label: string, options: DropdownOption[]) => {
     const value = (data[key] as string) || '';
     const isOpen = openDropdown === key;
+    const ddId = `inputs-dd-${key}`;
 
     return (
       <div>
-        <label className="block text-sm font-medium text-text-secondary mb-1.5">{label}</label>
+        <label htmlFor={ddId} className="block text-sm font-medium text-text-secondary mb-1.5">{label}</label>
         <div className="relative">
           <button
+            id={ddId}
             type="button"
             onClick={() => setOpenDropdown(isOpen ? null : key)}
             className={cn(
@@ -119,8 +121,9 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
             {renderDropdown('fertilizer_type', 'Fertilizer Type', FERTILIZER_TYPES)}
             {(data.fertilizer_type as string) && (data.fertilizer_type as string) !== 'none' && (
               <div>
-                <label className="block text-sm font-medium text-text-secondary mb-1.5">Amount (kg)</label>
+                <label htmlFor="inputs-fertilizer-amount-kg" className="block text-sm font-medium text-text-secondary mb-1.5">Amount (kg)</label>
                 <input
+                  id="inputs-fertilizer-amount-kg"
                   type="number"
                   min="0"
                   step="0.1"
@@ -143,8 +146,9 @@ const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
             {renderDropdown('pesticide_type', 'Pesticide Type', PESTICIDE_TYPES)}
             {(data.pesticide_type as string) && (data.pesticide_type as string) !== 'none' && (
               <div>
-                <label className="block text-sm font-medium text-text-secondary mb-1.5">Amount (litres)</label>
+                <label htmlFor="inputs-pesticide-amount-l" className="block text-sm font-medium text-text-secondary mb-1.5">Amount (litres)</label>
                 <input
+                  id="inputs-pesticide-amount-l"
                   type="number"
                   min="0"
                   step="0.1"

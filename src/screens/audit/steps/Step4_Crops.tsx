@@ -119,9 +119,10 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
 
             {/* Crop Type Dropdown */}
             <div className="mb-3.5">
-              <label className="block text-xs font-medium text-text-tertiary mb-1">Crop Type <span className="text-text-accent">*</span></label>
+              <label htmlFor={`crop-dd-${crop.id}`} className="block text-xs font-medium text-text-tertiary mb-1">Crop Type <span className="text-text-accent">*</span></label>
               <div className="relative">
                 <button
+                  id={`crop-dd-${crop.id}`}
                   type="button"
                   onClick={() => setOpenDropdowns(p => ({ ...p, [crop.id]: !p[crop.id] }))}
                   className={`${inputClasses} text-left cursor-pointer flex items-center justify-between`}
@@ -159,8 +160,9 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
             {/* Crop details grid */}
             <div className="nuru-crop-fields grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-text-tertiary mb-1">Area (ha)</label>
+                <label htmlFor={`crop-${crop.id}-area`} className="block text-xs font-medium text-text-tertiary mb-1">Area (ha)</label>
                 <input
+                  id={`crop-${crop.id}-area`}
                   type="number"
                   step="0.01"
                   min="0"
@@ -171,8 +173,9 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-text-tertiary mb-1">Variety</label>
+                <label htmlFor={`crop-${crop.id}-variety`} className="block text-xs font-medium text-text-tertiary mb-1">Variety</label>
                 <input
+                  id={`crop-${crop.id}-variety`}
                   type="text"
                   value={crop.variety}
                   onChange={e => updateCropField(crop.id, 'variety', e.target.value)}
@@ -181,8 +184,9 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-text-tertiary mb-1">Planting Date</label>
+                <label htmlFor={`crop-${crop.id}-planting`} className="block text-xs font-medium text-text-tertiary mb-1">Planting Date</label>
                 <input
+                  id={`crop-${crop.id}-planting`}
                   type="date"
                   value={crop.planting_date}
                   onChange={e => updateCropField(crop.id, 'planting_date', e.target.value)}
@@ -190,8 +194,9 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-text-tertiary mb-1">Expected Harvest</label>
+                <label htmlFor={`crop-${crop.id}-harvest`} className="block text-xs font-medium text-text-tertiary mb-1">Expected Harvest</label>
                 <input
+                  id={`crop-${crop.id}-harvest`}
                   type="date"
                   value={crop.expected_harvest}
                   onChange={e => updateCropField(crop.id, 'expected_harvest', e.target.value)}

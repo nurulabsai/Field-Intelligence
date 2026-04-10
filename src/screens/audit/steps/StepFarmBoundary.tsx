@@ -320,10 +320,10 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
 
           {showSkipReason && (
             <div className="nuru-glass-card rounded-[20px] p-5 border border-border-glass mt-2">
-              <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-2">
+              <p id="boundary-skip-reason-heading" className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-2">
                 Reason for skipping
-              </label>
-              <div className="flex flex-col gap-2">
+              </p>
+              <div role="group" aria-labelledby="boundary-skip-reason-heading" className="flex flex-col gap-2">
                 {['Cannot access full perimeter', 'GPS too weak in area', 'Farm too large for walking', 'Will capture later'].map(reason => (
                   <button
                     key={reason}
@@ -516,10 +516,11 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
 
       {/* Notes */}
       <div className="mt-4">
-        <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
+        <label htmlFor="boundary-notes" className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
           Boundary Notes
         </label>
         <textarea
+          id="boundary-notes"
           value={boundary.notes}
           onChange={e => updateBoundary({ notes: e.target.value })}
           placeholder="Any notes about boundary conditions, access, or limitations..."

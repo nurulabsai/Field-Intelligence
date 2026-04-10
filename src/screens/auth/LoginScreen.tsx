@@ -92,7 +92,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
                   onChange={e => setEmail(e.target.value)}
                   placeholder="you@nurulabs.io"
                   autoComplete="email"
-                  className="w-full bg-bg-primary border border-white/10 rounded-[16px] px-5 py-4 text-white text-sm outline-none transition-all focus:border-cyan focus:ring-1 focus:ring-cyan/30 placeholder:text-white/20 font-base"
+                  className="w-full bg-bg-primary border border-white/10 rounded-[16px] px-5 py-4 text-white text-sm outline-none transition-all focus:border-cyan focus:ring-1 focus:ring-cyan/30 placeholder:text-white/40 font-base"
                 />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none">
                   <MaterialIcon name="mail" size={18} />
@@ -113,7 +113,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, 
                   onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••••••"
                   autoComplete="current-password"
-                  className="w-full bg-bg-primary border border-white/10 rounded-[16px] px-5 py-4 text-white text-sm outline-none transition-all focus:border-cyan focus:ring-1 focus:ring-cyan/30 placeholder:text-white/20 font-base"
+                  className="w-full bg-bg-primary border border-white/10 rounded-[16px] px-5 py-4 text-white text-sm outline-none transition-all focus:border-cyan focus:ring-1 focus:ring-cyan/30 placeholder:text-white/40 font-base"
                 />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none">
                   <MaterialIcon name="lock" size={18} />

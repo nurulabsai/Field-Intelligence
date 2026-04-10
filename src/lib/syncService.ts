@@ -26,6 +26,13 @@ type PendingCountListener = (count: number) => void;
 let listeners: PendingCountListener[] = [];
 let draining = false;
 
+/** Optional UI hook — registered from App to avoid circular store imports. */
+let syncPermanentFailureHandler: (() => void) | null = null;
+
+export function registerSyncPermanentFailureHandler(fn: (() => void) | null): void {
+  syncPermanentFailureHandler = fn;
+}
+
 // ---------------------------------------------------------------------------
 // Listener management (the store subscribes to this)
 // ---------------------------------------------------------------------------
@@ -81,7 +88,11 @@ export async function drainSyncQueue(): Promise<void> {
   draining = true;
   try {
     const entries = await getAllSyncEntries();
-    const pending = entries.filter((e) => e.status !== 'in_flight');
+    const pending = entries.filter(
+      (e) =>
+        e.status !== 'in_flight' &&
+        !(e.status === 'failed' && e.retryCount >= MAX_RETRIES),
+    );
 
     for (const entry of pending) {
       await processEntry(entry);
@@ -131,6 +142,10 @@ async function processEntry(entry: SyncQueueEntry): Promise<void> {
     }
 
     await updateSyncEntry(entry);
+
+    if (entry.retryCount >= MAX_RETRIES) {
+      syncPermanentFailureHandler?.();
+    }
   }
 }
 

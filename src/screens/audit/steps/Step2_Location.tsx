@@ -70,11 +70,15 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
       <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5">
         {/* Region Dropdown */}
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
+          <label
+            htmlFor="location-region-dd"
+            className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5"
+          >
             Region <span className="text-text-accent">*</span>
           </label>
           <div className="relative">
             <button
+              id="location-region-dd"
               type="button"
               onClick={() => setRegionOpen(p => !p)}
               className={cn(
@@ -111,10 +115,14 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
         {/* District */}
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
+          <label
+            htmlFor="location-district"
+            className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5"
+          >
             District <span className="text-text-accent">*</span>
           </label>
           <input
+            id="location-district"
             type="text"
             value={(data.district as string) || ''}
             onChange={e => handleChange('district', e.target.value)}
@@ -131,8 +139,9 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
         {/* Ward */}
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">Ward</label>
+          <label htmlFor="location-ward" className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">Ward</label>
           <input
+            id="location-ward"
             type="text"
             value={(data.ward as string) || ''}
             onChange={e => handleChange('ward', e.target.value)}
@@ -143,8 +152,9 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
         {/* Village */}
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">Village</label>
+          <label htmlFor="location-village" className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">Village</label>
           <input
+            id="location-village"
             type="text"
             value={(data.village as string) || ''}
             onChange={e => handleChange('village', e.target.value)}
@@ -155,8 +165,9 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
 
         {/* GPS Capture */}
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">GPS Coordinates</label>
+          <label htmlFor="location-gps-capture" className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">GPS Coordinates</label>
           <button
+            id="location-gps-capture"
             type="button"
             onClick={captureGPS}
             disabled={gpsLoading}

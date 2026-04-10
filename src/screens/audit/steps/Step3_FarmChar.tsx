@@ -108,15 +108,17 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
     const isOpen = openDropdown === key;
     const error = allErrors[key as keyof FieldErrors];
     const showError = error && touched[key];
+    const ddId = `farm-char-dd-${key}`;
 
     return (
       <div key={key}>
-        <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
+        <label htmlFor={ddId} className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
           {label}
           {required && <span className="text-text-accent ml-1">*</span>}
         </label>
         <div className="relative">
           <button
+            id={ddId}
             type="button"
             onClick={() => setOpenDropdown(isOpen ? null : key)}
             className={cn(
@@ -187,10 +189,11 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
       <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5">
         {/* Total Area */}
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
+          <label htmlFor="farm-char-total-area" className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
             Total Area (ha) <span className="text-text-accent">*</span>
           </label>
           <input
+            id="farm-char-total-area"
             type="number"
             step="0.01"
             min="0"
@@ -212,10 +215,11 @@ const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: external
 
         {/* Cultivated Area */}
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
+          <label htmlFor="farm-char-cultivated-area" className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">
             Cultivated Area (ha) <span className="text-text-accent">*</span>
           </label>
           <input
+            id="farm-char-cultivated-area"
             type="number"
             step="0.01"
             min="0"

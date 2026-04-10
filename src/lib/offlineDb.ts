@@ -31,6 +31,19 @@ export interface DraftEntry {
 
 let dbPromise: Promise<IDBDatabase> | null = null;
 
+/** Optional UI hook — registered from App (toasts). */
+let quotaExceededHandler: (() => void) | null = null;
+
+export function registerQuotaExceededHandler(fn: (() => void) | null): void {
+  quotaExceededHandler = fn;
+}
+
+function notifyQuotaExceeded(e: unknown): void {
+  if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+    quotaExceededHandler?.();
+  }
+}
+
 function openDb(): Promise<IDBDatabase> {
   if (dbPromise) return dbPromise;
 
@@ -86,9 +99,14 @@ function idbRequest<T>(req: IDBRequest<T>): Promise<T> {
 export async function enqueueSync(
   entry: Omit<SyncQueueEntry, 'id'>,
 ): Promise<number> {
-  const store = await tx(STORE_SYNC_QUEUE, 'readwrite');
-  const key = await idbRequest(store.add(entry));
-  return key as number;
+  try {
+    const store = await tx(STORE_SYNC_QUEUE, 'readwrite');
+    const key = await idbRequest(store.add(entry));
+    return key as number;
+  } catch (e) {
+    notifyQuotaExceeded(e);
+    throw e;
+  }
 }
 
 export async function getAllSyncEntries(): Promise<SyncQueueEntry[]> {
@@ -131,14 +149,19 @@ export async function saveDraftToDb(
   currentStep: number,
   formData: Record<string, unknown>,
 ): Promise<void> {
-  const store = await tx(STORE_DRAFTS, 'readwrite');
-  const entry: DraftEntry = {
-    id: ACTIVE_DRAFT_ID,
-    currentStep,
-    formData,
-    updatedAt: new Date().toISOString(),
-  };
-  await idbRequest(store.put(entry));
+  try {
+    const store = await tx(STORE_DRAFTS, 'readwrite');
+    const entry: DraftEntry = {
+      id: ACTIVE_DRAFT_ID,
+      currentStep,
+      formData,
+      updatedAt: new Date().toISOString(),
+    };
+    await idbRequest(store.put(entry));
+  } catch (e) {
+    notifyQuotaExceeded(e);
+    throw e;
+  }
 }
 
 export async function loadDraftFromDb(): Promise<DraftEntry | undefined> {

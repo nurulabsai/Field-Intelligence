@@ -16,7 +16,8 @@ const shimmerKeyframes = `
 }
 `;
 
-const shimmerClass = "bg-[linear-gradient(90deg,#252525_0%,#2E2E2E_40%,#353535_50%,#2E2E2E_60%,#252525_100%)] bg-[length:800px_100%] animate-[nuru-shimmer_1.8s_ease-in-out_infinite] rounded-lg";
+const shimmerClass =
+  'bg-[linear-gradient(90deg,#252525_0%,#2E2E2E_40%,#353535_50%,#2E2E2E_60%,#252525_100%)] bg-[length:800px_100%] animate-[nuru-shimmer_1.8s_ease-in-out_infinite] motion-reduce:animate-none motion-reduce:bg-[#2E2E2E] rounded-lg';
 
 const SkeletonCard: React.FC = () => (
   <div className="bg-bg-card rounded-lg p-4 border border-[rgba(255,255,255,0.06)]">

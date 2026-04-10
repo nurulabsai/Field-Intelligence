@@ -40,7 +40,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
   };
 
   return (
-    <div className="font-[Inter,sans-serif]">
+    <div className="font-base">
       <div className="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2.5">
         {previews.map((src, i) => (
           <div
@@ -51,10 +51,14 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
               src={src}
               alt={`Photo ${i + 1}`}
               className="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
             />
             <button
+              type="button"
+              aria-label={`Remove photo ${i + 1}`}
               onClick={() => handleRemove(i)}
-              className="absolute top-1 right-1 w-[22px] h-[22px] rounded-full bg-[rgba(0,0,0,0.7)] text-white border-none cursor-pointer flex items-center justify-center p-0"
+              className="absolute top-0.5 right-0.5 min-w-[44px] min-h-[44px] rounded-full bg-[rgba(0,0,0,0.7)] text-white border-none cursor-pointer flex items-center justify-center p-0"
             >
               <MaterialIcon name="close" size={12} />
             </button>
@@ -63,6 +67,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({
 
         {photos.length < maxPhotos && (
           <button
+            type="button"
             onClick={handleAdd}
             className="aspect-square rounded-xl border-2 border-dashed border-[rgba(255,255,255,0.12)] bg-bg-input text-text-tertiary cursor-pointer flex flex-col items-center justify-center gap-1 transition-all duration-150"
             onMouseEnter={(e) => {
