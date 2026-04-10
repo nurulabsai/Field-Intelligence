@@ -81,7 +81,7 @@ const NuruSideNav: React.FC<NuruSideNavProps> = ({
         <button
           onClick={onLogout}
           title="Logout"
-          className="bg-transparent border-none text-text-tertiary cursor-pointer p-1.5 rounded-md flex items-center transition-colors duration-[var(--transition-base)] hover:text-error"
+          className="bg-transparent border-none text-text-tertiary cursor-pointer w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-[var(--transition-base)] hover:text-error"
         >
           <MaterialIcon name="logout" size={16} />
         </button>
