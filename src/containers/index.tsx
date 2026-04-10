@@ -1,4 +1,4 @@
-import React, { useEffect, useState, lazy } from 'react';
+import React, { useEffect, useRef, useState, lazy } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore, useUIStore, useAuditStore } from '../store/index';
 import { schedule, dashboard, uploadYieldPhotosFromFormData, auth } from '../lib/supabase';
@@ -417,6 +417,7 @@ export const BusinessWizardWrapper: React.FC = () => {
 export const CalendarWrapper: React.FC = () => {
   const user = useAuthStore((s) => s.user);
   const addToast = useUIStore((s) => s.addToast);
+  const loadErrorShown = useRef(false);
   const [events, setEvents] = useState<Array<{
     id: string;
     title: string;
@@ -432,6 +433,7 @@ export const CalendarWrapper: React.FC = () => {
     schedule
       .getEvents(user.id)
       .then((rows) => {
+        loadErrorShown.current = false;
         const mapped = rows.map((r) => {
           const start = new Date(r.start_time || r.created_at);
           const typeMap: Record<string, 'audit' | 'training' | 'meeting' | 'deadline'> = {
@@ -453,7 +455,10 @@ export const CalendarWrapper: React.FC = () => {
         setEvents(mapped);
       })
       .catch(() => {
-        addToast({ type: 'warning', message: 'Could not load schedule from server.' });
+        if (!loadErrorShown.current) {
+          loadErrorShown.current = true;
+          addToast({ type: 'warning', message: 'Could not load schedule from server.' });
+        }
       });
   }, [user?.id, addToast]);
 

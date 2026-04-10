@@ -4,6 +4,7 @@ import MaterialIcon from '../../components/MaterialIcon';
 interface DashboardHomeProps {
   userName?: string;
   stressAlert?: string | null;
+  onDismissAlert?: () => void;
   isLoading?: boolean;
   stats?: {
     totalAudits: number;
@@ -22,15 +23,15 @@ interface DashboardHomeProps {
   onProfilePress?: () => void;
 }
 
-/** Stitch `nuruos_premium_dashboard_home_2`: secondary-cyan, secondary-purple, display primary lime */
-const STITCH_DASH_LIME = '#d1fa7d';
-const STITCH_DASH_CYAN = '#4edaff';
-const STITCH_DASH_PURPLE = '#e0c6fd';
+/** Dashboard stat card fills — aligned to DESIGN.md palette */
+const DASH_LIME = '#BEF264';     // accent lime (design system)
+const DASH_CYAN = '#67E8F9';     // secondary cyan (design system)
+const DASH_AMBER = '#FDE68A';    // warm amber — business/reports semantic
 
 const PROGRESS_COLORS: string[] = [
-  STITCH_DASH_CYAN,
-  STITCH_DASH_PURPLE,
-  STITCH_DASH_LIME,
+  DASH_CYAN,
+  DASH_AMBER,
+  DASH_LIME,
   '#FBBF24',
   '#FB7185',
 ];
@@ -38,6 +39,7 @@ const PROGRESS_COLORS: string[] = [
 const DashboardHome: React.FC<DashboardHomeProps> = ({
   userName,
   stressAlert,
+  onDismissAlert,
   isLoading = false,
   stats,
   audits,
@@ -80,7 +82,17 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
         {stressAlert && (
           <div className="bg-amber-500/10 border border-amber-500/20 rounded-[20px] px-5 py-3.5 flex items-center gap-3" role="alert">
             <MaterialIcon name="warning" size={18} className="text-amber-400 shrink-0" />
-            <p className="text-amber-300 text-[13px] font-medium">{stressAlert}</p>
+            <p className="text-amber-300 text-[13px] font-medium flex-1">{stressAlert}</p>
+            {onDismissAlert && (
+              <button
+                type="button"
+                aria-label="Dismiss alert"
+                onClick={onDismissAlert}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-amber-400/60 hover:text-amber-300 hover:bg-amber-500/10 transition-colors cursor-pointer shrink-0"
+              >
+                <MaterialIcon name="close" size={16} />
+              </button>
+            )}
           </div>
         )}
 
@@ -103,10 +115,10 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
               {/* Stitch home_2: bg-primary #d1fa7d (display lime), icon text-primary on black */}
               <div
                 className="md:col-span-2 rounded-[32px] p-8 flex flex-col justify-between items-center text-center text-slate-900 nuru-soft-shadow relative overflow-hidden active:scale-95 transition-transform border border-white/5"
-                style={{ backgroundColor: STITCH_DASH_LIME }}
+                style={{ backgroundColor: DASH_LIME }}
               >
                 <div className="w-14 h-14 bg-black rounded-full flex items-center justify-center nuru-soft-shadow shrink-0">
-                  <MaterialIcon name="verified_user" size={24} style={{ color: STITCH_DASH_LIME }} />
+                  <MaterialIcon name="verified_user" size={24} style={{ color: DASH_LIME }} />
                 </div>
                 <div>
                   <span className="text-4xl font-light tracking-tighter block mb-1 nuru-tabular-nums">
@@ -121,7 +133,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
               <div className="flex flex-col gap-4 h-full md:contents">
                 <div
                   className="flex-1 rounded-[32px] p-6 flex flex-col justify-between items-center text-center text-slate-900 nuru-soft-shadow active:scale-95 transition-transform border border-white/5"
-                  style={{ backgroundColor: STITCH_DASH_CYAN }}
+                  style={{ backgroundColor: DASH_CYAN }}
                 >
                   <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center shrink-0">
                     <MaterialIcon name="eco" size={22} className="text-black/80" />
@@ -134,7 +146,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
 
                 <div
                   className="flex-1 rounded-[32px] p-6 flex flex-col justify-between items-center text-center text-slate-900 nuru-soft-shadow active:scale-95 transition-transform border border-white/5"
-                  style={{ backgroundColor: STITCH_DASH_PURPLE }}
+                  style={{ backgroundColor: DASH_AMBER }}
                 >
                   <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center shrink-0">
                     <MaterialIcon name="business_center" size={22} className="text-black/80" />
