@@ -69,7 +69,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
           type="button"
           aria-label="Settings and profile"
           onClick={() => onProfilePress?.()}
-          className="w-10 h-10 rounded-full border border-white/5 bg-white/5 flex items-center justify-center cursor-pointer text-text-secondary active:scale-95 transition-transform"
+          className="w-11 h-11 rounded-full border border-white/5 bg-white/5 flex items-center justify-center cursor-pointer text-text-secondary active:scale-95 transition-transform"
         >
           <MaterialIcon name="person" size={20} />
         </button>
