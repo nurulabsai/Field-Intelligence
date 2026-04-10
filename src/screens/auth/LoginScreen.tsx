@@ -9,8 +9,8 @@ interface LoginScreenProps {
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onNavigateToSignUp, onForgotPassword }) => {
-  const [email, setEmail] = useState(import.meta.env.DEV ? 'admin@nurulabs.io' : '');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(import.meta.env.DEV ? 'demo@nuruos.com' : '');
+  const [password, setPassword] = useState(import.meta.env.DEV ? 'demo123' : '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

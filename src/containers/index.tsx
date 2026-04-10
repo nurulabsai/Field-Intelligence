@@ -108,11 +108,13 @@ export const DashboardWrapper: React.FC = () => {
         });
 
         const statusMap: Record<string, 'draft' | 'submitted' | 'verified' | 'synced' | 'failed'> = {
-          draft: 'draft',
+          assigned: 'draft',
           in_progress: 'draft',
           submitted: 'submitted',
+          under_review: 'submitted',
           approved: 'verified',
           rejected: 'failed',
+          requires_correction: 'failed',
         };
 
         setAudits(recent.map((a) => ({
@@ -309,12 +311,13 @@ export const AuditWizardWrapper: React.FC = () => {
         const auditRow = {
           campaign_id: null,
           farm_id: farmLocalId,
+          workflow_template_id: '',
           assigned_to: user?.id ?? null,
           status: 'submitted' as const,
           audit_location: loc,
           gps_accuracy_m: gpsAccuracy,
           started_at: new Date().toISOString(),
-          completed_at: new Date().toISOString(),
+          submitted_at: new Date().toISOString(),
         };
 
         try {
@@ -372,12 +375,13 @@ export const BusinessWizardWrapper: React.FC = () => {
         const auditRow = {
           campaign_id: null,
           farm_id: crypto.randomUUID(),
+          workflow_template_id: '',
           assigned_to: user?.id ?? null,
           status: 'submitted' as const,
           audit_location: null,
           gps_accuracy_m: null,
           started_at: new Date().toISOString(),
-          completed_at: new Date().toISOString(),
+          submitted_at: new Date().toISOString(),
         };
 
         try {
@@ -435,17 +439,18 @@ export const CalendarWrapper: React.FC = () => {
       .then((rows) => {
         loadErrorShown.current = false;
         const mapped = rows.map((r) => {
-          const start = new Date(r.start_time || r.created_at);
+          const start = new Date(r.due_date || r.created_at);
           const typeMap: Record<string, 'audit' | 'training' | 'meeting' | 'deadline'> = {
             audit: 'audit',
             training: 'training',
             meeting: 'meeting',
             deadline: 'deadline',
+            schedule: 'meeting',
           };
           return {
             id: r.id,
             title: r.title,
-            type: typeMap[r.event_type ?? ''] ?? 'meeting',
+            type: typeMap[r.entity_type ?? ''] ?? 'meeting',
             date: start.toISOString().slice(0, 10),
             time: start.toTimeString().slice(0, 5),
             location: r.description ?? '',
@@ -475,12 +480,13 @@ export const CalendarWrapper: React.FC = () => {
         try {
           const isoStart = new Date(`${event.date}T${event.time}:00`).toISOString();
           const created = await schedule.createEvent({
+            entity_type: event.type,
+            entity_id: '',
             title: event.title,
             description: event.notes || event.location || null,
-            start_time: isoStart,
-            end_time: null,
             assigned_to: user?.id ?? null,
-            event_type: event.type,
+            due_date: isoStart,
+            priority: 'medium',
             status: 'pending',
           });
 

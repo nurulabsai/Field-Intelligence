@@ -8,7 +8,7 @@
  */
 
 import { create } from 'zustand';
-import { auth as authApi, audits as auditsApi, type FarmAuditRow } from '../lib/supabase';
+import { auth as authApi, audits as auditsApi, profiles, type FarmAuditRow } from '../lib/supabase';
 import type { FullAuditData } from '../lib/validations';
 import { saveDraftToDb, loadDraftFromDb, clearDraftFromDb } from '../lib/offlineDb';
 import { onPendingCountChange, refreshPendingCount } from '../lib/syncService';
@@ -63,24 +63,33 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const result = await authApi.signIn(email, password);
       const u = result.user;
-      set({
-        user: u
+      const session = result.session
+        ? {
+            accessToken: result.session.access_token,
+            refreshToken: result.session.refresh_token,
+            expiresAt: result.session.expires_at ?? 0,
+          }
+        : null;
+
+      let user: AuthUser | null = null;
+      if (u) {
+        const profile = await profiles.getProfile(u.id);
+        user = profile
           ? {
+              id: profile.id,
+              email: profile.email,
+              fullName: profile.full_name,
+              role: profile.role,
+            }
+          : {
               id: u.id,
               email: u.email ?? '',
               fullName: (u.user_metadata?.full_name as string) ?? '',
-              role: (u.user_metadata?.role as string) ?? 'auditor',
-            }
-          : null,
-        session: result.session
-          ? {
-              accessToken: result.session.access_token,
-              refreshToken: result.session.refresh_token,
-              expiresAt: result.session.expires_at ?? 0,
-            }
-          : null,
-        isLoading: false,
-      });
+              role: (u.user_metadata?.role as string) ?? 'field_officer',
+            };
+      }
+
+      set({ user, session, isLoading: false });
     } catch (err) {
       set({ isLoading: false });
       throw err;
@@ -127,13 +136,22 @@ export const useAuthStore = create<AuthState>((set) => ({
       const session = await authApi.getSession();
       if (session) {
         const u = session.user;
+        const profile = await profiles.getProfile(u.id);
+        const user: AuthUser = profile
+          ? {
+              id: profile.id,
+              email: profile.email,
+              fullName: profile.full_name,
+              role: profile.role,
+            }
+          : {
+              id: u.id,
+              email: u.email ?? '',
+              fullName: (u.user_metadata?.full_name as string) ?? '',
+              role: (u.user_metadata?.role as string) ?? 'field_officer',
+            };
         set({
-          user: {
-            id: u.id,
-            email: u.email ?? '',
-            fullName: (u.user_metadata?.full_name as string) ?? '',
-            role: (u.user_metadata?.role as string) ?? 'auditor',
-          },
+          user,
           session: {
             accessToken: session.access_token,
             refreshToken: session.refresh_token,

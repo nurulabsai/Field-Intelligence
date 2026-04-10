@@ -38,7 +38,6 @@ export interface UserRow {
   email: string;
   phone: string | null;
   role: string;
-  avatar_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -49,21 +48,22 @@ export interface FarmRow {
   farmer_phone: string | null;
   region_id: string | null;
   village: string | null;
-  total_area_ha: number | null;
-  cultivated_area_ha: number | null;
+  area_ha: number | null;
   created_at: string;
+  updated_at: string;
 }
 
 export interface FarmAuditRow {
   id: string;
   campaign_id: string | null;
   farm_id: string;
+  workflow_template_id: string;
   assigned_to: string | null;
-  status: 'draft' | 'in_progress' | 'submitted' | 'approved' | 'rejected';
+  status: 'assigned' | 'in_progress' | 'submitted' | 'under_review' | 'approved' | 'rejected' | 'requires_correction';
   audit_location: unknown | null;
   gps_accuracy_m: number | null;
   started_at: string | null;
-  completed_at: string | null;
+  submitted_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -83,7 +83,7 @@ export interface AuditPhotoRow {
   audit_id: string;
   farm_id: string;
   storage_path: string;
-  label: string | null;
+  caption: string | null;
   created_at: string;
 }
 
@@ -126,7 +126,7 @@ export interface MarketPriceRow {
   market_name: string;
   region_id: string | null;
   price_per_kg: number;
-  recorded_at: string;
+  price_date: string;
 }
 
 export interface WeatherObservationRow {
@@ -138,16 +138,19 @@ export interface WeatherObservationRow {
   temperature_min_c: number | null;
 }
 
+/** Maps to the `tasks` table in the DB */
 export interface ScheduleEventRow {
   id: string;
+  entity_type: string;
+  entity_id: string;
   title: string;
   description: string | null;
-  start_time: string;
-  end_time: string | null;
   assigned_to: string | null;
-  event_type: string | null;
+  due_date: string | null;
+  priority: string | null;
   status: string;
   created_at: string;
+  updated_at: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -212,7 +215,7 @@ export const profiles = {
 
   async updateProfile(
     authId: string,
-    updates: Partial<Pick<UserRow, 'full_name' | 'phone' | 'avatar_url'>>,
+    updates: Partial<Pick<UserRow, 'full_name' | 'phone'>>,
   ): Promise<UserRow> {
     const { data, error } = await supabase
       .from('users')
@@ -241,7 +244,7 @@ export const dashboard = {
         .from('farm_audits')
         .select('id', { count: 'exact', head: true })
         .eq('assigned_to', userId)
-        .in('status', ['draft', 'in_progress']),
+        .in('status', ['assigned', 'in_progress']),
     ]);
 
     return {
@@ -266,7 +269,7 @@ export const dashboard = {
     let query = supabase
       .from('market_prices')
       .select('*')
-      .order('recorded_at', { ascending: false })
+      .order('price_date', { ascending: false })
       .limit(limit);
 
     if (regionId) {
@@ -282,6 +285,8 @@ export const dashboard = {
 // ---------------------------------------------------------------------------
 // Audit queries
 // ---------------------------------------------------------------------------
+
+const DEFAULT_WORKFLOW_TEMPLATE_ID = 'a9f2ddbe-8186-4472-87f8-0bb42ed279cc';
 
 export const audits = {
   async list(
@@ -319,9 +324,13 @@ export const audits = {
   async create(
     audit: Omit<FarmAuditRow, 'id' | 'created_at' | 'updated_at'>,
   ): Promise<FarmAuditRow> {
+    const row = {
+      ...audit,
+      workflow_template_id: audit.workflow_template_id || DEFAULT_WORKFLOW_TEMPLATE_ID,
+    };
     const { data, error } = await supabase
       .from('farm_audits')
-      .insert(audit)
+      .insert(row)
       .select()
       .single();
     if (error) throw error;
@@ -345,7 +354,7 @@ export const audits = {
   async submit(auditId: string): Promise<FarmAuditRow> {
     return this.update(auditId, {
       status: 'submitted',
-      completed_at: new Date().toISOString(),
+      submitted_at: new Date().toISOString(),
     } as Partial<FarmAuditRow>);
   },
 };
@@ -416,7 +425,7 @@ export async function uploadAuditPhotoFromDataUrl(
   auditId: string,
   farmId: string,
   dataUrl: string,
-  label: string | null,
+  caption: string | null,
 ): Promise<AuditPhotoRow> {
   const blob = await dataUrlToBlob(dataUrl);
   const mime = blob.type || 'image/jpeg';
@@ -432,7 +441,7 @@ export async function uploadAuditPhotoFromDataUrl(
     audit_id: auditId,
     farm_id: farmId,
     storage_path: path,
-    label,
+    caption,
   });
 }
 
@@ -477,26 +486,28 @@ export const schedule = {
 
     const { data, error } = await query;
     if (error) throw error;
-    return (data ?? []) as unknown as ScheduleEventRow[];
+    return (data ?? []) as ScheduleEventRow[];
   },
 
   async createEvent(
-    event: Omit<ScheduleEventRow, 'id' | 'created_at'>,
+    event: Omit<ScheduleEventRow, 'id' | 'created_at' | 'updated_at'>,
   ): Promise<ScheduleEventRow> {
     const { data, error } = await supabase
       .from('tasks')
       .insert({
-        entity_type: event.event_type ?? 'schedule',
-        entity_id: '',
+        entity_type: event.entity_type ?? 'schedule',
+        entity_id: event.entity_id ?? '',
         title: event.title,
+        description: event.description,
         assigned_to: event.assigned_to,
-        due_date: event.start_time,
+        due_date: event.due_date,
+        priority: event.priority ?? 'medium',
         status: event.status ?? 'pending',
       })
       .select()
       .single();
     if (error) throw error;
-    return data as unknown as ScheduleEventRow;
+    return data as ScheduleEventRow;
   },
 
   async updateEvent(
@@ -507,14 +518,14 @@ export const schedule = {
       .from('tasks')
       .update({
         title: updates.title,
-        due_date: updates.start_time,
+        due_date: updates.due_date,
         status: updates.status,
       })
       .eq('id', eventId)
       .select()
       .single();
     if (error) throw error;
-    return data as unknown as ScheduleEventRow;
+    return data as ScheduleEventRow;
   },
 
   async deleteEvent(eventId: string): Promise<void> {
@@ -530,18 +541,23 @@ export const schedule = {
 export interface FarmBoundaryRow {
   id: string;
   farm_id: string;
-  capture_method: string;
-  boundary_geojson: unknown;
-  boundary_points: unknown[];
+  version: number | null;
   status: string;
-  confidence: string;
-  gps_accuracy_summary: unknown;
+  capture_method: string;
+  polygon: unknown | null;
   area_ha: number | null;
-  captured_at: string | null;
+  perimeter_m: number | null;
+  mean_accuracy_m: number | null;
+  max_accuracy_m: number | null;
+  point_count: number | null;
   captured_by: string | null;
-  notes: string | null;
-  skip_reason: string | null;
+  captured_at: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  review_notes: string | null;
+  client_id: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 export const farmBoundaries = {
@@ -573,19 +589,13 @@ export const farmBoundaries = {
 export interface PlotRow {
   id: string;
   farm_id: string;
-  name: string;
+  plot_name: string;
+  crop_id: string | null;
+  boundary: unknown | null;
   area_ha: number | null;
-  status: string;
-  current_crop: string | null;
-  variety: string | null;
-  growth_stage: string | null;
-  irrigation_status: string | null;
-  center_point: unknown | null;
-  center_lat: number | null;
-  center_lon: number | null;
-  center_gps_accuracy: number | null;
-  planting_season: string | null;
-  notes: string | null;
+  planting_date: string | null;
+  expected_harvest_date: string | null;
+  properties: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;
 }
