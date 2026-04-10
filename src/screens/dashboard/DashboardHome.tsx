@@ -112,7 +112,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                   <span className="text-4xl font-light tracking-tighter block mb-1 nuru-tabular-nums">
                     {String(highPriority).padStart(2, '0')}
                   </span>
-                  <h3 className="font-heading font-bold text-lg leading-tight">High Priority<br />Audits</h3>
+                  <h3 className="font-heading font-bold text-base leading-tight">High Priority<br />Audits</h3>
                   <p className="text-[10px] uppercase tracking-wider font-bold mt-2 opacity-60">Tasks Pending</p>
                 </div>
               </div>
@@ -128,7 +128,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                   </div>
                   <div>
                     <span className="text-2xl font-light tracking-tighter block nuru-tabular-nums">{farmChecks}</span>
-                    <h3 className="font-heading font-bold text-sm leading-tight">Farm Checks</h3>
+                    <h3 className="font-heading font-bold text-[13px] leading-tight">Farm Checks</h3>
                   </div>
                 </div>
 
@@ -141,7 +141,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                   </div>
                   <div>
                     <span className="text-2xl font-light tracking-tighter block nuru-tabular-nums">{businessReports}</span>
-                    <h3 className="font-heading font-bold text-sm leading-tight">Business<br />Reports</h3>
+                    <h3 className="font-heading font-bold text-[13px] leading-tight">Business<br />Reports</h3>
                   </div>
                 </div>
               </div>
