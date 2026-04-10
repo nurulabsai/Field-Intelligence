@@ -16,7 +16,7 @@ interface NuruButtonProps {
 }
 
 const SIZE_CLASSES: Record<string, string> = {
-  sm: 'px-4 py-2 text-[13px] h-9 rounded-full',
+  sm: 'px-4 py-2 text-[13px] h-11 rounded-full',
   md: 'px-5 py-2.5 text-sm h-11 rounded-full',
   lg: 'px-7 py-3.5 text-base h-[52px] rounded-full',
 };
