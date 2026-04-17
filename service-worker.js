@@ -41,7 +41,7 @@ self.addEventListener('activate', (event) => {
       Promise.all(
         keys.map((key) => {
           if (!VALID_CACHES.has(key)) {
-            console.log('[SW] Removing old cache:', key);
+            console.debug('[SW] Removing old cache:', key);
             return caches.delete(key);
           }
         })

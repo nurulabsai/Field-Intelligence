@@ -4,19 +4,11 @@
  */
 
 import { createClient, type SupabaseClient, type RealtimeChannel } from '@supabase/supabase-js';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './env';
 
 // ---------------------------------------------------------------------------
 // Client singleton
 // ---------------------------------------------------------------------------
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  throw new Error(
-    'Missing Supabase config: set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables',
-  );
-}
 
 export const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
@@ -421,6 +413,9 @@ async function dataUrlToBlob(dataUrl: string): Promise<Blob> {
  * Upload one yield-step photo (data URL from Step6) to Supabase Storage and insert audit_photos.
  * Requires a public or signed bucket policy for authenticated users (see Supabase dashboard).
  */
+const ALLOWED_PHOTO_MIMES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const MAX_PHOTO_BYTES = 10 * 1024 * 1024; // 10 MB
+
 export async function uploadAuditPhotoFromDataUrl(
   auditId: string,
   farmId: string,
@@ -429,6 +424,16 @@ export async function uploadAuditPhotoFromDataUrl(
 ): Promise<AuditPhotoRow> {
   const blob = await dataUrlToBlob(dataUrl);
   const mime = blob.type || 'image/jpeg';
+
+  if (!ALLOWED_PHOTO_MIMES.has(mime)) {
+    throw new Error(`Unsupported image type: ${mime}. Allowed: JPEG, PNG, WebP.`);
+  }
+  if (blob.size > MAX_PHOTO_BYTES) {
+    throw new Error(
+      `Photo exceeds 10 MB limit (${(blob.size / 1024 / 1024).toFixed(1)} MB). Compress before uploading.`,
+    );
+  }
+
   const ext = mime.includes('png') ? 'png' : mime.includes('webp') ? 'webp' : 'jpg';
   const path = `${auditId}/${crypto.randomUUID()}.${ext}`;
   const { error: upErr } = await supabase.storage.from(AUDIT_PHOTOS_BUCKET).upload(path, blob, {
@@ -682,6 +687,142 @@ export const plotObservations = {
       .select('*')
       .eq('plot_id', plotId)
       .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  },
+};
+
+// ---------------------------------------------------------------------------
+// dim_actors — farmer identity (separate from audits; multi-farm / OR-TAMISEMI)
+// Requires migration `supabase/migrations/001_dim_actors.sql`
+// ---------------------------------------------------------------------------
+
+export interface DimActorRow {
+  id: string;
+  phone_e164: string;
+  full_name: string | null;
+  gender: string | null;
+  date_of_birth: string | null;
+  national_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const dimActors = {
+  /** Returns existing row if phone already registered (duplicate detection). */
+  async findByPhoneE164(phoneE164: string): Promise<DimActorRow | null> {
+    const { data, error } = await supabase
+      .from('dim_actors')
+      .select('id, phone_e164, full_name, gender, date_of_birth, national_id, created_at, updated_at')
+      .eq('phone_e164', phoneE164)
+      .maybeSingle();
+    if (error) {
+      if (error.code === 'PGRST205' || error.code === '42P01') return null;
+      return null;
+    }
+    return data;
+  },
+
+  /** Upsert farmer row for linkage and de-duplication. */
+  async upsertFarmer(row: {
+    phone_e164: string;
+    full_name: string;
+    gender?: string | null;
+    date_of_birth?: string | null;
+    national_id?: string | null;
+  }): Promise<DimActorRow | null> {
+    const { data, error } = await supabase
+      .from('dim_actors')
+      .upsert(
+        {
+          phone_e164: row.phone_e164,
+          full_name: row.full_name,
+          gender: row.gender ?? null,
+          date_of_birth: row.date_of_birth ?? null,
+          national_id: row.national_id ?? null,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'phone_e164' },
+      )
+      .select()
+      .single();
+    if (error) {
+      console.warn('[dim_actors upsert]', error.message);
+      return null;
+    }
+    return data;
+  },
+};
+
+// ---------------------------------------------------------------------------
+// farm_entities — canonical farm profile from the wizard
+// Requires migration `supabase/migrations/002_farm_entities.sql`
+// ---------------------------------------------------------------------------
+
+export interface FarmEntityRow {
+  id: string;
+  local_id: string;
+  actor_id: string | null;
+  legacy_farm_id: string | null;
+  region_id: string | null;
+  farm_name: string;
+  farmer_name: string;
+  farmer_phone: string | null;
+  village: string | null;
+  ward: string | null;
+  district: string | null;
+  region: string | null;
+  total_area_ha: number;
+  tenure_type: string | null;
+  farming_system: string | null;
+  contact_number: string | null;
+  water_source: string | null;
+  notes: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type FarmEntityInsert = Omit<FarmEntityRow, 'id' | 'created_at' | 'updated_at'>;
+
+export const farmEntities = {
+  /** Look up by the client-generated temp ID (used by sync for idempotency). */
+  async findByLocalId(localId: string): Promise<FarmEntityRow | null> {
+    const { data, error } = await supabase
+      .from('farm_entities')
+      .select('*')
+      .eq('local_id', localId)
+      .maybeSingle();
+    if (error) {
+      if (error.code === 'PGRST205' || error.code === '42P01') return null;
+      throw error;
+    }
+    return data;
+  },
+
+  /**
+   * Offline-safe upsert keyed on `local_id`. Returning the row lets callers
+   * resolve the server-side UUID and update child records (plots, boundary).
+   */
+  async upsertByLocalId(row: FarmEntityInsert): Promise<FarmEntityRow> {
+    const { data, error } = await supabase
+      .from('farm_entities')
+      .upsert(
+        { ...row, updated_at: new Date().toISOString() },
+        { onConflict: 'local_id' },
+      )
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async listByActor(actorId: string): Promise<FarmEntityRow[]> {
+    const { data, error } = await supabase
+      .from('farm_entities')
+      .select('*')
+      .eq('actor_id', actorId)
+      .order('updated_at', { ascending: false });
     if (error) throw error;
     return data ?? [];
   },

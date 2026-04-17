@@ -230,6 +230,13 @@ export const cssVariables = `
   --color-error-light: ${tokens.colors.error.light};
   --color-error-lighter: ${tokens.colors.error.lighter};
 
+  /* Severity (0-4 constraint scale) — uses semantic tokens above */
+  --color-severity-none: ${tokens.colors.gray[500]};
+  --color-severity-low: ${tokens.colors.success.DEFAULT};
+  --color-severity-med: ${tokens.colors.warning.DEFAULT};
+  --color-severity-high: #F97316;
+  --color-severity-critical: ${tokens.colors.error.DEFAULT};
+
   --color-info: ${tokens.colors.info.DEFAULT};
   --color-info-light: ${tokens.colors.info.light};
   --color-info-lighter: ${tokens.colors.info.lighter};

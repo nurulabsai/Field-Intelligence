@@ -10,6 +10,9 @@
 import { create } from 'zustand';
 import { auth as authApi, audits as auditsApi, profiles, type FarmAuditRow } from '../lib/supabase';
 import type { FullAuditData } from '../lib/validations';
+import { TOTAL_STEPS } from '../lib/validations';
+import type { WizardKind } from '../lib/localWizardDraft';
+import { inferWizardKind } from '../lib/localWizardDraft';
 import { saveDraftToDb, loadDraftFromDb, clearDraftFromDb } from '../lib/offlineDb';
 import { onPendingCountChange, refreshPendingCount } from '../lib/syncService';
 
@@ -186,8 +189,13 @@ interface AuditState {
   currentStep: number;
   isLoading: boolean;
   draftRestored: boolean;
+  /** Last wizard that wrote the active draft — drives resume + dashboard row. */
+  activeWizardKind: WizardKind | null;
+  /** ISO timestamp of last successful IndexedDB draft write (from device). */
+  draftUpdatedAt: string | null;
+  setActiveWizardKind: (kind: WizardKind | null) => void;
   setStep: (step: number) => void;
-  saveDraft: (data: Partial<FullAuditData>) => void;
+  saveDraft: (data: Partial<FullAuditData>) => Promise<void>;
   resetDraft: () => void;
   restoreDraft: () => Promise<void>;
   submitAudit: (auditId: string) => Promise<void>;
@@ -201,12 +209,24 @@ export const useAuditStore = create<AuditState>((set, get) => ({
   currentStep: 0,
   isLoading: false,
   draftRestored: false,
+  activeWizardKind: null,
+  draftUpdatedAt: null,
+
+  setActiveWizardKind(kind: WizardKind | null) {
+    set({ activeWizardKind: kind });
+  },
 
   setStep(step: number) {
     set({ currentStep: step });
     const draft = get().currentDraft;
     if (draft) {
-      saveDraftToDb(step, draft as Record<string, unknown>).catch(() => {});
+      void saveDraftToDb(
+        step,
+        draft as Record<string, unknown>,
+        get().activeWizardKind,
+      )
+        .then((iso) => set({ draftUpdatedAt: iso }))
+        .catch(() => {});
     }
   },
 
@@ -214,14 +234,22 @@ export const useAuditStore = create<AuditState>((set, get) => ({
     const existing = get().currentDraft ?? {};
     const merged = { ...existing, ...data };
     set({ currentDraft: merged });
-    saveDraftToDb(
+    return saveDraftToDb(
       get().currentStep,
       merged as Record<string, unknown>,
-    ).catch(() => {});
+      get().activeWizardKind,
+    ).then((iso) => {
+      set({ draftUpdatedAt: iso });
+    });
   },
 
   resetDraft() {
-    set({ currentDraft: null, currentStep: 0 });
+    set({
+      currentDraft: null,
+      currentStep: 0,
+      activeWizardKind: null,
+      draftUpdatedAt: null,
+    });
     clearDraftFromDb().catch(() => {});
   },
 
@@ -229,16 +257,33 @@ export const useAuditStore = create<AuditState>((set, get) => ({
     try {
       const saved = await loadDraftFromDb();
       if (saved) {
+        const raw = saved.currentStep;
+        const n = typeof raw === 'number' ? raw : parseInt(String(raw), 10);
+        const step = Number.isFinite(n)
+          ? Math.max(0, Math.min(n, TOTAL_STEPS - 1))
+          : 0;
+        const kind =
+          saved.wizardKind ?? inferWizardKind(saved.formData as Record<string, unknown>);
         set({
           currentDraft: saved.formData as Partial<FullAuditData>,
-          currentStep: saved.currentStep,
+          currentStep: step,
           draftRestored: true,
+          activeWizardKind: kind,
+          draftUpdatedAt: saved.updatedAt,
         });
       } else {
-        set({ draftRestored: true });
+        set({
+          draftRestored: true,
+          activeWizardKind: null,
+          draftUpdatedAt: null,
+        });
       }
     } catch {
-      set({ draftRestored: true });
+      set({
+        draftRestored: true,
+        activeWizardKind: null,
+        draftUpdatedAt: null,
+      });
     }
   },
 
@@ -250,6 +295,8 @@ export const useAuditStore = create<AuditState>((set, get) => ({
         audits: state.audits.map((a) => (a.id === auditId ? updated : a)),
         currentDraft: null,
         currentStep: 0,
+        activeWizardKind: null,
+        draftUpdatedAt: null,
         isLoading: false,
       }));
     } catch (err) {

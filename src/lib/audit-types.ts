@@ -286,6 +286,7 @@ export interface AuditSubmissionPayload {
   plot_observations: Array<{
     local_id: string;
     plot_local_id: string;
+    observed_at: string;
     crop_condition: string;
     pest_present: boolean;
     disease_present: boolean;

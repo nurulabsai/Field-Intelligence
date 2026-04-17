@@ -80,6 +80,19 @@ export async function enqueueAuditSync(
 // ---------------------------------------------------------------------------
 
 const MAX_RETRIES = 5;
+const BASE_DELAY_MS = 1_000;
+const MAX_DELAY_MS = 16_000;
+
+/** Exponential backoff with jitter: 1s, 2s, 4s, 8s, 16s cap. */
+function backoffDelay(retryCount: number): number {
+  const exponential = Math.min(BASE_DELAY_MS * 2 ** retryCount, MAX_DELAY_MS);
+  const jitter = Math.random() * exponential * 0.3;
+  return exponential + jitter;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export async function drainSyncQueue(): Promise<void> {
   if (draining) return;
@@ -95,6 +108,10 @@ export async function drainSyncQueue(): Promise<void> {
     );
 
     for (const entry of pending) {
+      if (entry.retryCount > 0) {
+        await sleep(backoffDelay(entry.retryCount - 1));
+      }
+      if (!navigator.onLine) break;
       await processEntry(entry);
       await notifyListeners();
     }

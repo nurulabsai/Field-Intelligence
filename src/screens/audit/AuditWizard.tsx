@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import MaterialIcon from '../../components/MaterialIcon';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../design-system';
@@ -18,7 +18,10 @@ import type {
   AuditSubmissionPayload,
 } from '../../lib/audit-types';
 
+import { parseAreaHa } from '../../lib/utils';
+
 import AuditStepIndicator from '../../components/AuditStepIndicator';
+import LoadingSkeleton from '../../components/LoadingSkeleton';
 import Step1_Identity from './steps/Step1_Identity';
 import Step2_Location from './steps/Step2_Location';
 import StepFarmProfile from './steps/StepFarmProfile';
@@ -29,6 +32,8 @@ import Step3_FarmChar from './steps/Step3_FarmChar';
 import Step4_Crops from './steps/Step4_Crops';
 import Step5_Inputs from './steps/Step5_Inputs';
 import Step6_Yield from './steps/Step6_Yield';
+import StepSubmissionReview from './steps/StepSubmissionReview';
+import ConsentGate from './ConsentGate';
 
 interface AuditWizardProps {
   auditId?: string;
@@ -46,6 +51,7 @@ const STEP_LABELS = [
   'Crops',
   'Inputs',
   'Yield',
+  'Review',
 ];
 
 const STEPS_WITH_INLINE_VALIDATION = new Set([2, 3, 4, 5]);
@@ -59,6 +65,14 @@ function buildSubmissionPayload(
   const plots = (data.plots as Plot[]) || [];
   const observations = (data.plot_observations as PlotObservation[]) || [];
 
+  // Strict area parsing. Step validation runs before submit, so a null here
+  // indicates a bug (validation gap or state corruption) — fail loud instead
+  // of silently submitting 0 ha. The caller's try/catch surfaces it as a toast.
+  const farmAreaHa = parseAreaHa(farm.total_area_ha);
+  if (farmAreaHa === null) {
+    throw new Error('Farm area is required and must be a positive number');
+  }
+
   return {
     audit_id: auditId,
     farm: {
@@ -70,9 +84,7 @@ function buildSubmissionPayload(
       ward: farm.ward,
       district: farm.district,
       region: farm.region,
-      total_area_ha: typeof farm.total_area_ha === 'number'
-        ? farm.total_area_ha
-        : parseFloat(String(farm.total_area_ha)) || 0,
+      total_area_ha: farmAreaHa,
       tenure_type: farm.tenure_type as string,
       farming_system: farm.farming_system as string,
       contact_number: farm.contact_number || undefined,
@@ -93,13 +105,16 @@ function buildSubmissionPayload(
       notes: boundary.notes || undefined,
       skip_reason: boundary.skip_reason || undefined,
     },
-    plots: plots.map(p => ({
+    plots: plots.map(p => {
+      const plotAreaHa = parseAreaHa(p.area_ha);
+      if (plotAreaHa === null) {
+        throw new Error(`Plot "${p.name || p.id}": area is required and must be a positive number`);
+      }
+      return ({
       local_id: p.id,
       farm_local_id: farm.id,
       name: p.name,
-      area_ha: typeof p.area_ha === 'number'
-        ? p.area_ha
-        : parseFloat(String(p.area_ha)) || 0,
+      area_ha: plotAreaHa,
       status: p.status as string,
       current_crop: p.current_crop,
       variety: p.variety || undefined,
@@ -108,10 +123,12 @@ function buildSubmissionPayload(
       center_gps: p.center_gps,
       planting_season: p.planting_season || undefined,
       notes: p.notes || undefined,
-    })),
+      });
+    }),
     plot_observations: observations.map(o => ({
       local_id: o.id,
       plot_local_id: o.plot_id,
+      observed_at: new Date().toISOString(),
       crop_condition: o.crop_condition as string,
       pest_present: o.pest_present ?? false,
       disease_present: o.disease_present ?? false,
@@ -145,8 +162,8 @@ function validateInlineStep(
     if (!profile.ward) errors['farm_profile.ward'] = 'Ward is required';
     if (!profile.district) errors['farm_profile.district'] = 'District is required';
     if (!profile.region) errors['farm_profile.region'] = 'Region is required';
-    const area = parseFloat(String(profile.total_area_ha));
-    if (!area || area <= 0) errors['farm_profile.total_area_ha'] = 'Farm area must be > 0';
+    const area = parseAreaHa(profile.total_area_ha);
+    if (area === null || area <= 0) errors['farm_profile.total_area_ha'] = 'Farm area must be > 0';
     if (!profile.tenure_type) errors['farm_profile.tenure_type'] = 'Tenure type is required';
     if (!profile.farming_system) errors['farm_profile.farming_system'] = 'Farming system is required';
   }
@@ -170,8 +187,8 @@ function validateInlineStep(
     }
     plots.forEach((p, i) => {
       if (!p.name) errors[`plots.${i}`] = `Plot ${i + 1}: name is required`;
-      const area = parseFloat(String(p.area_ha));
-      if (!area || area <= 0) errors[`plots.${i}`] = `Plot ${i + 1}: area must be > 0`;
+      const area = parseAreaHa(p.area_ha);
+      if (area === null || area <= 0) errors[`plots.${i}`] = `Plot ${i + 1}: area must be > 0`;
       if (!p.status) errors[`plots.${i}`] = `Plot ${i + 1}: status is required`;
       if (!p.current_crop) errors[`plots.${i}`] = `Plot ${i + 1}: crop is required`;
       if (!p.growth_stage) errors[`plots.${i}`] = `Plot ${i + 1}: growth stage is required`;
@@ -197,20 +214,46 @@ function validateInlineStep(
   return errors;
 }
 
-const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
+const AuditWizardForm: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
   const navigate = useNavigate();
-  const { currentStep, setStep, currentDraft, saveDraft, resetDraft } = useAuditStore();
+  const { currentStep, setStep, currentDraft, saveDraft, resetDraft, setActiveWizardKind } =
+    useAuditStore();
+  const addToast = useUIStore((s) => s.addToast);
+  const language = useUIStore((s) => s.language);
 
   const [formData, setFormData] = useState<Record<string, unknown>>(() => {
     const initial: Record<string, unknown> = { ...(currentDraft ?? {}) };
     if (!initial.farm_profile) {
       initial.farm_profile = createFarmProfile();
     }
+    if (!Array.isArray(initial.labour_types)) {
+      initial.labour_types = ['none'];
+    }
+    if (initial.data_use_consent !== true) {
+      initial.data_use_consent = false;
+    }
     return initial;
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [confirmSubmitOpen, setConfirmSubmitOpen] = useState(false);
+  const bootPersisted = useRef(false);
+
+  useEffect(() => {
+    setActiveWizardKind('farm');
+    if (bootPersisted.current) return;
+    bootPersisted.current = true;
+    void saveDraft(formData as Record<string, unknown>).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-time bootstrap after shell + default entities exist
+  }, []);
+
+  useEffect(() => {
+    const step = useAuditStore.getState().currentStep;
+    if (step < 0 || step >= TOTAL_STEPS) {
+      useAuditStore.getState().setStep(Math.min(Math.max(0, step), TOTAL_STEPS - 1));
+    }
+  }, []);
 
   useEffect(() => {
     sessionStorage.setItem('nuru_audit_dirty', 'true');
@@ -240,16 +283,45 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
     }
   }, [formData.farm_profile, formData.plots]);
 
-  const handleChange = useCallback((patch: Record<string, unknown>) => {
-    setFormData(prev => {
-      const next = { ...prev, ...patch };
-      saveDraft(next as Record<string, unknown>);
-      return next;
-    });
-    if (Object.keys(errors).length > 0) {
-      setErrors({});
-    }
-  }, [errors, saveDraft]);
+  const handleChange = useCallback(
+    (patch: Record<string, unknown>) => {
+      setFormData((prev) => {
+        let next: Record<string, unknown> = { ...prev, ...patch };
+        if (!('farm_profile' in patch)) {
+          const fp = next.farm_profile as FarmProfile | undefined;
+          if (fp && typeof fp === 'object') {
+            const u: FarmProfile = { ...fp };
+            let ch = false;
+            if ('farmer_name' in patch) {
+              u.farmer_name = String(patch.farmer_name ?? '');
+              ch = true;
+            }
+            if ('farmer_phone' in patch) {
+              u.farmer_phone = String(patch.farmer_phone ?? '');
+              ch = true;
+            }
+            if ('farm_name' in patch) {
+              u.farm_name = String(patch.farm_name ?? '');
+              ch = true;
+            }
+            for (const k of ['region', 'district', 'ward', 'village'] as const) {
+              if (k in patch) {
+                (u as unknown as Record<string, string>)[k] = String((patch as Record<string, unknown>)[k] ?? '');
+                ch = true;
+              }
+            }
+            if (ch) next = { ...next, farm_profile: u };
+          }
+        }
+        void saveDraft(next as Record<string, unknown>).catch(() => {});
+        return next;
+      });
+      if (Object.keys(errors).length > 0) {
+        setErrors({});
+      }
+    },
+    [errors, saveDraft],
+  );
 
   const syncPlotObservations = useCallback((data: Record<string, unknown>): Record<string, unknown> => {
     const plots = (data.plots as Plot[]) || [];
@@ -319,7 +391,7 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
       }
     }
 
-    saveDraft(nextData as Record<string, unknown>);
+    void saveDraft(nextData as Record<string, unknown>).catch(() => {});
 
     if (currentStep < TOTAL_STEPS - 1) {
       setStep(currentStep + 1);
@@ -336,22 +408,39 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
   }, [currentStep, setStep, navigate]);
 
   const handleSubmit = useCallback(async () => {
-    if (STEPS_WITH_INLINE_VALIDATION.has(currentStep)) {
-      const inlineErrors = validateInlineStep(currentStep, formData);
-      if (Object.keys(inlineErrors).length > 0) {
-        setErrors(inlineErrors);
-        return;
+    if (currentStep !== TOTAL_STEPS - 1) return;
+
+    const errAccum: Record<string, string> = {};
+    for (let s = 0; s < TOTAL_STEPS - 1; s++) {
+      if (STEPS_WITH_INLINE_VALIDATION.has(s)) {
+        Object.assign(errAccum, validateInlineStep(s, formData));
+      } else {
+        const result = validateStep(s, formData);
+        if (!result.success) {
+          for (const issue of result.error.issues) {
+            const path = issue.path.length ? issue.path.join('.') : '_form';
+            errAccum[path] = issue.message;
+          }
+        }
       }
     }
+    if (Object.keys(errAccum).length > 0) {
+      setErrors(errAccum);
+      addToast({
+        type: 'error',
+        message:
+          language === 'sw'
+            ? 'Tafadhali kamilisha hatua zilizo na makosa kisha wasilisha tena.'
+            : 'Fix validation errors on earlier steps before submitting.',
+      });
+      return;
+    }
 
-    const lang = useUIStore.getState().language;
-    const confirmed = window.confirm(
-      lang === 'sw'
-        ? 'Wasilisha ukaguzi huu sasa? Huwezi kutengua baada ya kuwasilisha.'
-        : 'Submit this audit now? You cannot undo after submission.',
-    );
-    if (!confirmed) return;
+    setConfirmSubmitOpen(true);
+  }, [currentStep, formData, addToast, language]);
 
+  const performSubmit = useCallback(async () => {
+    setConfirmSubmitOpen(false);
     setSubmitting(true);
     try {
       const id = auditId || crypto.randomUUID();
@@ -370,11 +459,28 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
     } finally {
       setSubmitting(false);
     }
-  }, [currentStep, formData, auditId, onComplete, resetDraft]);
+  }, [formData, auditId, onComplete, resetDraft]);
 
-  const handleSaveDraft = useCallback(() => {
-    saveDraft(formData as Record<string, unknown>);
-  }, [formData, saveDraft]);
+  const handleSaveDraft = useCallback(async () => {
+    try {
+      await saveDraft(formData as Record<string, unknown>);
+      addToast({
+        type: 'success',
+        message:
+          language === 'sw'
+            ? 'Rasimu imehifadhiwa kwenye kifaa hiki.'
+            : 'Draft saved on this device.',
+      });
+    } catch {
+      addToast({
+        type: 'error',
+        message:
+          language === 'sw'
+            ? 'Imeshindwa kuhifadhi rasimu. Angalia hifadhi ya kifaa.'
+            : 'Could not save draft. Check device storage or permissions.',
+      });
+    }
+  }, [formData, saveDraft, addToast, language]);
 
   const isLastStep = currentStep === TOTAL_STEPS - 1;
 
@@ -391,12 +497,23 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
       case 7: return <Step4_Crops {...props} />;
       case 8: return <Step5_Inputs {...props} />;
       case 9: return <Step6_Yield {...props} />;
+      case 10: return <StepSubmissionReview data={formData} />;
       default: return null;
     }
   };
 
+  const needsConsent = formData.data_use_consent !== true;
+
   return (
-    <div className="min-h-screen bg-bg-primary flex flex-col font-base min-w-0 overflow-x-hidden">
+    <div className="min-h-screen bg-bg-primary flex flex-col font-base min-w-0 overflow-x-hidden relative">
+      {needsConsent && (
+        <ConsentGate
+          language={language}
+          onAccept={() => handleChange({ data_use_consent: true })}
+          onDecline={() => navigate(-1)}
+        />
+      )}
+
       {/* Header */}
       <div className="sticky top-0 z-40 bg-bg-primary/95 backdrop-blur-sm border-b border-border-light px-4 pt-4 pb-2 min-w-0">
         <div className="max-w-[800px] mx-auto min-w-0">
@@ -492,8 +609,63 @@ const AuditWizard: React.FC<AuditWizardProps> = ({ auditId, onComplete }) => {
           )}
         </div>
       </div>
+
+      {/* Submit confirmation modal */}
+      {confirmSubmitOpen && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-bg-primary/85 backdrop-blur-sm p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="submit-confirm-title"
+        >
+          <div className="max-w-md w-full nuru-glass-card rounded-[28px] border border-border-glass p-7 shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-11 h-11 rounded-2xl bg-accent/15 flex items-center justify-center">
+                <MaterialIcon name="cloud_upload" size={24} className="text-accent" />
+              </div>
+              <h2 id="submit-confirm-title" className="text-lg font-semibold font-heading text-white m-0">
+                {language === 'sw' ? 'Wasilisha ukaguzi?' : 'Submit audit?'}
+              </h2>
+            </div>
+            <p className="text-sm text-text-secondary leading-relaxed mb-6">
+              {language === 'sw'
+                ? 'Rasimu itatumwa (au kusubiri mtandao). Endelea?'
+                : 'Submission will upload now or queue offline. Continue?'}
+            </p>
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={performSubmit}
+                className="w-full py-3.5 rounded-full bg-accent text-black font-bold text-sm tracking-wide border-none cursor-pointer font-inherit hover:opacity-95"
+              >
+                {language === 'sw' ? 'Ndio, wasilisha' : 'Yes, submit'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmSubmitOpen(false)}
+                className="w-full py-3 text-sm text-text-secondary bg-transparent border border-border rounded-full cursor-pointer font-inherit"
+              >
+                {language === 'sw' ? 'Ghairi' : 'Cancel'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
+};
+
+const AuditWizard: React.FC<AuditWizardProps> = (props) => {
+  const draftRestored = useAuditStore((s) => s.draftRestored);
+  if (!draftRestored) {
+    return (
+      <div className="min-h-screen bg-bg-primary flex flex-col items-center justify-center gap-4 p-8 font-base">
+        <LoadingSkeleton variant="text" count={2} />
+        <LoadingSkeleton variant="card" count={1} />
+      </div>
+    );
+  }
+  return <AuditWizardForm {...props} />;
 };
 
 export default AuditWizard;

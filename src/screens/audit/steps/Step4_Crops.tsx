@@ -1,6 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
 import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
+import { useUIStore } from '../../../store/index';
+import { CROP_OPTIONS, optionsForDropdown } from '../../../lib/wizard-enums';
 
 interface Step4Props {
   data: Record<string, unknown>;
@@ -17,29 +19,6 @@ interface CropEntry {
   expected_harvest: string;
 }
 
-const CROP_OPTIONS = [
-  { value: 'maize', label: 'Maize' },
-  { value: 'rice', label: 'Rice' },
-  { value: 'wheat', label: 'Wheat' },
-  { value: 'sorghum', label: 'Sorghum' },
-  { value: 'millet', label: 'Millet' },
-  { value: 'cassava', label: 'Cassava' },
-  { value: 'sweet_potato', label: 'Sweet Potato' },
-  { value: 'beans', label: 'Beans' },
-  { value: 'groundnuts', label: 'Groundnuts' },
-  { value: 'sunflower', label: 'Sunflower' },
-  { value: 'sesame', label: 'Sesame' },
-  { value: 'cotton', label: 'Cotton' },
-  { value: 'coffee', label: 'Coffee' },
-  { value: 'tea', label: 'Tea' },
-  { value: 'cashew', label: 'Cashew Nuts' },
-  { value: 'tobacco', label: 'Tobacco' },
-  { value: 'sisal', label: 'Sisal' },
-  { value: 'banana', label: 'Banana' },
-  { value: 'coconut', label: 'Coconut' },
-  { value: 'pigeon_pea', label: 'Pigeon Pea' },
-];
-
 function createEmptyCrop(): CropEntry {
   return {
     id: `crop_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
@@ -54,6 +33,9 @@ function createEmptyCrop(): CropEntry {
 const inputClasses = "w-full py-2.5 px-3.5 bg-bg-input border border-border rounded-[14px] text-white text-sm font-inherit outline-none transition-colors duration-150 focus:border-accent";
 
 const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
+  const language = useUIStore((s) => s.language);
+  const cropOptions = useMemo(() => optionsForDropdown(CROP_OPTIONS, language), [language]);
+
   const crops: CropEntry[] = useMemo(() => {
     const raw = data.crops as CropEntry[] | undefined;
     return raw && raw.length > 0 ? raw : [createEmptyCrop()];
@@ -128,13 +110,13 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
                   className={`${inputClasses} text-left cursor-pointer flex items-center justify-between`}
                 >
                   <span className={crop.crop_id ? 'text-white' : 'text-text-tertiary'}>
-                    {CROP_OPTIONS.find(o => o.value === crop.crop_id)?.label || 'Select crop'}
+                    {cropOptions.find(o => o.value === crop.crop_id)?.label || (language === 'sw' ? 'Chagua zao' : 'Select crop')}
                   </span>
                   <MaterialIcon name="expand_more" size={16} className="text-text-tertiary" />
                 </button>
                 {openDropdowns[crop.id] && (
                   <div className="absolute top-full left-0 right-0 mt-1 nuru-glass-card border border-border rounded-[14px] z-50 max-h-[200px] overflow-y-auto shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
-                    {CROP_OPTIONS.map(opt => (
+                    {cropOptions.map(opt => (
                       <button
                         key={opt.value}
                         type="button"
@@ -189,6 +171,7 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
                   id={`crop-${crop.id}-planting`}
                   type="date"
                   value={crop.planting_date}
+                  max={new Date().toISOString().slice(0, 10)}
                   onChange={e => updateCropField(crop.id, 'planting_date', e.target.value)}
                   className={`${inputClasses} [color-scheme:dark]`}
                 />
@@ -199,6 +182,7 @@ const Step4_Crops: React.FC<Step4Props> = ({ data, onChange, errors }) => {
                   id={`crop-${crop.id}-harvest`}
                   type="date"
                   value={crop.expected_harvest}
+                  max={new Date().toISOString().slice(0, 10)}
                   onChange={e => updateCropField(crop.id, 'expected_harvest', e.target.value)}
                   className={`${inputClasses} [color-scheme:dark]`}
                 />

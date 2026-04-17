@@ -9,8 +9,10 @@ export default defineConfig(({ mode }) => {
 
   return {
     server: {
-      port: 3000,
-      host: 'localhost',
+      port: Number(process.env.PORT) || 3000,
+      // true exposes LAN URLs so you can open the app on a phone (same Wi‑Fi)
+      host: true,
+      strictPort: Boolean(process.env.PORT),
     },
 
     plugins: [

@@ -23,6 +23,13 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci --legacy-peer-deps
 
+      - name: Validate required env vars
+        run: |
+          # CI uses dummy values — validates the app starts without crashing
+          echo "VITE_SUPABASE_URL=https://ci-placeholder.supabase.co" >> $GITHUB_ENV
+          echo "VITE_SUPABASE_ANON_KEY=ci-placeholder-key" >> $GITHUB_ENV
+          echo "VITE_GEMINI_API_KEY=ci-placeholder-key" >> $GITHUB_ENV
+
       - name: TypeScript check
         run: npx tsc --noEmit
 
@@ -31,6 +38,10 @@ jobs:
 
       - name: Build frontend
         run: npm run build
+        env:
+          VITE_SUPABASE_URL: https://ci-placeholder.supabase.co
+          VITE_SUPABASE_ANON_KEY: ci-placeholder-key
+          VITE_GEMINI_API_KEY: ci-placeholder-key
 
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
@@ -39,6 +50,9 @@ jobs:
         run: npm run dev &
         env:
           CI: true
+          VITE_SUPABASE_URL: https://ci-placeholder.supabase.co
+          VITE_SUPABASE_ANON_KEY: ci-placeholder-key
+          VITE_GEMINI_API_KEY: ci-placeholder-key
 
       - name: Wait for dev server
         run: |

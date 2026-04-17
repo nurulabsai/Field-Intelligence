@@ -1,8 +1,8 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import MaterialIcon from '../../components/MaterialIcon';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../design-system';
-import { useAuditStore } from '../../store/index';
+import { useAuditStore, useUIStore } from '../../store/index';
 import {
   DISTRICTS, STAKEHOLDER_TYPES, INPUT_CATEGORIES, COMMODITIES,
   VOLUME_CATEGORIES, PAYMENT_TERMS, VEHICLE_TYPES, SERVICE_TYPES,
@@ -12,6 +12,7 @@ import {
   type Choice,
 } from '../../lib/business-audit-choices';
 import AuditStepIndicator from '../../components/AuditStepIndicator';
+import LoadingSkeleton from '../../components/LoadingSkeleton';
 
 type FormData = Record<string, unknown>;
 
@@ -601,13 +602,32 @@ const STEP_ICON_NAMES = [
   'bar_chart', 'assignment_turned_in', 'description',
 ] as const;
 
-const BusinessWizard: React.FC<BusinessWizardProps> = ({ onComplete }) => {
+const BusinessWizardForm: React.FC<BusinessWizardProps> = ({ onComplete }) => {
   const navigate = useNavigate();
-  const { currentStep, setStep, currentDraft, saveDraft, resetDraft } = useAuditStore();
+  const { currentStep, setStep, currentDraft, saveDraft, resetDraft, setActiveWizardKind } =
+    useAuditStore();
+  const addToast = useUIStore((s) => s.addToast);
+  const language = useUIStore((s) => s.language);
 
   const [formData, setFormData] = useState<FormData>(() => ({ ...(currentDraft ?? {}) }));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const bootPersisted = useRef(false);
+
+  useEffect(() => {
+    setActiveWizardKind('business');
+    if (bootPersisted.current) return;
+    bootPersisted.current = true;
+    void saveDraft(formData as Record<string, unknown>).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-time bootstrap
+  }, []);
+
+  useEffect(() => {
+    const step = useAuditStore.getState().currentStep;
+    if (step < 0 || step >= BUSINESS_TOTAL_STEPS) {
+      useAuditStore.getState().setStep(Math.min(Math.max(0, step), BUSINESS_TOTAL_STEPS - 1));
+    }
+  }, []);
 
   useEffect(() => {
     sessionStorage.setItem('nuru_audit_dirty', 'true');
@@ -617,7 +637,7 @@ const BusinessWizard: React.FC<BusinessWizardProps> = ({ onComplete }) => {
   const handleChange = useCallback((key: string, value: unknown) => {
     setFormData(prev => {
       const next = { ...prev, [key]: value };
-      saveDraft(next as Record<string, unknown>);
+      void saveDraft(next as Record<string, unknown>).catch(() => {});
       return next;
     });
     if (Object.keys(errors).length > 0) setErrors({});
@@ -648,7 +668,7 @@ const BusinessWizard: React.FC<BusinessWizardProps> = ({ onComplete }) => {
   const handleNext = useCallback(() => {
     if (!validateCurrentStep()) return;
     setErrors({});
-    saveDraft(formData as Record<string, unknown>);
+    void saveDraft(formData as Record<string, unknown>).catch(() => {});
     if (currentStep < BUSINESS_TOTAL_STEPS - 1) {
       setStep(currentStep + 1);
     }
@@ -676,9 +696,26 @@ const BusinessWizard: React.FC<BusinessWizardProps> = ({ onComplete }) => {
     }
   }, [formData, onComplete, resetDraft, validateCurrentStep]);
 
-  const handleSaveDraft = useCallback(() => {
-    saveDraft(formData as Record<string, unknown>);
-  }, [formData, saveDraft]);
+  const handleSaveDraft = useCallback(async () => {
+    try {
+      await saveDraft(formData as Record<string, unknown>);
+      addToast({
+        type: 'success',
+        message:
+          language === 'sw'
+            ? 'Rasimu imehifadhiwa kwenye kifaa hiki.'
+            : 'Draft saved on this device.',
+      });
+    } catch {
+      addToast({
+        type: 'error',
+        message:
+          language === 'sw'
+            ? 'Imeshindwa kuhifadhi rasimu. Angalia hifadhi ya kifaa.'
+            : 'Could not save draft. Check device storage or permissions.',
+      });
+    }
+  }, [formData, saveDraft, addToast, language]);
 
   const isLastStep = currentStep === BUSINESS_TOTAL_STEPS - 1;
 
@@ -798,6 +835,19 @@ const BusinessWizard: React.FC<BusinessWizardProps> = ({ onComplete }) => {
       </div>
     </div>
   );
+};
+
+const BusinessWizard: React.FC<BusinessWizardProps> = (props) => {
+  const draftRestored = useAuditStore((s) => s.draftRestored);
+  if (!draftRestored) {
+    return (
+      <div className="min-h-screen bg-bg-primary flex flex-col items-center justify-center gap-4 p-8 font-base">
+        <LoadingSkeleton variant="text" count={2} />
+        <LoadingSkeleton variant="card" count={1} />
+      </div>
+    );
+  }
+  return <BusinessWizardForm {...props} />;
 };
 
 export default BusinessWizard;

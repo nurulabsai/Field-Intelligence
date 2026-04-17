@@ -3,20 +3,13 @@ import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
 import type { FarmProfile, TenureType, FarmingSystem } from '../../../lib/audit-types';
 import { createFarmProfile } from '../../../lib/audit-types';
+import { TANZANIA_REGIONS } from '../../../lib/tanzania-admin-cascade';
 
 interface StepFarmProfileProps {
   data: Record<string, unknown>;
   onChange: (data: Record<string, unknown>) => void;
   errors: Record<string, string>;
 }
-
-const TANZANIA_REGIONS = [
-  'Arusha', 'Dar es Salaam', 'Dodoma', 'Geita', 'Iringa', 'Kagera', 'Katavi',
-  'Kigoma', 'Kilimanjaro', 'Lindi', 'Manyara', 'Mara', 'Mbeya', 'Morogoro',
-  'Mtwara', 'Mwanza', 'Njombe', 'Pemba North', 'Pemba South', 'Pwani',
-  'Rukwa', 'Ruvuma', 'Shinyanga', 'Simiyu', 'Singida', 'Songwe', 'Tabora',
-  'Tanga', 'Unguja North', 'Unguja South', 'Zanzibar Central/South',
-];
 
 const TENURE_OPTIONS: { value: TenureType; label: string }[] = [
   { value: 'owned', label: 'Owned (with title)' },

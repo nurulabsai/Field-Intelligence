@@ -6,6 +6,8 @@
  *   drafts    – wizard draft snapshots keyed by a stable draft ID
  */
 
+import type { WizardKind } from './localWizardDraft';
+
 const DB_NAME = 'nuruos-field-intelligence';
 const DB_VERSION = 1;
 
@@ -27,6 +29,8 @@ export interface DraftEntry {
   currentStep: number;
   formData: Record<string, unknown>;
   updatedAt: string;
+  /** Which wizard last wrote this draft — used for resume navigation. */
+  wizardKind?: WizardKind;
 }
 
 let dbPromise: Promise<IDBDatabase> | null = null;
@@ -75,20 +79,24 @@ function openDb(): Promise<IDBDatabase> {
   return dbPromise;
 }
 
-function tx(
+/**
+ * IndexedDB auto-commits a transaction as soon as the current task yields if no
+ * request was queued in the same synchronous turn as `db.transaction()`.
+ * Never `await` between starting a transaction and calling `store.get/add/put`.
+ */
+async function withStore<T>(
   storeName: string,
   mode: IDBTransactionMode,
-): Promise<IDBObjectStore> {
-  return openDb().then((db) => {
-    const transaction = db.transaction(storeName, mode);
-    return transaction.objectStore(storeName);
-  });
-}
-
-function idbRequest<T>(req: IDBRequest<T>): Promise<T> {
-  return new Promise((resolve, reject) => {
-    req.onsuccess = () => resolve(req.result);
+  run: (store: IDBObjectStore) => IDBRequest<T>,
+): Promise<T> {
+  const db = await openDb();
+  return new Promise<T>((resolve, reject) => {
+    const tr = db.transaction(storeName, mode);
+    tr.onerror = () => reject(tr.error);
+    const store = tr.objectStore(storeName);
+    const req = run(store);
     req.onerror = () => reject(req.error);
+    req.onsuccess = () => resolve(req.result as T);
   });
 }
 
@@ -100,8 +108,9 @@ export async function enqueueSync(
   entry: Omit<SyncQueueEntry, 'id'>,
 ): Promise<number> {
   try {
-    const store = await tx(STORE_SYNC_QUEUE, 'readwrite');
-    const key = await idbRequest(store.add(entry));
+    const key = await withStore(STORE_SYNC_QUEUE, 'readwrite', (store) =>
+      store.add(entry),
+    );
     return key as number;
   } catch (e) {
     notifyQuotaExceeded(e);
@@ -110,33 +119,27 @@ export async function enqueueSync(
 }
 
 export async function getAllSyncEntries(): Promise<SyncQueueEntry[]> {
-  const store = await tx(STORE_SYNC_QUEUE, 'readonly');
-  return idbRequest(store.getAll());
+  return withStore(STORE_SYNC_QUEUE, 'readonly', (store) => store.getAll());
 }
 
 export async function getSyncEntry(id: number): Promise<SyncQueueEntry | undefined> {
-  const store = await tx(STORE_SYNC_QUEUE, 'readonly');
-  return idbRequest(store.get(id));
+  return withStore(STORE_SYNC_QUEUE, 'readonly', (store) => store.get(id));
 }
 
 export async function updateSyncEntry(entry: SyncQueueEntry): Promise<void> {
-  const store = await tx(STORE_SYNC_QUEUE, 'readwrite');
-  await idbRequest(store.put(entry));
+  await withStore(STORE_SYNC_QUEUE, 'readwrite', (store) => store.put(entry));
 }
 
 export async function deleteSyncEntry(id: number): Promise<void> {
-  const store = await tx(STORE_SYNC_QUEUE, 'readwrite');
-  await idbRequest(store.delete(id));
+  await withStore(STORE_SYNC_QUEUE, 'readwrite', (store) => store.delete(id));
 }
 
 export async function getSyncQueueCount(): Promise<number> {
-  const store = await tx(STORE_SYNC_QUEUE, 'readonly');
-  return idbRequest(store.count());
+  return withStore(STORE_SYNC_QUEUE, 'readonly', (store) => store.count());
 }
 
 export async function clearSyncQueue(): Promise<void> {
-  const store = await tx(STORE_SYNC_QUEUE, 'readwrite');
-  await idbRequest(store.clear());
+  await withStore(STORE_SYNC_QUEUE, 'readwrite', (store) => store.clear());
 }
 
 // ---------------------------------------------------------------------------
@@ -148,16 +151,19 @@ const ACTIVE_DRAFT_ID = 'active-wizard-draft';
 export async function saveDraftToDb(
   currentStep: number,
   formData: Record<string, unknown>,
-): Promise<void> {
+  wizardKind?: WizardKind | null,
+): Promise<string> {
   try {
-    const store = await tx(STORE_DRAFTS, 'readwrite');
+    const updatedAt = new Date().toISOString();
     const entry: DraftEntry = {
       id: ACTIVE_DRAFT_ID,
       currentStep,
       formData,
-      updatedAt: new Date().toISOString(),
+      updatedAt,
+      ...(wizardKind ? { wizardKind } : {}),
     };
-    await idbRequest(store.put(entry));
+    await withStore(STORE_DRAFTS, 'readwrite', (store) => store.put(entry));
+    return updatedAt;
   } catch (e) {
     notifyQuotaExceeded(e);
     throw e;
@@ -165,11 +171,11 @@ export async function saveDraftToDb(
 }
 
 export async function loadDraftFromDb(): Promise<DraftEntry | undefined> {
-  const store = await tx(STORE_DRAFTS, 'readonly');
-  return idbRequest(store.get(ACTIVE_DRAFT_ID));
+  return withStore(STORE_DRAFTS, 'readonly', (store) => store.get(ACTIVE_DRAFT_ID));
 }
 
 export async function clearDraftFromDb(): Promise<void> {
-  const store = await tx(STORE_DRAFTS, 'readwrite');
-  await idbRequest(store.delete(ACTIVE_DRAFT_ID));
+  await withStore(STORE_DRAFTS, 'readwrite', (store) =>
+    store.delete(ACTIVE_DRAFT_ID),
+  );
 }

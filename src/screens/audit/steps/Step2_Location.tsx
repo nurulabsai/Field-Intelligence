@@ -1,6 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
+import {
+  districtsForRegion,
+  TARGET_REGION_KEYS,
+  TANZANIA_REGIONS,
+} from '../../../lib/tanzania-admin-cascade';
 
 interface Step2Props {
   data: Record<string, unknown>;
@@ -8,26 +13,36 @@ interface Step2Props {
   errors: Record<string, string>;
 }
 
-const TANZANIA_REGIONS = [
-  'Arusha', 'Dar es Salaam', 'Dodoma', 'Geita', 'Iringa', 'Kagera', 'Katavi',
-  'Kigoma', 'Kilimanjaro', 'Lindi', 'Manyara', 'Mara', 'Mbeya', 'Morogoro',
-  'Mtwara', 'Mwanza', 'Njombe', 'Pemba North', 'Pemba South', 'Pwani',
-  'Rukwa', 'Ruvuma', 'Shinyanga', 'Simiyu', 'Singida', 'Songwe', 'Tabora',
-  'Tanga', 'Unguja North', 'Unguja South', 'Zanzibar Central/South',
-];
-
 const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsError, setGpsError] = useState<string | null>(null);
   const [regionOpen, setRegionOpen] = useState(false);
+  const [districtOpen, setDistrictOpen] = useState(false);
 
-  const lat = data.latitude as number | undefined;
-  const lng = data.longitude as number | undefined;
+  const lat = (data.latitude as number | undefined) ?? (data.gps_lat as number | undefined);
+  const lng = (data.longitude as number | undefined) ?? (data.gps_lng as number | undefined);
   const accuracy = data.gps_accuracy as number | undefined;
 
-  const handleChange = useCallback((key: string, value: string) => {
-    onChange({ [key]: value });
-  }, [onChange]);
+  const region = (data.region as string) || '';
+  const districtList = useMemo(() => districtsForRegion(region), [region]);
+  const useDistrictDropdown = TARGET_REGION_KEYS.includes(region as (typeof TARGET_REGION_KEYS)[number]);
+
+  const handleChange = useCallback(
+    (key: string, value: string) => {
+      if (key === 'region') {
+        const nextDistricts = districtsForRegion(value);
+        const currentD = (data.district as string) || '';
+        const patch: Record<string, unknown> = { region: value };
+        if (nextDistricts.length > 0 && !nextDistricts.includes(currentD)) {
+          patch.district = '';
+        }
+        onChange(patch);
+        return;
+      }
+      onChange({ [key]: value });
+    },
+    [data.district, onChange],
+  );
 
   const captureGPS = useCallback(() => {
     if (!navigator.geolocation) {
@@ -37,26 +52,29 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
     setGpsLoading(true);
     setGpsError(null);
     navigator.geolocation.getCurrentPosition(
-      position => {
+      (position) => {
+        const la = position.coords.latitude;
+        const lo = position.coords.longitude;
         onChange({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+          latitude: la,
+          longitude: lo,
+          gps_lat: la,
+          gps_lng: lo,
           gps_accuracy: position.coords.accuracy,
           gps_timestamp: position.timestamp,
         });
         setGpsLoading(false);
       },
-      err => {
+      (err) => {
         setGpsError(err.message || 'Failed to capture GPS location');
         setGpsLoading(false);
       },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
     );
   }, [onChange]);
 
-  const region = (data.region as string) || '';
-
-  const inputBaseClasses = "w-full py-3 px-4 bg-bg-input rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150";
+  const inputBaseClasses =
+    'w-full py-3 px-4 bg-bg-input rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150';
 
   return (
     <div>
@@ -64,11 +82,10 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
         Location Details
       </h2>
       <p className="text-sm text-text-tertiary mb-7">
-        Capture farm location and administrative details
+        Region, district (cascade for Pwani / Morogoro / Ruvuma), ward, village, and GPS
       </p>
 
       <div className="nuru-glass-card rounded-[32px] p-6 flex flex-col gap-5">
-        {/* Region Dropdown */}
         <div>
           <label
             htmlFor="location-region-dd"
@@ -80,7 +97,7 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
             <button
               id="location-region-dd"
               type="button"
-              onClick={() => setRegionOpen(p => !p)}
+              onClick={() => setRegionOpen((p) => !p)}
               className={cn(
                 inputBaseClasses,
                 'text-left cursor-pointer flex items-center justify-between border',
@@ -94,11 +111,14 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
             </button>
             {regionOpen && (
               <div className="absolute top-full left-0 right-0 mt-1 nuru-glass-card border border-border-dark rounded-[18px] z-50 max-h-60 overflow-y-auto shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
-                {TANZANIA_REGIONS.map(r => (
+                {TANZANIA_REGIONS.map((r) => (
                   <button
                     key={r}
                     type="button"
-                    onClick={() => { handleChange('region', r); setRegionOpen(false); }}
+                    onClick={() => {
+                      handleChange('region', r);
+                      setRegionOpen(false);
+                    }}
                     className={cn(
                       'w-full min-h-12 py-2.5 px-4 border-none text-sm text-left cursor-pointer font-inherit',
                       region === r ? 'bg-accent/15 text-accent' : 'bg-transparent text-white',
@@ -113,7 +133,6 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
           {errors.region && <p className="text-xs text-error-light mt-1">{errors.region}</p>}
         </div>
 
-        {/* District */}
         <div>
           <label
             htmlFor="location-district"
@@ -121,51 +140,113 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
           >
             District <span className="text-text-accent">*</span>
           </label>
-          <input
-            id="location-district"
-            type="text"
-            value={(data.district as string) || ''}
-            onChange={e => handleChange('district', e.target.value)}
-            placeholder="Enter district"
-            className={cn(
-              inputBaseClasses,
-              'border',
-              errors.district ? 'border-error' : 'border-border',
-              'focus:border-accent',
-            )}
-          />
+          {useDistrictDropdown && districtList.length > 0 ? (
+            <div className="relative">
+              <button
+                id="location-district"
+                type="button"
+                onClick={() => setDistrictOpen((p) => !p)}
+                className={cn(
+                  inputBaseClasses,
+                  'text-left cursor-pointer flex items-center justify-between border w-full',
+                  errors.district ? 'border-error' : 'border-border',
+                )}
+              >
+                <span className={(data.district as string) ? 'text-white' : 'text-text-tertiary'}>
+                  {(data.district as string) || 'Select district'}
+                </span>
+                <MaterialIcon name="expand_more" size={18} className="text-text-tertiary" />
+              </button>
+              {districtOpen && (
+                <div className="absolute top-full left-0 right-0 mt-1 nuru-glass-card border border-border-dark rounded-[18px] z-50 max-h-52 overflow-y-auto shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
+                  {districtList.map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      onClick={() => {
+                        handleChange('district', d);
+                        setDistrictOpen(false);
+                      }}
+                      className={cn(
+                        'w-full min-h-12 py-2.5 px-4 border-none text-sm text-left cursor-pointer font-inherit',
+                        (data.district as string) === d ? 'bg-accent/15 text-accent' : 'bg-transparent text-white',
+                      )}
+                    >
+                      {d}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <input
+              id="location-district"
+              type="text"
+              value={(data.district as string) || ''}
+              onChange={(e) => handleChange('district', e.target.value)}
+              placeholder="Enter district"
+              className={cn(
+                inputBaseClasses,
+                'border',
+                errors.district ? 'border-error' : 'border-border',
+                'focus:border-accent',
+              )}
+            />
+          )}
           {errors.district && <p className="text-xs text-error-light mt-1">{errors.district}</p>}
         </div>
 
-        {/* Ward */}
         <div>
-          <label htmlFor="location-ward" className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">Ward</label>
+          <label
+            htmlFor="location-ward"
+            className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5"
+          >
+            Ward <span className="text-text-accent">*</span>
+          </label>
           <input
             id="location-ward"
             type="text"
             value={(data.ward as string) || ''}
-            onChange={e => handleChange('ward', e.target.value)}
+            onChange={(e) => handleChange('ward', e.target.value)}
             placeholder="Enter ward"
-            className={cn(inputBaseClasses, 'border border-border focus:border-accent')}
+            className={cn(
+              inputBaseClasses,
+              'border border-border focus:border-accent',
+              errors.ward ? 'border-error' : 'border-border',
+            )}
           />
+          {errors.ward && <p className="text-xs text-error-light mt-1">{errors.ward}</p>}
         </div>
 
-        {/* Village */}
         <div>
-          <label htmlFor="location-village" className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">Village</label>
+          <label
+            htmlFor="location-village"
+            className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5"
+          >
+            Village <span className="text-text-accent">*</span>
+          </label>
           <input
             id="location-village"
             type="text"
             value={(data.village as string) || ''}
-            onChange={e => handleChange('village', e.target.value)}
+            onChange={(e) => handleChange('village', e.target.value)}
             placeholder="Enter village"
-            className={cn(inputBaseClasses, 'border border-border focus:border-accent')}
+            className={cn(
+              inputBaseClasses,
+              'border border-border focus:border-accent',
+              errors.village ? 'border-error' : 'border-border',
+            )}
           />
+          {errors.village && <p className="text-xs text-error-light mt-1">{errors.village}</p>}
         </div>
 
-        {/* GPS Capture */}
         <div>
-          <label htmlFor="location-gps-capture" className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5">GPS Coordinates</label>
+          <label
+            htmlFor="location-gps-capture"
+            className="block text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary mb-1.5"
+          >
+            GPS Coordinates <span className="text-text-accent">*</span>
+          </label>
           <button
             id="location-gps-capture"
             type="button"
@@ -195,7 +276,6 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
             )}
           </button>
 
-          {/* GPS Data Display */}
           {lat !== undefined && lng !== undefined && (
             <div className="mt-3 py-3.5 px-4 nuru-glass-card rounded-[16px] border border-border-glass">
               <div className="grid grid-cols-2 gap-2">
@@ -224,7 +304,6 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
             </div>
           )}
 
-          {/* Accuracy Warning */}
           {accuracy !== undefined && accuracy > 50 && (
             <div className="flex items-center gap-2 mt-2 py-2.5 px-3.5 bg-warning/10 border border-warning/25 rounded-[10px]">
               <MaterialIcon name="warning" size={16} className="text-warning shrink-0" />
@@ -234,12 +313,9 @@ const Step2_Location: React.FC<Step2Props> = ({ data, onChange, errors }) => {
             </div>
           )}
 
-          {gpsError && (
-            <p className="text-xs text-error-light mt-2">{gpsError}</p>
-          )}
+          {gpsError && <p className="text-xs text-error-light mt-2">{gpsError}</p>}
         </div>
 
-        {/* Map Placeholder */}
         <div className="w-full h-[200px] nuru-glass-card rounded-[18px] border border-border-glass flex items-center justify-center text-text-tertiary">
           <div className="text-center">
             <MaterialIcon name="location_on" size={32} className="mx-auto mb-2 opacity-50" />

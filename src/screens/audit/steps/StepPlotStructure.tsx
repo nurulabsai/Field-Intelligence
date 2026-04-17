@@ -3,6 +3,9 @@ import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
 import type { Plot, FarmProfile, PlotStatus, GrowthStage } from '../../../lib/audit-types';
 import { createPlot } from '../../../lib/audit-types';
+import { useUIStore } from '../../../store/index';
+import { CROP_OPTIONS, optionsForDropdown } from '../../../lib/wizard-enums';
+import { parseAreaHa } from '../../../lib/utils';
 
 interface StepPlotStructureProps {
   data: Record<string, unknown>;
@@ -33,18 +36,14 @@ const IRRIGATION_OPTIONS = [
   { value: 'supplemental', label: 'Supplemental' },
 ];
 
-const CROP_OPTIONS = [
-  'Maize', 'Rice', 'Wheat', 'Sorghum', 'Millet', 'Cassava', 'Sweet Potato',
-  'Beans', 'Groundnuts', 'Sunflower', 'Sesame', 'Cotton', 'Coffee', 'Tea',
-  'Cashew Nuts', 'Tobacco', 'Banana', 'Coconut', 'Pigeon Pea', 'Tomato',
-  'Onion', 'Cabbage', 'Other',
-];
-
 const SEASONS = ['Long rains (Masika)', 'Short rains (Vuli)', 'Dry season', 'Year-round'];
 
 const inputClasses = "w-full py-2.5 px-3.5 bg-bg-input border border-border rounded-[14px] text-white text-sm font-inherit outline-none transition-colors duration-150 focus:border-accent";
 
 const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, errors }) => {
+  const language = useUIStore((s) => s.language);
+  const cropOptions = useMemo(() => optionsForDropdown(CROP_OPTIONS, language), [language]);
+
   const farmProfile = data.farm_profile as FarmProfile | undefined;
   const farmId = farmProfile?.id || '';
 
@@ -120,8 +119,11 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
     setExpandedPlots(prev => ({ ...prev, [plotId]: !prev[plotId] }));
   };
 
-  const totalPlotArea = plots.reduce((s, p) => s + (parseFloat(String(p.area_ha)) || 0), 0);
-  const farmArea = parseFloat(String(farmProfile?.total_area_ha)) || 0;
+  // Display-only aggregation: treat invalid/empty entries as 0 so the running
+  // total stays visible while the user is mid-edit. Submission path (in
+  // AuditWizard.buildSubmissionPayload) rejects invalid input instead.
+  const totalPlotArea = plots.reduce((s, p) => s + (parseAreaHa(p.area_ha) ?? 0), 0);
+  const farmArea = parseAreaHa(farmProfile?.total_area_ha) ?? 0;
   const areaOverflow = farmArea > 0 && totalPlotArea > farmArea * 1.2;
 
   const renderDropdown = (
@@ -310,7 +312,7 @@ const StepPlotStructure: React.FC<StepPlotStructureProps> = ({ data, onChange, e
 
                   {/* Crop + Variety */}
                   <div className="grid grid-cols-2 gap-3">
-                    {renderDropdown(plot.id, 'current_crop', 'Current Crop', CROP_OPTIONS.map(c => ({ value: c.toLowerCase().replace(/\s+/g, '_'), label: c })), true)}
+                    {renderDropdown(plot.id, 'current_crop', 'Current Crop', cropOptions, true)}
                     <div>
                       <label htmlFor={`plot-${plot.id}-variety`} className="block text-xs font-medium text-text-tertiary mb-1">Variety</label>
                       <input

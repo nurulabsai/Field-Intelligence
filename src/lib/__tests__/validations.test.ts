@@ -18,6 +18,12 @@ describe('step1IdentitySchema', () => {
   const valid = {
     farmer_name: 'Juma Mwangi',
     farmer_phone: '+255712345678',
+    farmer_gender: 'male' as const,
+    farmer_dob: '1985-06-15',
+    reporting_season: 'masika_2025_26' as const,
+    labour_types: ['family_only' as const],
+    data_use_consent: true as const,
+    farm_name: 'Kijiji farm',
   };
 
   it('accepts valid identity data', () => {
@@ -34,18 +40,28 @@ describe('step1IdentitySchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('rejects phone without country code', () => {
+  it('normalizes phone with leading zero to +255 prefix', () => {
     const result = step1IdentitySchema.safeParse({ ...valid, farmer_phone: '0712345678' });
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
   });
 
   it('accepts optional national ID', () => {
-    const result = step1IdentitySchema.safeParse({ ...valid, farmer_national_id: '12345678' });
+    const result = step1IdentitySchema.safeParse({
+      ...valid,
+      farmer_national_id: '12345678',
+      cooperative: '',
+      farm_name: 'Test farm',
+    });
     expect(result.success).toBe(true);
   });
 
   it('rejects national ID with letters', () => {
-    const result = step1IdentitySchema.safeParse({ ...valid, farmer_national_id: 'ABC123' });
+    const result = step1IdentitySchema.safeParse({
+      ...valid,
+      cooperative: '',
+      farm_name: 'F',
+      farmer_national_id: 'ABC123',
+    });
     expect(result.success).toBe(false);
   });
 });
@@ -92,6 +108,22 @@ describe('step2LocationSchema', () => {
     const result = step2LocationSchema.safeParse({ ...valid, gps_accuracy: 150 });
     expect(result.success).toBe(false);
   });
+
+  it('maps latitude/longitude to gps_lat/gps_lng', () => {
+    const result = step2LocationSchema.safeParse({
+      region: 'Pwani',
+      district: 'Rufiji',
+      ward: 'Utete',
+      village: 'Kikale',
+      latitude: -7.47,
+      longitude: 39.18,
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.gps_lat).toBe(-7.47);
+      expect(result.data.gps_lng).toBe(39.18);
+    }
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -124,6 +156,28 @@ describe('step3FarmSchema', () => {
 
   it('rejects unrealistically large area', () => {
     const result = step3FarmSchema.safeParse({ ...valid, total_area_ha: 20_000 });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts Swahili decimal-comma input ("2,5" → 2.5 ha)', () => {
+    const result = step3FarmSchema.safeParse({
+      ...valid,
+      total_area_ha: '2,5',
+      cultivated_area_ha: '1,75',
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.total_area_ha).toBe(2.5);
+      expect(result.data.cultivated_area_ha).toBe(1.75);
+    }
+  });
+
+  it('enforces cultivated ≤ total when both use comma decimals', () => {
+    const result = step3FarmSchema.safeParse({
+      ...valid,
+      total_area_ha: '2,0',
+      cultivated_area_ha: '2,5',
+    });
     expect(result.success).toBe(false);
   });
 });
@@ -203,6 +257,7 @@ describe('step6YieldSchema', () => {
       yield_loss_pct: 15,
       market_channel: 'cooperative',
       price_per_kg_tzs: 800,
+      ortamisemi_constraint_tags: ['input_access', 'finance_credit'],
     });
     expect(result.success).toBe(true);
   });
@@ -215,6 +270,7 @@ describe('step6YieldSchema', () => {
   it('validates constraint severity range 0-4', () => {
     const result = step6YieldSchema.safeParse({
       constraints: { pests: 5, diseases: 0, drought: 0, flooding: 0 },
+      ortamisemi_constraint_tags: ['other'],
     });
     expect(result.success).toBe(false);
   });
@@ -222,6 +278,7 @@ describe('step6YieldSchema', () => {
   it('accepts valid photo entries', () => {
     const result = step6YieldSchema.safeParse({
       photos: [{ id: 'p1', timestamp: '2025-03-15T10:00:00Z', label: 'field' }],
+      ortamisemi_constraint_tags: ['pests_diseases'],
     });
     expect(result.success).toBe(true);
   });
@@ -232,12 +289,21 @@ describe('step6YieldSchema', () => {
 // ---------------------------------------------------------------------------
 
 describe('validateStep', () => {
-  it('returns TOTAL_STEPS = 6', () => {
-    expect(TOTAL_STEPS).toBe(6);
+  it('returns TOTAL_STEPS = 11', () => {
+    expect(TOTAL_STEPS).toBe(11);
   });
 
   it('validates step 0 (identity)', () => {
-    const result = validateStep(0, { farmer_name: 'Test', farmer_phone: '+255712345678' });
+    const result = validateStep(0, {
+      farmer_name: 'Test User',
+      farmer_phone: '+255712345678',
+      farmer_gender: 'female',
+      farmer_dob: '1990-01-01',
+      reporting_season: 'masika_2025_26',
+      labour_types: ['none'],
+      data_use_consent: true,
+      farm_name: 'Demo farm',
+    });
     expect(result.success).toBe(true);
   });
 
@@ -248,6 +314,6 @@ describe('validateStep', () => {
 
   it('throws RangeError for out-of-bounds step', () => {
     expect(() => validateStep(-1, {})).toThrow(RangeError);
-    expect(() => validateStep(6, {})).toThrow(RangeError);
+    expect(() => validateStep(11, {})).toThrow(RangeError);
   });
 });

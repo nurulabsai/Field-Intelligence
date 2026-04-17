@@ -1,23 +1,28 @@
-
 {
   "short_name": "NuruOS",
   "name": "NuruOS: Field Intelligence",
   "description": "Professional field audit and data collection platform.",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192.png?text=NuruOS+192",
+      "src": "/icons/icon-192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "https://via.placeholder.com/512.png?text=NuruOS+512",
+      "src": "/icons/icon-512.png",
       "type": "image/png",
       "sizes": "512x512"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#2563eb",
-  "background_color": "#f8fafc",
+  "theme_color": "#0B0F19",
+  "background_color": "#0B0F19",
   "orientation": "portrait"
 }

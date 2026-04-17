@@ -1,6 +1,14 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
+import { useUIStore } from '../../../store/index';
+import {
+  IRRIGATION_TYPE_OPTIONS,
+  LAND_TENURE_OPTIONS,
+  optionsForDropdown,
+  SOIL_TYPE_OPTIONS,
+  WATER_SOURCE_OPTIONS,
+} from '../../../lib/wizard-enums';
 
 interface Step3Props {
   data: Record<string, unknown>;
@@ -13,36 +21,6 @@ interface DropdownOption {
   label: string;
 }
 
-const LAND_TENURE: DropdownOption[] = [
-  { value: 'owned', label: 'Owned' },
-  { value: 'leased', label: 'Leased' },
-  { value: 'communal', label: 'Communal' },
-  { value: 'government', label: 'Government' },
-];
-
-const SOIL_TYPES: DropdownOption[] = [
-  { value: 'clay', label: 'Clay' },
-  { value: 'loam', label: 'Loam' },
-  { value: 'sand', label: 'Sand' },
-  { value: 'silt', label: 'Silt' },
-];
-
-const IRRIGATION_TYPES: DropdownOption[] = [
-  { value: 'none', label: 'None' },
-  { value: 'drip', label: 'Drip' },
-  { value: 'sprinkler', label: 'Sprinkler' },
-  { value: 'flood', label: 'Flood' },
-  { value: 'canal', label: 'Canal' },
-];
-
-const WATER_SOURCES: DropdownOption[] = [
-  { value: 'rain', label: 'Rain' },
-  { value: 'river', label: 'River' },
-  { value: 'borehole', label: 'Borehole' },
-  { value: 'dam', label: 'Dam' },
-  { value: 'spring', label: 'Spring' },
-];
-
 interface FieldErrors {
   total_area_ha?: string;
   cultivated_area_ha?: string;
@@ -53,6 +31,12 @@ interface FieldErrors {
 }
 
 const Step3_FarmChar: React.FC<Step3Props> = ({ data, onChange, errors: externalErrors }) => {
+  const language = useUIStore((s) => s.language);
+  const LAND_TENURE = useMemo(() => optionsForDropdown(LAND_TENURE_OPTIONS, language), [language]);
+  const SOIL_TYPES = useMemo(() => optionsForDropdown(SOIL_TYPE_OPTIONS, language), [language]);
+  const IRRIGATION_TYPES = useMemo(() => optionsForDropdown(IRRIGATION_TYPE_OPTIONS, language), [language]);
+  const WATER_SOURCES = useMemo(() => optionsForDropdown(WATER_SOURCE_OPTIONS, language), [language]);
+
   const [localErrors, setLocalErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);

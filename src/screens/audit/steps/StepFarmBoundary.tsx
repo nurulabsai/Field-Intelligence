@@ -227,6 +227,9 @@ const StepFarmBoundary: React.FC<StepFarmBoundaryProps> = ({ data, onChange, err
     const maxLat = Math.max(...lats);
     const minLon = Math.min(...lons);
     const maxLon = Math.max(...lons);
+    // Zero-guard, not user-input coercion: when all captured points share a
+    // lat/lon (e.g. three collinear GPS fixes), the bbox collapses and the
+    // SVG projection would divide by zero. 0.001 is the fallback pad width.
     const padLat = (maxLat - minLat) * 0.15 || 0.001;
     const padLon = (maxLon - minLon) * 0.15 || 0.001;
     const vMinLat = minLat - padLat;

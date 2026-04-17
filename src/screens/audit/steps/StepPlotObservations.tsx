@@ -76,7 +76,6 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
 
   const [activePlotIndex, setActivePlotIndex] = useState(0);
   const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>({});
-  const [recording, setRecording] = useState(false);
   const photoRef = useRef<HTMLInputElement>(null);
 
   const activePlot = plots[activePlotIndex];
@@ -430,23 +429,6 @@ const StepPlotObservations: React.FC<StepPlotObservationsProps> = ({ data, onCha
               aria-label="Plot observation photo"
             />
           </div>
-
-          {/* Voice note indicator */}
-          {typeof window !== 'undefined' && 'MediaRecorder' in window && (
-            <button
-              type="button"
-              onClick={() => setRecording(p => !p)}
-              className={cn(
-                "w-full py-3 flex items-center justify-center gap-2 rounded-full text-sm font-medium cursor-pointer font-inherit border mb-4",
-                recording
-                  ? "bg-error/15 border-error/30 text-error"
-                  : "bg-border-glass border-border text-text-secondary",
-              )}
-            >
-              {recording ? <MaterialIcon name="mic_off" size={16} /> : <MaterialIcon name="mic" size={16} />}
-              {recording ? 'Stop Recording' : 'Voice Note'}
-            </button>
-          )}
 
           {/* Notes */}
           <label htmlFor={`obs-notes-${activePlotIndex}`} className="block text-xs font-medium text-text-tertiary mb-1">Notes</label>

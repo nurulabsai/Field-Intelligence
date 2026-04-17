@@ -1,6 +1,14 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import MaterialIcon from '../../../components/MaterialIcon';
 import { cn } from '../../../design-system';
+import { useUIStore } from '../../../store/index';
+import {
+  FERTILIZER_TYPE_OPTIONS,
+  optionsForDropdown,
+  PESTICIDE_TYPE_OPTIONS,
+  SEED_SOURCE_OPTIONS,
+  SEED_TYPE_OPTIONS,
+} from '../../../lib/wizard-enums';
 
 interface Step5Props {
   data: Record<string, unknown>;
@@ -13,40 +21,15 @@ interface DropdownOption {
   label: string;
 }
 
-const FERTILIZER_TYPES: DropdownOption[] = [
-  { value: 'none', label: 'None' },
-  { value: 'urea', label: 'Urea' },
-  { value: 'dap', label: 'DAP' },
-  { value: 'npk', label: 'NPK' },
-  { value: 'organic', label: 'Organic' },
-  { value: 'compost', label: 'Compost' },
-];
-
-const PESTICIDE_TYPES: DropdownOption[] = [
-  { value: 'none', label: 'None' },
-  { value: 'herbicide', label: 'Herbicide' },
-  { value: 'insecticide', label: 'Insecticide' },
-  { value: 'fungicide', label: 'Fungicide' },
-];
-
-const SEED_TYPES: DropdownOption[] = [
-  { value: 'local', label: 'Local' },
-  { value: 'improved', label: 'Improved' },
-  { value: 'hybrid', label: 'Hybrid' },
-  { value: 'certified', label: 'Certified' },
-];
-
-const SEED_SOURCES: DropdownOption[] = [
-  { value: 'own', label: 'Own Saved' },
-  { value: 'market', label: 'Market' },
-  { value: 'government', label: 'Government' },
-  { value: 'ngo', label: 'NGO' },
-  { value: 'company', label: 'Company' },
-];
-
 const inputClasses = "w-full py-3 px-4 bg-bg-input border border-border rounded-[16px] text-white text-[0.938rem] font-inherit outline-none transition-colors duration-150 focus:border-accent";
 
 const Step5_Inputs: React.FC<Step5Props> = ({ data, onChange, errors }) => {
+  const language = useUIStore((s) => s.language);
+  const FERTILIZER_TYPES = useMemo(() => optionsForDropdown(FERTILIZER_TYPE_OPTIONS, language), [language]);
+  const PESTICIDE_TYPES = useMemo(() => optionsForDropdown(PESTICIDE_TYPE_OPTIONS, language), [language]);
+  const SEED_TYPES = useMemo(() => optionsForDropdown(SEED_TYPE_OPTIONS, language), [language]);
+  const SEED_SOURCES = useMemo(() => optionsForDropdown(SEED_SOURCE_OPTIONS, language), [language]);
+
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const handleChange = useCallback((key: string, value: string) => {

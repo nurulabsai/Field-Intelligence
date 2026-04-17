@@ -1,8 +1,14 @@
-import React, { useEffect, useRef, useState, lazy } from 'react';
+import React, { useEffect, useMemo, useRef, useState, lazy } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore, useUIStore, useAuditStore } from '../store/index';
-import { schedule, dashboard, uploadYieldPhotosFromFormData, auth } from '../lib/supabase';
+import { schedule, dashboard, uploadYieldPhotosFromFormData, auth, dimActors } from '../lib/supabase';
+import { normalizeTanzanianPhoneInput } from '../lib/phone';
 import { enqueueAuditSync, drainSyncQueue } from '../lib/syncService';
+import {
+  buildLocalWizardDashboardRow,
+  inferWizardKind,
+  LOCAL_WIZARD_DRAFT_ID,
+} from '../lib/localWizardDraft';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 
 // Lazy-loaded screens (preserves code splitting from the old App.tsx layout)
@@ -80,6 +86,11 @@ export const DashboardWrapper: React.FC = () => {
   const addToast = useUIStore((s) => s.addToast);
   const setSideNavOpen = useUIStore((s) => s.setSideNavOpen);
   const navigate = useNavigate();
+  const currentDraft = useAuditStore((s) => s.currentDraft);
+  const currentStep = useAuditStore((s) => s.currentStep);
+  const activeWizardKind = useAuditStore((s) => s.activeWizardKind);
+  const draftUpdatedAt = useAuditStore((s) => s.draftUpdatedAt);
+  const draftRestored = useAuditStore((s) => s.draftRestored);
   const [isLoading, setIsLoading] = useState(false);
   const [stats, setStats] = useState<{ totalAudits: number; submittedToday: number; pendingSync: number; verified: number }>();
   const [audits, setAudits] = useState<Array<{ id: string; farmName: string; auditType: string; date: string; status: 'draft' | 'submitted' | 'verified' | 'synced' | 'failed' }> | undefined>(undefined);
@@ -88,6 +99,7 @@ export const DashboardWrapper: React.FC = () => {
 
   useEffect(() => {
     if (!user?.id) return;
+    const controller = new AbortController();
     setIsLoading(true);
     Promise.all([
       dashboard.getStats(user.id),
@@ -95,6 +107,7 @@ export const DashboardWrapper: React.FC = () => {
       dashboard.getCropPrices(undefined, 12),
     ])
       .then(([s, recent, market]) => {
+        if (controller.signal.aborted) return;
         const submittedToday = recent.filter((a) => {
           const date = new Date(a.updated_at || a.created_at).toDateString();
           return date === new Date().toDateString() && a.status === 'submitted';
@@ -134,27 +147,67 @@ export const DashboardWrapper: React.FC = () => {
         })));
       })
       .catch(() => {
+        if (controller.signal.aborted) return;
         setStressAlert("Can't reach the server. Showing your last synced data.");
         setAudits(undefined);
         setPrices(undefined);
         setStats(undefined);
       })
-      .finally(() => setIsLoading(false));
+      .finally(() => {
+        if (!controller.signal.aborted) setIsLoading(false);
+      });
+    return () => controller.abort();
   }, [user?.id, addToast]);
 
   useEffect(() => {
     setStats((prev) => (prev ? { ...prev, pendingSync } : prev));
   }, [pendingSync]);
 
+  const displayAudits = useMemo(() => {
+    const local =
+      draftRestored &&
+      buildLocalWizardDashboardRow(
+        currentDraft,
+        currentStep,
+        activeWizardKind,
+        draftUpdatedAt,
+      );
+    const base = audits ?? [];
+    if (!local) {
+      if (audits === undefined) return undefined;
+      return base;
+    }
+    return [local, ...base.filter((a) => a.id !== LOCAL_WIZARD_DRAFT_ID)];
+  }, [
+    audits,
+    currentDraft,
+    currentStep,
+    activeWizardKind,
+    draftUpdatedAt,
+    draftRestored,
+  ]);
+
   return (
     <DashboardHome
       userName={user?.fullName}
       isLoading={isLoading}
       stats={stats}
-      audits={audits}
+      audits={displayAudits}
       prices={prices}
       stressAlert={stressAlert}
-      onAuditClick={(id) => navigate(`/audit/${id}`)}
+      onAuditClick={(id) => {
+        if (id === LOCAL_WIZARD_DRAFT_ID) {
+          const st = useAuditStore.getState();
+          const kind =
+            st.activeWizardKind
+            ?? inferWizardKind(st.currentDraft as Record<string, unknown> | null);
+          navigate(
+            kind === 'business' ? '/audit/wizard/business' : '/audit/wizard/farm',
+          );
+          return;
+        }
+        navigate(`/audit/${id}`);
+      }}
       onViewAllAudits={() => navigate('/audits')}
       onStartNewAudit={() => navigate('/audit/new')}
       onMenuPress={() => setSideNavOpen(true)}
@@ -212,6 +265,11 @@ export const AuditListWrapper: React.FC = () => {
   const audits = useAuditStore((s) => s.audits);
   const loadAudits = useAuditStore((s) => s.loadAudits);
   const isLoading = useAuditStore((s) => s.isLoading);
+  const currentDraft = useAuditStore((s) => s.currentDraft);
+  const currentStep = useAuditStore((s) => s.currentStep);
+  const activeWizardKind = useAuditStore((s) => s.activeWizardKind);
+  const draftUpdatedAt = useAuditStore((s) => s.draftUpdatedAt);
+  const draftRestored = useAuditStore((s) => s.draftRestored);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -220,45 +278,89 @@ export const AuditListWrapper: React.FC = () => {
     });
   }, [user?.id, loadAudits]);
 
-  const mappedAudits = audits.map((a) => {
-    const location =
-      typeof a.audit_location === 'object' && a.audit_location
-        ? 'GPS Tagged'
-        : 'Location pending';
+  const mappedAudits = useMemo(
+    () =>
+      audits.map((a) => {
+        const location =
+          typeof a.audit_location === 'object' && a.audit_location
+            ? 'GPS Tagged'
+            : 'Location pending';
 
-    const statusMap: Record<string, 'draft' | 'submitted' | 'verified' | 'synced' | 'failed'> = {
-      draft: 'draft',
-      in_progress: 'draft',
-      submitted: 'submitted',
-      approved: 'verified',
-      rejected: 'failed',
-    };
+        const statusMap: Record<string, 'draft' | 'submitted' | 'verified' | 'synced' | 'failed'> = {
+          draft: 'draft',
+          in_progress: 'draft',
+          submitted: 'submitted',
+          approved: 'verified',
+          rejected: 'failed',
+        };
 
-    return {
-      id: a.id,
-      farmName: `Farm ${a.farm_id.slice(0, 8)}`,
-      date: new Date(a.updated_at || a.created_at).toLocaleDateString('en-TZ', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
+        return {
+          id: a.id,
+          farmName: `Farm ${a.farm_id.slice(0, 8)}`,
+          date: new Date(a.updated_at || a.created_at).toLocaleDateString('en-TZ', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+          }),
+          status: statusMap[a.status] ?? 'draft',
+          location,
+        };
       }),
-      status: statusMap[a.status] ?? 'draft',
-      location,
+    [audits],
+  );
+
+  const mappedAuditsWithLocal = useMemo(() => {
+    const local =
+      draftRestored &&
+      buildLocalWizardDashboardRow(
+        currentDraft,
+        currentStep,
+        activeWizardKind,
+        draftUpdatedAt,
+      );
+    if (!local) return mappedAudits;
+    const loc = {
+      id: local.id,
+      farmName: local.farmName,
+      auditType: local.auditType,
+      date: local.date,
+      status: local.status,
+      location: 'On device',
     };
-  });
+    return [loc, ...mappedAudits.filter((a) => a.id !== LOCAL_WIZARD_DRAFT_ID)];
+  }, [
+    mappedAudits,
+    draftRestored,
+    currentDraft,
+    currentStep,
+    activeWizardKind,
+    draftUpdatedAt,
+  ]);
 
   return (
     <AuditList
-      audits={mappedAudits}
+      audits={mappedAuditsWithLocal}
       isLoading={isLoading}
-      onAuditClick={(id) => navigate(`/audit/${id}`)}
+      onAuditClick={(id) => {
+        if (id === LOCAL_WIZARD_DRAFT_ID) {
+          const st = useAuditStore.getState();
+          const kind =
+            st.activeWizardKind
+            ?? inferWizardKind(st.currentDraft as Record<string, unknown> | null);
+          navigate(
+            kind === 'business' ? '/audit/wizard/business' : '/audit/wizard/farm',
+          );
+          return;
+        }
+        navigate(`/audit/${id}`);
+      }}
       onSettingsPress={() => navigate('/settings')}
       onExportCsv={() => {
-        if (mappedAudits.length === 0) {
+        if (mappedAuditsWithLocal.length === 0) {
           addToast({ type: 'warning', message: 'No audits to export yet.' });
           return;
         }
-        downloadAuditsCsv(mappedAudits);
+        downloadAuditsCsv(mappedAuditsWithLocal);
         addToast({ type: 'success', message: 'CSV downloaded.' });
       }}
       onFilterDatesPress={() =>
@@ -293,6 +395,22 @@ export const AuditWizardWrapper: React.FC = () => {
     <AuditWizard
       auditId={id}
       onComplete={async (data) => {
+        const d = data as Record<string, unknown>;
+        const phoneNorm = normalizeTanzanianPhoneInput(String(d.farmer_phone ?? ''));
+        if (/^\+255[1-9]\d{8}$/.test(phoneNorm)) {
+          try {
+            await dimActors.upsertFarmer({
+              phone_e164: phoneNorm,
+              full_name: String(d.farmer_name ?? ''),
+              gender: String(d.farmer_gender ?? '') || null,
+              date_of_birth: String(d.farmer_dob ?? '') || null,
+              national_id: String(d.farmer_national_id ?? '').trim() || null,
+            });
+          } catch {
+            // Table may not exist yet; do not block audit submit.
+          }
+        }
+
         const loc =
           typeof data.latitude === 'number' && typeof data.longitude === 'number'
             ? { latitude: data.latitude, longitude: data.longitude }
