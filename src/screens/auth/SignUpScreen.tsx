@@ -130,11 +130,14 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
             {/* Split Name Fields */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
-                <label className="block text-[10px] font-bold text-white/40 tracking-[0.15em] uppercase mb-2 ml-1">
+                <label htmlFor="signup-first-name" className="block text-[10px] font-bold text-white/40 tracking-[0.15em] uppercase mb-2 ml-1">
                   First Name
                 </label>
                 <input
+                  id="signup-first-name"
+                  name="firstName"
                   type="text"
+                  autoComplete="given-name"
                   value={firstName}
                   onChange={e => setFirstName(e.target.value)}
                   placeholder="Jonathan"
@@ -142,11 +145,14 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-white/40 tracking-[0.15em] uppercase mb-2 ml-1">
+                <label htmlFor="signup-last-name" className="block text-[10px] font-bold text-white/40 tracking-[0.15em] uppercase mb-2 ml-1">
                   Last Name
                 </label>
                 <input
+                  id="signup-last-name"
+                  name="lastName"
                   type="text"
+                  autoComplete="family-name"
                   value={lastName}
                   onChange={e => setLastName(e.target.value)}
                   placeholder="Smith"
@@ -157,11 +163,14 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
 
             {/* Email Field */}
             <div className="mb-6">
-              <label className="block text-[10px] font-bold text-white/40 tracking-[0.15em] uppercase mb-2 ml-1">
+              <label htmlFor="signup-email" className="block text-[10px] font-bold text-white/40 tracking-[0.15em] uppercase mb-2 ml-1">
                 Email
               </label>
               <input
+                id="signup-email"
+                name="email"
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="jonathansmith76@gmail.com"
@@ -171,12 +180,15 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
 
             {/* Password Field */}
             <div className="mb-6">
-              <label className="block text-[10px] font-bold text-white/40 tracking-[0.15em] uppercase mb-2 ml-1">
+              <label htmlFor="signup-password" className="block text-[10px] font-bold text-white/40 tracking-[0.15em] uppercase mb-2 ml-1">
                 Password
               </label>
               <div className="relative">
                 <input
+                  id="signup-password"
+                  name="new-password"
                   type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••••••"
@@ -196,12 +208,15 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onSignUp, onNavigateToLogin
 
             {/* Confirm Password Field */}
             <div className="mb-8">
-              <label className="block text-[10px] font-bold text-white/40 tracking-[0.15em] uppercase mb-2 ml-1">
+              <label htmlFor="signup-confirm-password" className="block text-[10px] font-bold text-white/40 tracking-[0.15em] uppercase mb-2 ml-1">
                 Confirm Password
               </label>
               <div className="relative">
                 <input
+                  id="signup-confirm-password"
+                  name="confirm-password"
                   type={showConfirm ? "text" : "password"}
+                  autoComplete="new-password"
                   value={confirmPassword}
                   onChange={e => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter password"
