@@ -45,6 +45,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
   audits,
   onAuditClick,
   onViewAllAudits,
+  onStartNewAudit,
   onMenuPress,
   onProfilePress,
 }) => {
@@ -122,7 +123,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                 </div>
                 <div>
                   <span className="text-4xl font-light tracking-tighter block mb-1 nuru-tabular-nums">
-                    {String(highPriority).padStart(2, '0')}
+                    {highPriority}
                   </span>
                   <h3 className="font-heading font-bold text-base leading-tight">High Priority<br />Audits</h3>
                   <p className="text-[10px] uppercase tracking-wider font-bold mt-2 opacity-60">Tasks Pending</p>
@@ -182,9 +183,19 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                       <h5 className="font-heading font-light text-lg text-white tracking-tight mb-1">
                         No audits yet
                       </h5>
-                      <p className="text-xs text-text-secondary max-w-[260px]">
-                        Start your first audit from the <span className="text-accent font-medium">+</span> button below.
+                      <p className="text-xs text-text-secondary max-w-[260px] mb-4">
+                        Start your first audit to begin tracking farm visits and observations.
                       </p>
+                      {onStartNewAudit && (
+                        <button
+                          type="button"
+                          onClick={onStartNewAudit}
+                          className="inline-flex items-center gap-2 bg-accent text-black px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider cursor-pointer border-none active:scale-95 transition-transform"
+                        >
+                          <MaterialIcon name="add" size={16} />
+                          Start Audit
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
