@@ -63,7 +63,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
         {/* Status text + progress bar */}
         <div className="w-full flex flex-col items-center space-y-6">
           <p className="font-heading font-light text-lg text-white tracking-tight leading-none">
-            Initializing Intelligence\u2026
+            Initializing Intelligence…
           </p>
           <div
             className="w-full h-[6px] bg-[#1E293B] rounded-full overflow-hidden relative"
