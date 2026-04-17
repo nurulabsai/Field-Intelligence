@@ -219,7 +219,9 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
               </p>
             </div>
             <div className="relative z-10 w-20 h-20 rounded-full bg-accent/5 border border-accent/10 flex items-center justify-center">
-              <span className="text-accent text-3xl font-light font-heading">A+</span>
+              <span className="text-accent text-3xl font-light font-heading">
+                {activities.length > 0 ? 'A+' : '—'}
+              </span>
             </div>
           </div>
         </div>
