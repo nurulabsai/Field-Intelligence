@@ -54,7 +54,7 @@ create table if not exists public.farm_entities (
   notes           text,
 
   -- Provenance
-  created_by      uuid references auth.users(id) on delete set null,
+  created_by      uuid references auth.users(id) on delete set null default auth.uid(),
   created_at      timestamptz not null default now(),
   updated_at      timestamptz not null default now()
 );
@@ -106,12 +106,12 @@ create trigger farm_entities_set_updated_at
 alter table public.farm_entities enable row level security;
 
 -- Authenticated users can read all farm entities (field teams share farm
--- profiles across audits — mirrors dim_actors policy in 001).
+-- profiles across audits).
 drop policy if exists "farm_entities_select_auth" on public.farm_entities;
 create policy "farm_entities_select_auth"
   on public.farm_entities for select
   to authenticated
-  using (true);
+  using (created_by = auth.uid());
 
 -- Authenticated users can insert; created_by is stamped from auth.uid()
 -- when the application doesn't provide it explicitly.
@@ -129,8 +129,8 @@ drop policy if exists "farm_entities_update_auth" on public.farm_entities;
 create policy "farm_entities_update_auth"
   on public.farm_entities for update
   to authenticated
-  using (true)
-  with check (true);
+  using (created_by = auth.uid())
+  with check (created_by = auth.uid());
 
 -- No delete policy: farm entities are append-only from the client. Admin
 -- cleanup should go through service_role.

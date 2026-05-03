@@ -1,5 +1,6 @@
 import React from 'react';
 import MaterialIcon from '../../components/MaterialIcon';
+import SyncStatusPanel from '../../components/SyncStatusPanel';
 
 interface DashboardHomeProps {
   userName?: string;
@@ -21,6 +22,9 @@ interface DashboardHomeProps {
   onMenuPress?: () => void;
   /** Opens Settings / profile. */
   onProfilePress?: () => void;
+  isOnline?: boolean;
+  syncInProgress?: boolean;
+  onSyncNow?: () => void;
 }
 
 /** Dashboard stat card fills — aligned to DESIGN.md palette */
@@ -48,6 +52,9 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
   onStartNewAudit,
   onMenuPress,
   onProfilePress,
+  isOnline = true,
+  syncInProgress = false,
+  onSyncNow,
 }) => {
   const highPriority = stats?.pendingSync ?? 0;
   const farmChecks = stats?.totalAudits ?? 0;
@@ -111,8 +118,17 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
               </h2>
             </section>
 
+            <section className="nuru-animate-in nuru-stagger-2">
+              <SyncStatusPanel
+                pendingCount={stats?.pendingSync ?? 0}
+                isOnline={isOnline}
+                syncing={syncInProgress}
+                onSyncNow={onSyncNow}
+              />
+            </section>
+
             {/* Stitch: grid grid-cols-2 gap-4 h-80; on md+ becomes 4 equal cards */}
-            <section className="grid grid-cols-2 md:grid-cols-4 gap-4 min-h-[260px] md:h-56 nuru-animate-in nuru-stagger-2" aria-label="Audit statistics">
+            <section className="grid grid-cols-2 md:grid-cols-4 gap-4 min-h-[260px] md:h-56 nuru-animate-in nuru-stagger-3" aria-label="Audit statistics">
               {/* Stitch home_2: bg-primary #d1fa7d (display lime), icon text-primary on black */}
               <div
                 className="md:col-span-2 rounded-[32px] p-8 flex flex-col justify-between items-center text-center text-slate-900 nuru-soft-shadow relative overflow-hidden active:scale-95 transition-transform border border-white/5"
@@ -160,7 +176,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
               </div>
             </section>
 
-            <section className="mt-2 nuru-animate-in nuru-stagger-3">
+            <section className="mt-2 nuru-animate-in nuru-stagger-4">
               <div className="flex justify-between items-center mb-6">
                 <h4 className="text-xl font-heading font-light tracking-tight text-white">Ongoing Audits</h4>
                 <button
@@ -228,7 +244,12 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({
                       role="listitem"
                       className="nuru-glass-card rounded-[32px] p-6 flex items-center gap-4 cursor-pointer active:scale-[0.98] transition-transform"
                       onClick={() => onAuditClick?.(audit.id)}
-                      onKeyDown={(e) => e.key === 'Enter' && onAuditClick?.(audit.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          onAuditClick?.(audit.id);
+                        }
+                      }}
                       tabIndex={0}
                     >
                       <div

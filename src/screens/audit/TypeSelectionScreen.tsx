@@ -15,6 +15,8 @@ const TypeSelectionScreen: React.FC = () => {
             Select Audit Type
           </h1>
           <button 
+            type="button"
+            aria-label="Close audit type selection"
             onClick={() => navigate('/dashboard')}
             className="w-12 h-12 shrink-0 rounded-full bg-bg-card border border-border flex items-center justify-center text-white/50 hover:text-white transition-colors cursor-pointer"
           >
@@ -57,7 +59,7 @@ const TypeSelectionScreen: React.FC = () => {
                 </div>
               </div>
               <span className="text-text-tertiary text-[13px] font-semibold">
-                12 Available templates
+                Farm workflow templates
               </span>
             </div>
 
@@ -103,7 +105,7 @@ const TypeSelectionScreen: React.FC = () => {
                 </div>
               </div>
               <span className="text-text-tertiary text-[13px] font-semibold">
-                8 Standard protocols
+                Business workflow templates
               </span>
             </div>
 

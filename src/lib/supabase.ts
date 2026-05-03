@@ -5,6 +5,7 @@
 
 import { createClient, type SupabaseClient, type RealtimeChannel } from '@supabase/supabase-js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './env';
+import type { ConsentRecord } from './consent-types';
 
 // ---------------------------------------------------------------------------
 // Client singleton
@@ -77,6 +78,39 @@ export interface AuditPhotoRow {
   storage_path: string;
   caption: string | null;
   created_at: string;
+}
+
+export interface AuditConsentRecordRow {
+  id: string;
+  client_id: string;
+  subject_farmer_id: string | null;
+  subject_actor_id: string | null;
+  farm_audit_id: string | null;
+  audit_type: 'farm_audit' | 'business_audit';
+  subject_name_confirmed: string;
+  subject_id_confirmed: string | null;
+  consent_data_collection: boolean;
+  consent_data_sharing_ortamisemi: boolean;
+  consent_data_sharing_government: boolean;
+  consent_photo_capture: boolean;
+  consent_gps_location: boolean;
+  language_of_consent: 'sw' | 'en';
+  consent_read_aloud: boolean;
+  subject_literate: boolean | null;
+  right_to_withdraw_explained: boolean;
+  consent_method: 'signature' | 'thumbprint' | 'verbal_witnessed';
+  consent_signature_data: string | null;
+  consent_signature_storage_path: string | null;
+  witness_name: string | null;
+  witness_phone: string | null;
+  consent_given_at: string;
+  consent_location_lat: number | null;
+  consent_location_lng: number | null;
+  form_version: string;
+  captured_by: string | null;
+  device_id: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CropRow {
@@ -399,6 +433,47 @@ export const photos = {
   },
 };
 
+export const consentRecords = {
+  async upsert(record: ConsentRecord): Promise<AuditConsentRecordRow> {
+    const payload = {
+      client_id: record.client_id,
+      subject_farmer_id: record.subject_farmer_id ?? null,
+      subject_actor_id: record.subject_actor_id ?? null,
+      farm_audit_id: record.farm_audit_id ?? null,
+      audit_type: record.audit_type,
+      subject_name_confirmed: record.subject_name_confirmed,
+      subject_id_confirmed: record.subject_id_confirmed ?? null,
+      consent_data_collection: record.consent_data_collection,
+      consent_data_sharing_ortamisemi: record.consent_data_sharing_ortamisemi,
+      consent_data_sharing_government: record.consent_data_sharing_government,
+      consent_photo_capture: record.consent_photo_capture,
+      consent_gps_location: record.consent_gps_location,
+      language_of_consent: record.language_of_consent,
+      consent_read_aloud: record.consent_read_aloud,
+      subject_literate: record.subject_literate ?? null,
+      right_to_withdraw_explained: record.right_to_withdraw_explained,
+      consent_method: record.consent_method,
+      consent_signature_data: record.consent_signature_data ?? null,
+      consent_signature_storage_path: record.consent_signature_storage_path ?? null,
+      witness_name: record.witness_name ?? null,
+      witness_phone: record.witness_phone ?? null,
+      consent_given_at: record.consent_given_at || new Date().toISOString(),
+      consent_location_lat: record.consent_location_lat ?? null,
+      consent_location_lng: record.consent_location_lng ?? null,
+      form_version: record.form_version,
+      device_id: record.device_id ?? null,
+    };
+
+    const { data, error } = await supabase
+      .from('audit_consent_records')
+      .upsert(payload, { onConflict: 'client_id' })
+      .select('*')
+      .single();
+    if (error) throw error;
+    return data as AuditConsentRecordRow;
+  },
+};
+
 const AUDIT_PHOTOS_BUCKET =
   (import.meta.env.VITE_SUPABASE_AUDIT_PHOTOS_BUCKET as string | undefined)?.trim() ||
   'audit-photos';
@@ -630,7 +705,7 @@ export const plots = {
       .from('plots')
       .select('*')
       .eq('farm_id', farmId)
-      .order('name', { ascending: true });
+      .order('plot_name', { ascending: true });
     if (error) throw error;
     return data ?? [];
   },
