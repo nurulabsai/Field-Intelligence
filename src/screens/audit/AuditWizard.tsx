@@ -33,7 +33,9 @@ import Step4_Crops from './steps/Step4_Crops';
 import Step5_Inputs from './steps/Step5_Inputs';
 import Step6_Yield from './steps/Step6_Yield';
 import StepSubmissionReview from './steps/StepSubmissionReview';
-import ConsentGate from './ConsentGate';
+import ConsentGateModal from '../../components/forms/ConsentGateModal';
+import type { ConsentRecord } from '../../lib/consent-types';
+import { isConsentComplete } from '../../lib/consent-types';
 
 interface AuditWizardProps {
   auditId?: string;
@@ -502,15 +504,23 @@ const AuditWizardForm: React.FC<AuditWizardProps> = ({ auditId, onComplete }) =>
     }
   };
 
-  const needsConsent = formData.data_use_consent !== true;
+  const consentRecord = formData.consent_record as ConsentRecord | undefined;
+  const needsConsent =
+    formData.data_use_consent !== true || !consentRecord || !isConsentComplete(consentRecord);
 
   return (
     <div className="min-h-screen bg-bg-primary flex flex-col font-base min-w-0 overflow-x-hidden relative">
       {needsConsent && (
-        <ConsentGate
+        <ConsentGateModal
+          audit_type="farm_audit"
           language={language}
-          onAccept={() => handleChange({ data_use_consent: true })}
+          consent={consentRecord}
+          onChange={(next) => handleChange({ consent_record: next })}
+          onAccept={() =>
+            handleChange({ data_use_consent: true, consent_completed_at: new Date().toISOString() })
+          }
           onDecline={() => navigate(-1)}
+          subjectLabel={{ en: 'Farmer', sw: 'Mkulima' }}
         />
       )}
 

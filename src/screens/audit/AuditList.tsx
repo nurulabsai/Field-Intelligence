@@ -181,7 +181,12 @@ const AuditList: React.FC<AuditListProps> = ({
                   <div
                     key={audit.id}
                     onClick={() => onAuditClick?.(audit.id)}
-                    onKeyDown={(e) => e.key === 'Enter' && onAuditClick?.(audit.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onAuditClick?.(audit.id);
+                      }
+                    }}
                     tabIndex={0}
                     role="button"
                     className="nuru-glassmorphism rounded-[32px] p-5 cursor-pointer active:scale-[0.98] transition-all"

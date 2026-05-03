@@ -1,15 +1,26 @@
 import React, { useEffect, useMemo, useRef, useState, lazy } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore, useUIStore, useAuditStore } from '../store/index';
-import { schedule, dashboard, uploadYieldPhotosFromFormData, auth, dimActors } from '../lib/supabase';
+import {
+  schedule,
+  dashboard,
+  auth,
+  dimActors,
+  consentRecords,
+  audits as auditsApi,
+} from '../lib/supabase';
 import { normalizeTanzanianPhoneInput } from '../lib/phone';
 import { enqueueAuditSync, drainSyncQueue } from '../lib/syncService';
+import { processSubmission } from '../lib/submissionService';
+import type { ConsentRecord } from '../lib/consent-types';
+import { isConsentComplete } from '../lib/consent-types';
 import {
   buildLocalWizardDashboardRow,
   inferWizardKind,
   LOCAL_WIZARD_DRAFT_ID,
 } from '../lib/localWizardDraft';
 import LoadingSkeleton from '../components/LoadingSkeleton';
+import SyncStatusPanel from '../components/SyncStatusPanel';
 
 // Lazy-loaded screens (preserves code splitting from the old App.tsx layout)
 const SignUpScreen = lazy(() => import('../screens/auth/SignUpScreen'));
@@ -83,6 +94,7 @@ export const SignUpWrapper: React.FC = () => {
 export const DashboardWrapper: React.FC = () => {
   const user = useAuthStore((s) => s.user);
   const pendingSync = useUIStore((s) => s.pendingSyncCount);
+  const isOnline = useUIStore((s) => s.isOnline);
   const addToast = useUIStore((s) => s.addToast);
   const setSideNavOpen = useUIStore((s) => s.setSideNavOpen);
   const navigate = useNavigate();
@@ -96,6 +108,7 @@ export const DashboardWrapper: React.FC = () => {
   const [audits, setAudits] = useState<Array<{ id: string; farmName: string; auditType: string; date: string; status: 'draft' | 'submitted' | 'verified' | 'synced' | 'failed' }> | undefined>(undefined);
   const [prices, setPrices] = useState<Array<{ id: string; crop: string; region: string; pricePerKg: number; change: number }> | undefined>(undefined);
   const [stressAlert, setStressAlert] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -212,28 +225,22 @@ export const DashboardWrapper: React.FC = () => {
       onStartNewAudit={() => navigate('/audit/new')}
       onMenuPress={() => setSideNavOpen(true)}
       onProfilePress={() => navigate('/settings')}
+      isOnline={isOnline}
+      syncInProgress={syncing}
+      onSyncNow={async () => {
+        setSyncing(true);
+        try {
+          await drainSyncQueue();
+          addToast({ type: 'success', message: 'Sync queue processed.' });
+        } catch {
+          addToast({ type: 'error', message: 'Could not run sync.' });
+        } finally {
+          setSyncing(false);
+        }
+      }}
     />
   );
 };
-
-// ─── Audit helpers ──────────────────────────────────────────────────────────
-async function tryUploadYieldPhotos(
-  addToast: (t: { type: 'warning'; message: string }) => void,
-  auditId: string,
-  farmId: string,
-  formData: Record<string, unknown>,
-): Promise<void> {
-  try {
-    await uploadYieldPhotosFromFormData(auditId, farmId, formData);
-  } catch (err) {
-    console.error('[audit photos]', err);
-    addToast({
-      type: 'warning',
-      message:
-        'Audit saved but some photos could not be uploaded. Create the Storage bucket and policies in Supabase (see .env.example).',
-    });
-  }
-}
 
 function escapeCsvCell(s: string): string {
   return `"${s.replace(/"/g, '""')}"`;
@@ -387,15 +394,117 @@ export const AuditWizardWrapper: React.FC = () => {
   const addToast = useUIStore((s) => s.addToast);
   const isOnline = useUIStore((s) => s.isOnline);
   const user = useAuthStore((s) => s.user);
-  const createAudit = useAuditStore((s) => s.createAudit);
-  const submitAudit = useAuditStore((s) => s.submitAudit);
+  const saveDraft = useAuditStore((s) => s.saveDraft);
   const resetDraft = useAuditStore((s) => s.resetDraft);
+  const setStep = useAuditStore((s) => s.setStep);
+  const setActiveWizardKind = useAuditStore((s) => s.setActiveWizardKind);
+  const [hydrating, setHydrating] = useState<boolean>(Boolean(id));
+  const [loadError, setLoadError] = useState<'not_found' | 'fetch_failed' | null>(null);
+
+  useEffect(() => {
+    if (!id) {
+      setHydrating(false);
+      setLoadError(null);
+      return;
+    }
+
+    let cancelled = false;
+    setHydrating(true);
+    setLoadError(null);
+
+    auditsApi
+      .getById(id)
+      .then(async (audit) => {
+        if (cancelled) return;
+        if (!audit) {
+          setLoadError('not_found');
+          setHydrating(false);
+          return;
+        }
+
+        const patch: Record<string, unknown> = {
+          _audit_id: audit.id,
+          farm_id: audit.farm_id,
+          gps_accuracy: audit.gps_accuracy_m ?? undefined,
+          audit_status: audit.status,
+        };
+
+        if (audit.audit_location && typeof audit.audit_location === 'object') {
+          const loc = audit.audit_location as Record<string, unknown>;
+          if (typeof loc.latitude === 'number') patch.latitude = loc.latitude;
+          if (typeof loc.longitude === 'number') patch.longitude = loc.longitude;
+          if (typeof loc.lat === 'number') patch.latitude = loc.lat;
+          if (typeof loc.lng === 'number') patch.longitude = loc.lng;
+        }
+
+        resetDraft();
+        setActiveWizardKind('farm');
+        await saveDraft(patch);
+        setStep(0);
+        setHydrating(false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setLoadError('fetch_failed');
+        setHydrating(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, resetDraft, saveDraft, setStep, setActiveWizardKind]);
+
+  if (loadError) {
+    return (
+      <Navigate
+        to="/audit/error"
+        replace
+        state={{
+          title: loadError === 'not_found' ? 'Audit not found' : 'Could not load audit',
+          message:
+            loadError === 'not_found'
+              ? 'The audit record may have been removed or you do not have access.'
+              : 'Please check connectivity and try again.',
+          retryPath: id ? `/audit/${id}` : '/audits',
+          backPath: '/audits',
+        }}
+      />
+    );
+  }
+
+  if (hydrating) {
+    return (
+      <div className="min-h-screen bg-bg-primary flex flex-col items-center justify-center gap-4 p-8 font-base">
+        <LoadingSkeleton variant="text" count={2} />
+        <LoadingSkeleton variant="card" count={1} />
+      </div>
+    );
+  }
 
   return (
     <AuditWizard
       auditId={id}
       onComplete={async (data) => {
         const d = data as Record<string, unknown>;
+        const auditClientId = typeof d._audit_client_id === 'string' && d._audit_client_id
+          ? d._audit_client_id
+          : crypto.randomUUID();
+        const consent = d.consent_record as ConsentRecord | undefined;
+        if (!consent || !isConsentComplete(consent)) {
+          addToast({
+            type: 'error',
+            message: 'Consent is required before submission.',
+          });
+          throw new Error('Consent is incomplete');
+        }
+
+        await consentRecords.upsert({
+          ...consent,
+          audit_type: 'farm_audit',
+          consent_given_at: consent.consent_given_at || new Date().toISOString(),
+          farm_audit_id: id ?? consent.farm_audit_id ?? null,
+        });
+
         const phoneNorm = normalizeTanzanianPhoneInput(String(d.farmer_phone ?? ''));
         if (/^\+255[1-9]\d{8}$/.test(phoneNorm)) {
           try {
@@ -438,19 +547,23 @@ export const AuditWizardWrapper: React.FC = () => {
           submitted_at: new Date().toISOString(),
         };
 
+        let persistedAuditId: string | undefined = id;
         try {
-          if (id) {
-            await submitAudit(id);
-            await tryUploadYieldPhotos(addToast, id, farmLocalId, data as Record<string, unknown>);
-          } else {
-            const created = await createAudit(auditRow);
-            await submitAudit(created.id);
-            await tryUploadYieldPhotos(
-              addToast,
-              created.id,
-              farmLocalId,
-              data as Record<string, unknown>,
-            );
+          const result = await processSubmission({
+            auditRow,
+            existingAuditId: id,
+            formData: data as Record<string, unknown>,
+            auditClientId,
+          });
+          persistedAuditId = result.auditId;
+
+          if (persistedAuditId) {
+            await consentRecords.upsert({
+              ...consent,
+              audit_type: 'farm_audit',
+              consent_given_at: consent.consent_given_at || new Date().toISOString(),
+              farm_audit_id: persistedAuditId,
+            });
           }
 
           addToast({ type: 'success', message: 'Audit submitted successfully.' });
@@ -459,8 +572,9 @@ export const AuditWizardWrapper: React.FC = () => {
           if (!isOnline || !navigator.onLine) {
             await enqueueAuditSync({
               auditRow,
-              existingAuditId: id,
+              existingAuditId: persistedAuditId,
               formData: data,
+              auditClientId,
             });
             resetDraft();
             addToast({
@@ -483,13 +597,24 @@ export const BusinessWizardWrapper: React.FC = () => {
   const addToast = useUIStore((s) => s.addToast);
   const isOnline = useUIStore((s) => s.isOnline);
   const user = useAuthStore((s) => s.user);
-  const createAudit = useAuditStore((s) => s.createAudit);
-  const submitAudit = useAuditStore((s) => s.submitAudit);
   const resetDraft = useAuditStore((s) => s.resetDraft);
 
   return (
     <BusinessWizard
       onComplete={async (data) => {
+        const payload = data as Record<string, unknown>;
+        const auditClientId = typeof payload._audit_client_id === 'string' && payload._audit_client_id
+          ? payload._audit_client_id
+          : crypto.randomUUID();
+        const consent = payload.consent_record as ConsentRecord | undefined;
+        if (consent && !isConsentComplete(consent)) {
+          addToast({
+            type: 'error',
+            message: 'Consent is incomplete. Please complete consent before submitting.',
+          });
+          throw new Error('Consent is incomplete');
+        }
+
         const auditRow = {
           campaign_id: null,
           farm_id: crypto.randomUUID(),
@@ -503,14 +628,19 @@ export const BusinessWizardWrapper: React.FC = () => {
         };
 
         try {
-          const created = await createAudit(auditRow);
-          await submitAudit(created.id);
-          await tryUploadYieldPhotos(
-            addToast,
-            created.id,
-            created.farm_id,
-            data as Record<string, unknown>,
-          );
+          const result = await processSubmission({
+            auditRow,
+            formData: data as Record<string, unknown>,
+            auditClientId,
+          });
+          if (consent) {
+            await consentRecords.upsert({
+              ...consent,
+              audit_type: 'business_audit',
+              consent_given_at: consent.consent_given_at || new Date().toISOString(),
+              farm_audit_id: result.auditId,
+            });
+          }
           addToast({ type: 'success', message: 'Business audit submitted successfully.' });
           navigate('/audits');
         } catch {
@@ -518,6 +648,7 @@ export const BusinessWizardWrapper: React.FC = () => {
             await enqueueAuditSync({
               auditRow,
               formData: data,
+              auditClientId,
             });
             resetDraft();
             addToast({
@@ -537,9 +668,12 @@ export const BusinessWizardWrapper: React.FC = () => {
 
 // ─── Schedule ───────────────────────────────────────────────────────────────
 export const CalendarWrapper: React.FC = () => {
+  const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const addToast = useUIStore((s) => s.addToast);
   const loadErrorShown = useRef(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<Array<{
     id: string;
     title: string;
@@ -552,10 +686,13 @@ export const CalendarWrapper: React.FC = () => {
 
   useEffect(() => {
     if (!user?.id) return;
+    setIsLoading(true);
+    setError(null);
     schedule
       .getEvents(user.id)
       .then((rows) => {
         loadErrorShown.current = false;
+        setError(null);
         const mapped = rows.map((r) => {
           const start = new Date(r.due_date || r.created_at);
           const typeMap: Record<string, 'audit' | 'training' | 'meeting' | 'deadline'> = {
@@ -578,16 +715,36 @@ export const CalendarWrapper: React.FC = () => {
         setEvents(mapped);
       })
       .catch(() => {
+        setError('Could not load schedule from server.');
         if (!loadErrorShown.current) {
           loadErrorShown.current = true;
           addToast({ type: 'warning', message: 'Could not load schedule from server.' });
         }
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }, [user?.id, addToast]);
 
   return (
     <CalendarScreen
       events={events}
+      isLoading={isLoading}
+      error={error}
+      onEventPress={(event) => {
+        if (event.type === 'audit') {
+          navigate('/audit/wizard/farm');
+          return;
+        }
+        if (event.type === 'deadline') {
+          navigate('/audits');
+          return;
+        }
+        addToast({
+          type: 'info',
+          message: `${event.title} scheduled at ${event.time}.`,
+        });
+      }}
       onSearchPress={() =>
         addToast({ type: 'info', message: 'Schedule search is not available yet.' })
       }
@@ -650,6 +807,7 @@ export const SettingsScreen: React.FC = () => {
   const user = useAuthStore((s) => s.user);
   const signOut = useAuthStore((s) => s.signOut);
   const pendingSync = useUIStore((s) => s.pendingSyncCount);
+  const isOnline = useUIStore((s) => s.isOnline);
   const language = useUIStore((s) => s.language);
   const setLanguage = useUIStore((s) => s.setLanguage);
   const addToast = useUIStore((s) => s.addToast);
@@ -750,22 +908,13 @@ export const SettingsScreen: React.FC = () => {
           <h2 className="text-[11px] font-bold text-text-tertiary uppercase tracking-[0.15em]">
             Offline Sync
           </h2>
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-[13px] text-white font-medium">Pending audits</div>
-              <div className="text-xs text-text-secondary">
-                {pendingSync === 0 ? 'All synced' : `${pendingSync} waiting to upload`}
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={handleDrain}
-              disabled={draining || pendingSync === 0}
-              className="bg-white/5 border border-white/10 text-white text-xs font-bold uppercase tracking-widest rounded-full px-5 py-3 cursor-pointer disabled:opacity-40 active:scale-[0.98] transition-all"
-            >
-              {draining ? 'Syncing…' : 'Sync now'}
-            </button>
-          </div>
+          <SyncStatusPanel
+            pendingCount={pendingSync}
+            isOnline={isOnline}
+            syncing={draining}
+            onSyncNow={handleDrain}
+            compact
+          />
         </section>
 
         <section aria-label="Security" className="nuru-glassmorphism rounded-[32px] p-8 mb-6 space-y-5">
@@ -787,6 +936,13 @@ export const SettingsScreen: React.FC = () => {
 
         <button
           onClick={async () => {
+            const hasUnsavedAudit =
+              typeof window !== 'undefined' &&
+              sessionStorage.getItem('nuru_audit_dirty') === 'true';
+            if (hasUnsavedAudit) {
+              const ok = window.confirm('You have unsaved audit changes. Sign out anyway?');
+              if (!ok) return;
+            }
             await signOut();
             navigate('/auth/login');
           }}

@@ -33,6 +33,7 @@ interface DisplayActivity {
 interface CalendarScreenProps {
   events?: CalendarEvent[];
   onAddEvent?: (event: { title: string; type: EventType; date: string; time: string; location: string; notes?: string }) => Promise<void>;
+  onEventPress?: (event: CalendarEvent) => void;
   isLoading?: boolean;
   error?: string | null;
   onSearchPress?: () => void;
@@ -89,6 +90,7 @@ const FILTERS = ['All', 'Completed', 'Pending'];
 
 const CalendarScreen: React.FC<CalendarScreenProps> = ({
   events = [],
+  onEventPress,
   isLoading = false,
   error = null,
   onSearchPress,
@@ -277,7 +279,55 @@ const CalendarScreen: React.FC<CalendarScreenProps> = ({
             {!isLoading && filteredActivities.map((activity) => (
               <div 
                 key={activity.id} 
-                onClick={() => navigate('/audit/wizard/business')}
+                onClick={() => {
+                  if (onEventPress) {
+                    onEventPress({
+                      id: activity.id,
+                      title: activity.title,
+                      type: activity.type,
+                      date: activity.date,
+                      time: activity.time,
+                      location: activity.location,
+                    });
+                    return;
+                  }
+                  if (activity.type === 'audit') {
+                    navigate('/audit/wizard/farm');
+                    return;
+                  }
+                  if (activity.type === 'deadline') {
+                    navigate('/audits');
+                    return;
+                  }
+                  navigate('/schedule');
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (onEventPress) {
+                      onEventPress({
+                        id: activity.id,
+                        title: activity.title,
+                        type: activity.type,
+                        date: activity.date,
+                        time: activity.time,
+                        location: activity.location,
+                      });
+                      return;
+                    }
+                    if (activity.type === 'audit') {
+                      navigate('/audit/wizard/farm');
+                      return;
+                    }
+                    if (activity.type === 'deadline') {
+                      navigate('/audits');
+                      return;
+                    }
+                    navigate('/schedule');
+                  }
+                }}
+                tabIndex={0}
+                role="button"
                 className="nuru-vital-card rounded-[32px] p-8 flex flex-col relative overflow-hidden cursor-pointer group"
               >
                 <div className="flex gap-6">

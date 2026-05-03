@@ -18,7 +18,7 @@ import {
   getSyncQueueCount,
   type SyncQueueEntry,
 } from './offlineDb';
-import { audits as auditsApi, uploadYieldPhotosFromFormData } from './supabase';
+import { processSubmission } from './submissionService';
 import type { FarmAuditRow } from './supabase';
 
 type PendingCountListener = (count: number) => void;
@@ -57,6 +57,7 @@ export interface AuditSyncPayload {
   auditRow: Omit<FarmAuditRow, 'id' | 'created_at' | 'updated_at'>;
   existingAuditId?: string;
   formData: Record<string, unknown>;
+  auditClientId?: string;
 }
 
 export async function enqueueAuditSync(
@@ -130,21 +131,12 @@ async function processEntry(entry: SyncQueueEntry): Promise<void> {
   try {
     if (entry.type === 'create_and_submit_audit') {
       const p = entry.payload as unknown as AuditSyncPayload;
-
-      let auditId: string;
-      if (p.existingAuditId) {
-        await auditsApi.submit(p.existingAuditId);
-        auditId = p.existingAuditId;
-      } else {
-        const created = await auditsApi.create(p.auditRow);
-        await auditsApi.submit(created.id);
-        auditId = created.id;
-      }
-
-      const farmId = p.auditRow.farm_id;
-      if (farmId) {
-        await uploadYieldPhotosFromFormData(auditId, farmId, p.formData);
-      }
+      await processSubmission({
+        auditRow: p.auditRow,
+        existingAuditId: p.existingAuditId,
+        formData: p.formData,
+        auditClientId: p.auditClientId,
+      });
     }
 
     await deleteSyncEntry(entry.id);

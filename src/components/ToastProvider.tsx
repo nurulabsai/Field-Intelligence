@@ -61,6 +61,8 @@ const ToastItem: React.FC<{ toast: Toast; onDismiss: () => void }> = ({
         {t.message}
       </span>
       <button
+        type="button"
+        aria-label="Dismiss notification"
         onClick={() => {
           setIsExiting(true);
           setTimeout(onDismiss, 300);
@@ -81,7 +83,11 @@ const ToastProvider: React.FC<{ children?: React.ReactNode }> = ({ children }) =
   return (
     <>
       {children}
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 items-center pointer-events-none w-full max-w-[440px] px-4">
+      <div
+        className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 items-center pointer-events-none w-full max-w-[440px] px-4"
+        aria-live="polite"
+        aria-atomic="true"
+      >
         {toasts.map((t) => (
           <div key={t.id} className="pointer-events-auto w-full">
             <ToastItem toast={t} onDismiss={() => removeToast(t.id)} />
